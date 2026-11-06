@@ -160,8 +160,25 @@ Day to day, you use Terraform in a simple loop:
 There are a few supporting commands (`init`, `validate`, `fmt`, `destroy`) that
 you will learn in Chapter 3.
 
-The **plan** step is one of Terraform's biggest strengths. You see exactly what
-will happen *before* it happens — like a "preview" button for infrastructure.
+The **plan** step is one of Terraform's biggest strengths. You see what
+Terraform *intends* to do before it does it — like a "preview" button for
+infrastructure.
+
+> **Warning:** A plan is a prediction, not a guarantee. Terraform builds it
+> from your code, the state file, and what it reads from the cloud, but most
+> cloud-side checks only happen when a resource is actually created or
+> changed. So `terraform apply` can still fail after a clean plan, for
+> example because:
+>
+> * your account is **missing a permission** (an IAM role) for the change;
+> * a **quota** is exhausted (e.g. too many VMs or IP addresses in a region);
+> * a **name is already taken** (Cloud Storage bucket names are global);
+> * an **API isn't enabled** yet, or an organisation policy forbids the
+>   resource or region.
+>
+> If an apply fails halfway, the resources created so far stay and are
+> recorded in state. Fix the cause and run `terraform apply` again —
+> Terraform continues from where it stopped.
 
 ## 1.5 Multi-cloud, hybrid-cloud, and service-agnostic workflows `[1c]`
 

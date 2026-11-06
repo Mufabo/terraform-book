@@ -295,7 +295,9 @@ $ terraform apply tfplan
 When you apply a saved plan, Terraform does **not** ask for confirmation and
 does exactly what the plan says — nothing more. If anything changed in the
 meantime so the plan is stale, Terraform refuses to apply it. This is how
-CI/CD pipelines make sure that what was reviewed is what gets applied.
+CI/CD pipelines make sure that what was reviewed is what gets applied. (The
+apply can still *fail* — for example on a missing permission or a quota — as
+the warning in section 1.4 explains.)
 
 The plan file is binary. To read it:
 
