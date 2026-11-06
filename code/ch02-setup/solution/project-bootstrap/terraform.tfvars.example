@@ -1,0 +1,3 @@
+project_id      = "tf-book-yourname-12345"
+billing_account = "0X0X0X-0X0X0X-0X0X0X"
+# budget_currency = "EUR" # must match your billing account's currency
