@@ -1,0 +1,22 @@
+import "tfplan/v2" as tfplan
+
+required_labels = ["owner"]
+
+buckets = filter tfplan.resource_changes as _, rc {
+	rc.type is "google_storage_bucket" and
+	(rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+missing = filter buckets as address, rc {
+	any required_labels as label {
+		rc.change.after.labels is null or label not in keys(rc.change.after.labels)
+	}
+}
+
+for missing as address, _ {
+	print(address, "is missing one of the required labels", required_labels)
+}
+
+main = rule {
+	length(missing) is 0
+}

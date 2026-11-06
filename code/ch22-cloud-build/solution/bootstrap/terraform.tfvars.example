@@ -1,0 +1,4 @@
+project_id        = "your-project-id"
+github_owner      = "your-github-user"
+github_repository = "web-shop-infra"
+state_bucket      = "your-project-id-tfstate"

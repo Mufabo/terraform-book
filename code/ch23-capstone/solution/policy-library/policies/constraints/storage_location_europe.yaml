@@ -1,0 +1,15 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: TFStorageBucketLocationAllowlistConstraintV1
+metadata:
+  name: storage-location-europe
+spec:
+  severity: high
+  match:
+    addresses:
+      - "**"
+  parameters:
+    allowed_locations:
+      - EU
+      - EUROPE-WEST1
+      - EUROPE-WEST3
+      - EUROPE-WEST4

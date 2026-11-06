@@ -1,0 +1,5 @@
+# TODO (step 6): turn this into a constraint of kind GCPIAMBannedMembersConstraintV1
+# named "no-public-cloud-run" that bans allUsers and allAuthenticatedUsers on
+# asset type run.googleapis.com/Service. Then rename the file to .yaml.
+#
+# CAI-based constraints use `match.ancestries` instead of `match.addresses`.

@@ -1,0 +1,12 @@
+project_id  = "your-project-id"
+environment = "dev"
+
+labels = {
+  team = "platform"
+}
+
+network = {
+  name          = "web"
+  subnet_cidr   = "10.20.0.0/24"
+  allowed_ports = ["80", "443"]
+}

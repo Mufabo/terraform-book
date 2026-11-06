@@ -1,0 +1,19 @@
+project_id  = "your-project-id"
+environment = "dev"
+
+subnets = {
+  europe = { region = "europe-west1" }
+  us     = { region = "us-central1" }
+}
+
+firewall_rules = [
+  { protocol = "tcp", ports = ["80", "443"] },
+  { protocol = "icmp", ports = [] },
+]
+
+enable_ssh = false
+
+buckets = {
+  logs    = { location = "EU" }
+  backups = { location = "EU", storage_class = "NEARLINE" }
+}

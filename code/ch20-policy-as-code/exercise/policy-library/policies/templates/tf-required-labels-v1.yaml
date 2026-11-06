@@ -1,0 +1,49 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: tfrequiredlabelsconstraintv1
+spec:
+  crd:
+    spec:
+      names:
+        kind: TFRequiredLabelsConstraintV1
+      validation:
+        openAPIV3Schema:
+          properties:
+            resource_types:
+              description: Terraform resource types to check, e.g. google_storage_bucket.
+              type: array
+              items:
+                type: string
+            required_labels:
+              description: Label keys that must be present.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: validation.resourcechange.terraform.cloud.google.com
+      rego: |
+        package templates.gcp.TFRequiredLabelsConstraintV1
+
+        # TODO: write a violation rule that
+        #   1. binds resource := input.review
+        #   2. checks resource.type is one of input.parameters.resource_types
+        #   3. skips deletes (is_object(resource.change.after))
+        #   4. finds a key in input.parameters.required_labels that is missing
+        #      from get_labels(resource.change.after)
+        #   5. returns {"msg": message, "details": metadata}
+        # Look at tf-storage-bucket-location-allowlist-v1.yaml for the shape.
+        # The placeholder rule below never fires; replace it.
+        violation[{
+          "msg": message,
+          "details": metadata,
+        }] {
+          false
+          message := "placeholder"
+          metadata := {}
+        }
+
+        get_labels(after) = labels {
+          labels := after.labels
+          is_object(labels)
+        } else = {}

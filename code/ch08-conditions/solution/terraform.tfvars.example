@@ -1,0 +1,4 @@
+project_id   = "your-project-id"
+environment  = "dev"
+machine_type = "e2-micro"
+allowed_cidr = "0.0.0.0/0"

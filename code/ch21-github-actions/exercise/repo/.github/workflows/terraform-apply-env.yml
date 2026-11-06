@@ -1,0 +1,64 @@
+name: terraform-apply-env
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Environment to deploy (directory under infra/envs).
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    name: Apply (${{ inputs.environment }})
+    runs-on: ubuntu-24.04
+    # The GitHub environment holds the protection rules (e.g. required
+    # reviewers for prod) and puts "environment:<name>" into the OIDC token,
+    # which Google requires before allowing the apply service account.
+    # TODO: run this job in the GitHub environment named inputs.environment
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: infra/envs/${{ inputs.environment }}
+    env:
+      TF_VERSION: "1.17.0"
+      GCLOUD_VERSION: "591.0.0"
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: google-github-actions/auth@v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ inputs.environment == 'prod' && vars.GCP_APPLY_SA_PROD || vars.GCP_APPLY_SA_DEV }}
+
+      - uses: google-github-actions/setup-gcloud@v3.0.1
+        with:
+          version: ${{ env.GCLOUD_VERSION }}
+          install_components: beta,terraform-tools
+
+      - uses: hashicorp/setup-terraform@v4.0.1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform init
+        run: terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+
+      - name: terraform plan
+        run: terraform plan -lock-timeout=300s -out=tfplan
+
+      - name: Policy check (gcloud terraform vet)
+        run: |
+          terraform show -json tfplan > tfplan.json
+          gcloud beta terraform vet tfplan.json --policy-library="$GITHUB_WORKSPACE/policy-library"
+
+      - name: terraform apply
+        run: terraform apply -lock-timeout=300s tfplan

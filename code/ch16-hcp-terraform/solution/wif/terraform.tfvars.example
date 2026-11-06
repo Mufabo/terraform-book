@@ -1,0 +1,3 @@
+project_id       = "your-project-id"
+hcp_organization = "tf-book-yourname"
+hcp_workspace    = "ch16-app"

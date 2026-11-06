@@ -1,0 +1,141 @@
+name: terraform-pr
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "policy-library/**"
+      - ".github/workflows/terraform-*.yml"
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: "1.17.0"
+  TFLINT_VERSION: "0.65.0"
+  GCLOUD_VERSION: "591.0.0"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+
+jobs:
+  static:
+    name: Static checks and unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: hashicorp/setup-terraform@v4.0.1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive infra
+
+      - name: Install TFLint
+        run: |
+          curl -sSLo tflint.zip "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip"
+          unzip -q tflint.zip -d "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: tflint
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # avoids rate limits when downloading plugins
+        run: |
+          tflint --init --config "$GITHUB_WORKSPACE/.tflint.hcl"
+          tflint --recursive --config "$GITHUB_WORKSPACE/.tflint.hcl" --chdir infra
+
+      - name: Module unit tests (mocked, no credentials)
+        working-directory: infra/modules/web-app
+        run: |
+          terraform init -backend=false
+          terraform test -filter=tests/unit.tftest.hcl
+
+  plan:
+    name: Plan and vet (${{ matrix.environment }})
+    needs: static
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, prod]
+    permissions:
+      contents: read
+      id-token: write       # request the GitHub OIDC token
+      pull-requests: write  # comment the plan on the pull request
+    defaults:
+      run:
+        working-directory: infra/envs/${{ matrix.environment }}
+    env:
+      TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      # TODO: authenticate to Google Cloud with google-github-actions/auth@v3.0.0
+      # using vars.GCP_WIF_PROVIDER and vars.GCP_PLAN_SA (give the step id: auth)
+
+      - uses: google-github-actions/setup-gcloud@v3.0.1
+        with:
+          version: ${{ env.GCLOUD_VERSION }}
+          install_components: beta,terraform-tools
+
+      - uses: hashicorp/setup-terraform@v4.0.1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform init
+        run: terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+
+      - name: terraform validate
+        run: terraform validate
+
+      - name: terraform plan
+        id: plan
+        run: |
+          set +e
+          terraform plan -lock-timeout=120s -detailed-exitcode -out=tfplan -no-color > plan.txt
+          code=$?
+          cat plan.txt
+          echo "exitcode=$code" >> "$GITHUB_OUTPUT"
+          # 0 = no changes, 2 = changes, 1 = error
+          [ "$code" -ne 1 ]
+
+      - name: Policy check (gcloud terraform vet)
+        id: vet
+        run: |
+          # TODO: convert tfplan to JSON, run gcloud beta terraform vet with
+          # the policy library in $GITHUB_WORKSPACE/policy-library, write the
+          # exit code to $GITHUB_OUTPUT as "exitcode", and fail the step on
+          # violations (exit code 2) or errors (exit code 1).
+          echo "exitcode=1" >> "$GITHUB_OUTPUT"
+          exit 1
+
+      - name: Comment plan on the pull request
+        if: always() && steps.plan.outcome != 'skipped'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ENVIRONMENT: ${{ matrix.environment }}
+          PLAN_EXIT: ${{ steps.plan.outputs.exitcode }}
+          VET_EXIT: ${{ steps.vet.outputs.exitcode }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          case "$VET_EXIT" in
+            0) vet="✅ No policy violations" ;;
+            2) vet="❌ Policy violations found — see the job log" ;;
+            *) vet="⚠️ Policy check did not run successfully" ;;
+          esac
+          {
+            echo "### Terraform plan: \`$ENVIRONMENT\`"
+            echo
+            echo "**Policy check:** $vet"
+            echo
+            echo "<details><summary>Show plan (exit code $PLAN_EXIT)</summary>"
+            echo
+            echo '```'
+            tail -c 60000 plan.txt
+            echo '```'
+            echo "</details>"
+          } > comment.md
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file comment.md

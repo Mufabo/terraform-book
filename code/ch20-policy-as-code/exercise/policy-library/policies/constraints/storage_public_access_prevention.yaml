@@ -1,0 +1,10 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: TFStorageBucketPublicAccessPreventionConstraintV1
+metadata:
+  name: storage-public-access-prevention
+spec:
+  severity: high
+  match:
+    addresses:
+      - "**"
+  parameters: {}

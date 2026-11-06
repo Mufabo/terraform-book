@@ -1,0 +1,16 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: TFRequiredLabelsConstraintV1
+metadata:
+  name: required-labels
+spec:
+  severity: medium
+  match:
+    addresses:
+      - "**"
+  parameters:
+    resource_types:
+      - google_storage_bucket
+      - google_cloud_run_v2_service
+    required_labels:
+      - environment
+      - managed_by

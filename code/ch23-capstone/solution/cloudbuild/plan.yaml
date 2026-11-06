@@ -1,0 +1,71 @@
+# Runs on pull requests (trigger tf-plan-<env>): static checks, unit tests,
+# plan, and policy check for one environment. Substitutions come from the
+# trigger: _ENV, _STATE_BUCKET.
+
+substitutions:
+  _TF_IMAGE: hashicorp/terraform:1.17.0
+  _TFLINT_IMAGE: ghcr.io/terraform-linters/tflint:v0.65.0
+  _GCLOUD_IMAGE: gcr.io/google.com/cloudsdktool/google-cloud-cli:591.0.0-debian_component_based
+
+options:
+  logging: CLOUD_LOGGING_ONLY # required when a trigger uses its own service account
+  env:
+    - TF_IN_AUTOMATION=true
+    - TF_INPUT=false
+    - TF_VAR_project_id=$PROJECT_ID
+
+steps:
+  - id: fmt
+    name: $_TF_IMAGE
+    args: ["fmt", "-check", "-recursive", "infra"]
+
+  - id: tflint
+    name: $_TFLINT_IMAGE
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        tflint --init --config /workspace/.tflint.hcl
+        tflint --recursive --config /workspace/.tflint.hcl --chdir infra
+
+  - id: unit-tests
+    name: $_TF_IMAGE
+    dir: infra/modules/web-app
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        terraform init -backend=false
+        terraform test -filter=tests/unit.tftest.hcl
+
+  - id: init
+    name: $_TF_IMAGE
+    dir: infra/envs/${_ENV}
+    args: ["init", "-backend-config=bucket=${_STATE_BUCKET}"]
+
+  - id: validate
+    name: $_TF_IMAGE
+    dir: infra/envs/${_ENV}
+    args: ["validate"]
+
+  - id: plan
+    name: $_TF_IMAGE
+    dir: infra/envs/${_ENV}
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        terraform plan -lock-timeout=120s -out=tfplan
+        terraform show -json tfplan > tfplan.json
+
+  - id: vet
+    name: $_GCLOUD_IMAGE
+    dir: infra/envs/${_ENV}
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud components install terraform-tools --quiet
+        gcloud beta terraform vet tfplan.json --policy-library=/workspace/policy-library
+
+timeout: 1200s

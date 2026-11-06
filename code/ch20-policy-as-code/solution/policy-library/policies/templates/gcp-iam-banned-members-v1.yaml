@@ -1,0 +1,40 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: gcpiambannedmembersconstraintv1
+spec:
+  crd:
+    spec:
+      names:
+        kind: GCPIAMBannedMembersConstraintV1
+      validation:
+        openAPIV3Schema:
+          properties:
+            asset_types:
+              description: CAI asset types to check.
+              type: array
+              items:
+                type: string
+            banned_members:
+              description: IAM members that must not appear in any binding.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: validation.gcp.forsetisecurity.org
+      rego: |
+        package templates.gcp.GCPIAMBannedMembersConstraintV1
+
+        violation[{
+          "msg": message,
+          "details": metadata,
+        }] {
+          asset := input.review
+          asset.asset_type == input.parameters.asset_types[_]
+          binding := asset.iam_policy.bindings[_]
+          member := binding.members[_]
+          member == input.parameters.banned_members[_]
+
+          message := sprintf("%s grants %s to %s, which is not allowed", [asset.name, binding.role, member])
+          metadata := {"resource": asset.name, "role": binding.role, "member": member}
+        }

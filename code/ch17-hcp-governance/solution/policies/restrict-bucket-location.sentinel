@@ -1,0 +1,21 @@
+import "tfplan/v2" as tfplan
+import "strings"
+
+allowed_locations = ["EU", "EUROPE-WEST1", "EUROPE-WEST3", "EUROPE-WEST4"]
+
+buckets = filter tfplan.resource_changes as _, rc {
+	rc.type is "google_storage_bucket" and
+	(rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+violations = filter buckets as address, rc {
+	strings.to_upper(rc.change.after.location) not in allowed_locations
+}
+
+for violations as address, _ {
+	print(address, "is not in an allowed location", allowed_locations)
+}
+
+main = rule {
+	length(violations) is 0
+}

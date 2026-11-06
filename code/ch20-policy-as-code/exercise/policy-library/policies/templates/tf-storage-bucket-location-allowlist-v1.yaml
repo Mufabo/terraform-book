@@ -1,0 +1,35 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: tfstoragebucketlocationallowlistconstraintv1
+spec:
+  crd:
+    spec:
+      names:
+        kind: TFStorageBucketLocationAllowlistConstraintV1
+      validation:
+        openAPIV3Schema:
+          properties:
+            allowed_locations:
+              description: Bucket locations that are allowed, in upper case.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: validation.resourcechange.terraform.cloud.google.com
+      rego: |
+        package templates.gcp.TFStorageBucketLocationAllowlistConstraintV1
+
+        violation[{
+          "msg": message,
+          "details": metadata,
+        }] {
+          resource := input.review
+          resource.type == "google_storage_bucket"
+          location := upper(resource.change.after.location)
+          allowed := {upper(l) | l := input.parameters.allowed_locations[_]}
+          not allowed[location]
+
+          message := sprintf("%s: location %s is not allowed. Allowed: %v", [resource.address, location, input.parameters.allowed_locations])
+          metadata := {"resource": resource.address, "location": location}
+        }

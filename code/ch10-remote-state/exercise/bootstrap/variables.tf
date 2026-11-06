@@ -1,0 +1,16 @@
+variable "project_id" {
+  description = "Google Cloud project ID."
+  type        = string
+}
+
+variable "region" {
+  description = "Default region."
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "state_location" {
+  description = "Location of the state bucket."
+  type        = string
+  default     = "EU"
+}

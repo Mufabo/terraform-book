@@ -1,0 +1,43 @@
+# Runs on pushes to main (trigger tf-apply-<env>). For prod, the trigger
+# requires a manual approval before this build starts.
+
+substitutions:
+  _TF_IMAGE: hashicorp/terraform:1.17.0
+  _GCLOUD_IMAGE: gcr.io/google.com/cloudsdktool/google-cloud-cli:591.0.0-debian_component_based
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  env:
+    - TF_IN_AUTOMATION=true
+    - TF_INPUT=false
+    - TF_VAR_project_id=$PROJECT_ID
+
+steps:
+  - id: init
+    name: $_TF_IMAGE
+    dir: infra/envs/${_ENV}
+    args: ["init", "-backend-config=bucket=${_STATE_BUCKET}"]
+
+  - id: plan
+    name: $_TF_IMAGE
+    dir: infra/envs/${_ENV}
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        terraform plan -lock-timeout=300s -out=tfplan
+        terraform show -json tfplan > tfplan.json
+
+  - id: vet
+    name: $_GCLOUD_IMAGE
+    dir: infra/envs/${_ENV}
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud components install terraform-tools --quiet
+        gcloud beta terraform vet tfplan.json --policy-library=/workspace/policy-library
+
+  # TODO: add a step "apply" that applies the saved plan file tfplan
+
+timeout: 1800s
