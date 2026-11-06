@@ -109,7 +109,18 @@ directory must exist, constraint names are lowercase-with-hyphens, templates
 need an `openAPIV3Schema` (at least `properties: {}`), and the Rego rule must be
 named `violation` and read `input.review` / `input.parameters`.
 
-To render the book: `pandoc book/*.md -o terraform-on-google-cloud.pdf --toc`.
+## Building and releasing the book
+
+`epub/build.sh [OUTPUT] [VERSION]` builds the EPUB with pandoc 3.13 from
+`epub/metadata.yaml` plus `book/[0-9]*.md book/appendix-*.md` (file names
+define the order). `epub/links.lua` rewrites relative links to GitHub URLs
+(base from `REPO_URL`), because files outside `book/` aren't in the EPUB.
+Validate with `epubcheck <file>.epub`.
+
+`.github/workflows/release-book.yml` builds and runs EPUBCheck on PRs touching
+`book/` or `epub/`; pushing a `v*` tag also creates a GitHub release with the
+EPUB attached. Pandoc and EPUBCheck are pinned by version **and** SHA-256 in
+the workflow's `env`; update both when bumping.
 
 ## Status
 

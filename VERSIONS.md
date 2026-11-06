@@ -28,6 +28,8 @@ after newer releases come out.
 | Module `terraform-google-modules/network/google` | **18.3.1** | Chapter 12 |
 | Module `terraform-google-modules/cloud-storage/google` | **12.4.1** | Chapter 12 |
 | actionlint | **1.7.12** | Optional workflow linting |
+| pandoc | **3.13** | Building the EPUB (`epub/build.sh`, release workflow) |
+| EPUBCheck | **5.4.0** | Validating the EPUB (release workflow) |
 
 ## Why `~> 1.17.0` for Terraform but an exact pin for providers?
 

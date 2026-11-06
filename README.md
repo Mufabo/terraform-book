@@ -56,9 +56,21 @@ delete anything you forgot.
 
 ## Building the book (optional)
 
-The Markdown renders well on GitHub. To produce a single PDF or EPUB you can
-use [pandoc](https://pandoc.org/):
+The Markdown renders well on GitHub. Each
+[release](https://github.com/Mufabo/terraform-book/releases) also has the
+book as an EPUB.
+
+To build the EPUB yourself, install [pandoc](https://pandoc.org/) 3.13 and run:
 
 ```bash
-pandoc book/*.md -o terraform-on-google-cloud.pdf --toc
+epub/build.sh                      # writes terraform-on-google-cloud.epub
+```
+
+To publish a new release, push a version tag. The
+[Build and release book](.github/workflows/release-book.yml) workflow builds
+the EPUB, validates it with EPUBCheck, and attaches it to a GitHub release:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
 ```

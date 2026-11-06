@@ -1,0 +1,12 @@
+---
+title: Introduction to Terraform on Google Cloud
+subtitle: From Infrastructure as Code to CI/CD — and the Terraform Associate (004) exam
+author: Mufabo
+lang: en-US
+rights: All rights reserved.
+description: >
+  A hands-on book for absolute beginners: 23 one-hour lessons covering the
+  Terraform Associate (004) curriculum, multiple environments, testing,
+  policy as code, and CI/CD on Google Cloud.
+subject: Terraform; Google Cloud; Infrastructure as Code
+...
