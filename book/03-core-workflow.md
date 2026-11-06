@@ -117,6 +117,64 @@ This creates a **Cloud Storage bucket** — a container for files in the cloud.
 Bucket names are **globally unique** across all Google Cloud customers, so
 include your project ID in the name.
 
+Why does that help? A bucket name like `notes` is almost certainly taken by
+someone already, and `terraform apply` would fail with an error saying the
+name isn't available. Your project ID, however, is already unique: Google
+only let you create your project in section 2.4 because no one else in the
+world had that ID. Other people don't use your project ID in their bucket names,
+so `tf-book-fatih-12345-notes` is very unlikely to be taken. The suffix
+(`-notes`) then keeps it apart from your own other buckets.
+
+This is a naming convention, not a rule Google enforces: nothing stops a
+stranger from creating a bucket with your project ID in its name. In practice
+nobody does, which is why the convention is so widely used. (The one name
+format Google *does* protect is a domain name, such as `assets.example.com`:
+you must prove you own the domain before you can use it as a bucket name.)
+
+**Alternative: a random suffix.** Instead of the project ID, you can let
+Terraform generate a random suffix with the `random` provider. Add it to
+`versions.tf`:
+
+```hcl
+    random = {
+      source  = "hashicorp/random"
+      version = "3.9.1"
+    }
+```
+
+and use it in `main.tf`:
+
+```hcl
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+resource "google_storage_bucket" "notes" {
+  name                        = "notes-${random_id.suffix.hex}" # e.g. notes-8f3a1c2b
+  location                    = "EU"
+  uniform_bucket_level_access = true
+  force_destroy               = true
+}
+```
+
+`random_id` generates 4 random bytes, written as 8 hexadecimal characters:
+about 4 billion possible values, so a collision is extremely unlikely. The
+value is generated **once**, on the first `terraform apply`, and then stored
+in the state file; later runs reuse it, so the bucket name doesn't change
+every time. Run `terraform init` again after adding the provider.
+
+Which one to choose?
+
+* **Project ID:** readable, and you can tell from the name which project a
+  bucket belongs to. Best when one bucket per purpose and project is enough.
+* **Random suffix:** works when you need several similar buckets (for
+  example in many environments or in tests), and keeps the project ID out of
+  the name. The downside is that you can't guess the name; read it from
+  `terraform output` or the console.
+
+Chapter 4 covers the `random` provider in more detail. The rest of this
+chapter uses the project ID version.
+
 * `uniform_bucket_level_access = true` is the recommended, simpler
   permission model.
 * `force_destroy = true` lets Terraform delete the bucket even if it contains
