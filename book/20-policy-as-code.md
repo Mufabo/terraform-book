@@ -541,8 +541,10 @@ pipeline-style pass/fail.
    (public access prevention + labels). Run `./vet.sh` (default variables):
    exit code `0`, "No policy violations."
 8. **Scope a rule.** Change `required_labels.yaml` so it ignores the address
-   `google_storage_bucket.scratch` using `excludedAddresses`. Revert the labels
-   on `scratch` and confirm that only the public-access rule fires for it.
+   `google_storage_bucket.scratch` using `excludedAddresses` (a list under
+   `match`, next to `addresses`). Revert `scratch` to its original,
+   non-compliant form (remove both the labels and `public_access_prevention`)
+   and confirm that only the public-access rule fires for it.
 
 ### Expected result
 

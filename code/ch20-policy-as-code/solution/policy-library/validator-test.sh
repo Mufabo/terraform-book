@@ -4,5 +4,6 @@
 # It doesn't need Google Cloud credentials.
 #   usage: ./validator-test.sh path/to/tfplan.json
 set -euo pipefail
-TOOLS="$(dirname "$(command -v gcloud)")/terraform-tools"
+# Ask gcloud where it is installed; `command -v gcloud` may be a symlink.
+TOOLS="$(gcloud info --format='value(installation.sdk_root)')/bin/terraform-tools"
 "$TOOLS" validate-tfplan "${1:?plan json}" --policy-library="$(dirname "$0")"
