@@ -416,6 +416,12 @@ requirements in `code/ch22-capstone/exercise/README.md`, then compare with
 When you're finished with the book, delete everything:
 
 1. Destroy prod (set `deletion_protection = false` and apply first), then dev.
+   The first `destroy` usually stops at the subnet with
+   `resourceInUseByAnotherResource` on a `serverless-ipv4-cloudrun-...`
+   address: Cloud Run's Direct VPC egress reserves these addresses, and
+   Google releases them only some time after the service is deleted (allow
+   an hour or two). Run `terraform destroy` again later; everything except
+   the network is already gone.
 2. Destroy the bootstrap configurations (Chapters 16, 21, 22).
 3. Delete leftover resources from Appendix C's checklist.
 4. Optionally **shut down the whole learning project**:

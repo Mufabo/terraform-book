@@ -58,6 +58,10 @@ must be applied to every copy:
   `ch19-testing/solution/web-app`, and
   `ch21-github-actions/solution/repo/infra/modules/web-app`. The ch22 capstone
   version is an extended variant (VPC egress, `secret_env`).
+* `ch22-capstone/solution/bootstrap-github` is the ch21 `bootstrap/` except
+  for the pool ID (`web-shop-github`; deleted pool IDs stay reserved for 30
+  days). Apply identities bind to `attribute.environment`, because new GitHub
+  repos get immutable OIDC subjects with numeric IDs.
 * The ch20 `policy-library/` is copied into the ch21 repo and the ch22
   capstone. It bans `allUsers` on Cloud Run, so the ch21/ch22 envs set
   `public = false`.
@@ -130,6 +134,9 @@ the workflow's `env`; update both when bumping.
 ## Status
 
 All solution roots pass fmt/init/validate (except the ch17 consumer); unit
-tests pass offline. Nothing has been applied against a real GCP project yet,
-and the pipelines, HCP Terraform flows, integration tests, and vet's CAI path
-are untested live.
+tests pass offline. Chapters 2–15 and 18–22 were run live against a real
+project in November 2026, including the integration tests, vet's CAI path,
+and the ch21 GitHub Actions pipeline end to end (with a private repo, so the
+prod approval and branch ruleset were not exercised: GitHub Free only offers
+them for public repos). Untested live: HCP Terraform (ch16/17, only validated
+and the ch16 `wif/` planned) and the Sentinel policies.

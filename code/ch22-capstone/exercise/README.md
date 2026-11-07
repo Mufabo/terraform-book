@@ -61,3 +61,13 @@ Compare your result with `code/ch22-capstone/solution/` when you're done.
 
 Destroy prod (after disabling deletion protection), then dev, then the
 bootstrap configuration. Delete the secrets' leftover versions if any remain.
+
+The subnets can't be deleted until Google releases the
+`serverless-ipv4-cloudrun-...` addresses that Direct VPC egress reserved,
+some time after the Cloud Run services are gone. If `terraform destroy` stops
+with `resourceInUseByAnotherResource`, wait an hour or two and run it again.
+
+The reference solution's `bootstrap-github/` uses the pool ID
+`web-shop-github`, not Chapter 21's `github`: a deleted pool's ID stays
+reserved for 30 days. If your Chapter 21 bootstrap still exists, reuse it
+instead of applying a second one (both create the same service accounts).
