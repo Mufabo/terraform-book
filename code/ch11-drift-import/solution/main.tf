@@ -7,8 +7,7 @@ resource "google_storage_bucket" "site" {
   force_destroy               = true
 
   labels = {
-    team  = "web"
-    owner = "alice" # accepted drift (step 4)
+    team = "marketing" # was "web"; accepted drift (step 4)
   }
 }
 

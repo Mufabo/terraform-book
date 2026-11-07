@@ -35,22 +35,27 @@ last "terraform apply" which may have affected this plan:
   ~ resource "google_storage_bucket" "site" {
         id     = "tf-book-fatih-12345-ch11-site"
       ~ labels = {
-          + "owner" = "alice"
+          ~ "team" = "web" -> "marketing"
         }
     }
 ```
 
-followed by the plan to *undo* that change, because the configuration doesn't
-contain the label:
+followed by the plan to *undo* that change, because the configuration still
+says `team = "web"`:
 
 ```
   # google_storage_bucket.site will be updated in-place
   ~ resource "google_storage_bucket" "site" {
       ~ labels = {
-          - "owner" = "alice" -> null
+          ~ "team" = "marketing" -> "web"
         }
     }
 ```
+
+(The real output also lists `effective_labels` and `terraform_labels`; see
+Chapter 3.) As Chapter 8 showed, the Google provider only compares the labels
+in your configuration. A label that someone *adds* outside Terraform appears
+only under `effective_labels` in the drift note, and the plan doesn't undo it.
 
 ## 11.2 Detecting drift without changing anything: `-refresh-only`
 
@@ -387,7 +392,7 @@ refactor with `moved` and `removed` blocks.
    ```
 
 2. **Import with generated configuration.** Create `terraform.tfvars`. In
-   `imports.tf`, complete the `import` block for the `...-legacy-site` bucket,
+   `imports.tf`, uncomment and complete the `import` block for the `...-legacy-site` bucket,
    targeting `google_storage_bucket.site`. Do *not* write the resource block.
    Run `terraform init` and:
 
@@ -395,23 +400,33 @@ refactor with `moved` and `removed` blocks.
    $ terraform plan -generate-config-out=generated.tf
    ```
 
-   Open `generated.tf`. Tidy it up: keep `name`, `location`,
-   `storage_class`, `uniform_bucket_level_access`, `labels`,
-   `force_destroy = true`; delete attributes that are only defaults. Plan
-   again until it shows `1 to import, 0 to add, 0 to change`. Apply.
+   Open `generated.tf` and move its resource block to `main.tf`. Tidy it up:
+   keep `name`, `location`, `storage_class`, `uniform_bucket_level_access`,
+   and set `force_destroy = true`; delete attributes that are only defaults.
+   The generated `labels = {}` is empty because the provider only lists
+   labels that Terraform manages; write `labels = { team = "web" }` to take
+   over the bucket's existing label. In `token.tf`, you can now use
+   `google_storage_bucket.site.name`. Plan again until it shows
+   `1 to import, 2 to add, 1 to change`. The two additions are the token from
+   `token.tf`. The one change is the imported bucket: `force_destroy` is a
+   Terraform-only setting that import always records as `false`, and `team`
+   moves into `labels`. Neither changes the real bucket. Apply.
 3. **Legacy import command.** Write a resource block
    `google_storage_bucket.media` for the `...-legacy-media` bucket yourself,
    then import it with
    `terraform import google_storage_bucket.media <project-id>-legacy-media`.
-   Run `terraform plan` and fix differences until there are no changes.
-4. **Drift.** Change the site bucket behind Terraform's back:
+   Run `terraform plan` and fix differences until the only change left is
+   `force_destroy = false -> true` (Terraform-only, as in step 2). Apply it;
+   the next plan shows no changes.
+4. **Drift.** Change the site bucket's `team` label behind Terraform's back:
 
    ```console
-   $ gcloud storage buckets update gs://<project-id>-legacy-site --update-labels=owner=alice
+   $ gcloud storage buckets update gs://<project-id>-legacy-site --update-labels=team=marketing
    ```
 
-   Run `terraform plan -refresh-only`, then `terraform plan`. Decide to
-   *accept* the change: add the label to the code and plan again (no changes).
+   Run `terraform plan -refresh-only` (it shows `"web" -> "marketing"`), then
+   `terraform plan` (it proposes to change it back). Decide to *accept* the
+   change: set `team = "marketing"` in the code and plan again (no changes).
 5. **Replace.** Run `terraform plan -replace=random_id.token` and then apply
    it. Which other resources changed?
 6. **Moved.** Rename `google_storage_bucket.media` to
