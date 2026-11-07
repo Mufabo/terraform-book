@@ -328,6 +328,31 @@ $ gcloud services enable \
 This takes a minute or two. (In Chapter 5 you will learn to enable APIs with
 Terraform itself using the `google_project_service` resource.)
 
+> **Info: the `default` network.** Enabling `compute.googleapis.com` also
+> creates a network called `default`, with a subnet in every region and four
+> firewall rules. Three of them accept traffic from the whole internet
+> (`0.0.0.0/0`): `default-allow-ssh` (port 22), `default-allow-rdp` (port
+> 3389), and `default-allow-icmp` (ping). Any VM with a public IP address in
+> this network is reachable on those ports. List the rules with:
+>
+> ```console
+> $ gcloud compute firewall-rules list
+> ```
+>
+> Keep the network itself: Chapter 8 places a VM in it and opens only port 80
+> with its own rule. The three internet-facing rules aren't needed anywhere in
+> this book, so it's safer to delete them:
+>
+> ```console
+> $ gcloud compute firewall-rules delete default-allow-ssh default-allow-rdp default-allow-icmp
+> ```
+>
+> The fourth rule, `default-allow-internal`, only allows traffic between VMs
+> inside the network and can stay. In production, teams usually turn off the
+> automatic `default` network altogether (with the organization policy
+> `compute.skipDefaultNetworkCreation`) and create their own networks, as
+> Chapter 5 does.
+
 ### Alternative: enabling APIs with Terraform
 
 > **Note:** Like the alternative in section 2.4, skip this on your first read
