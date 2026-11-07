@@ -1,4 +1,4 @@
 provider "google" {
-  project = "TODO-your-project-id"
+  project = "TODO-your-project-id" # TODO (step 2): your project ID
   region  = "europe-west1"
 }

@@ -100,7 +100,9 @@ provider "google" {
 
 The provider block sets defaults used by all Google resources: which project
 and which region. Pick a region near you (for example `us-central1`,
-`europe-west1`, `asia-southeast1`).
+`europe-west1`, `asia-southeast1`). The default region applies to regional
+resources such as VMs; it does not decide where the bucket below lives. That
+is set by the bucket's own `location` argument.
 
 **`main.tf`**
 
@@ -114,6 +116,12 @@ resource "google_storage_bucket" "notes" {
 ```
 
 This creates a **Cloud Storage bucket** — a container for files in the cloud.
+
+* `uniform_bucket_level_access = true` is the recommended, simpler
+  permission model.
+* `force_destroy = true` lets Terraform delete the bucket even if it contains
+  files. Handy for learning; think twice before using it in production.
+
 Bucket names are **globally unique** across all Google Cloud customers, so
 include your project ID in the name.
 
@@ -169,16 +177,12 @@ Which one to choose?
   bucket belongs to. Best when one bucket per purpose and project is enough.
 * **Random suffix:** works when you need several similar buckets (for
   example in many environments or in tests), and keeps the project ID out of
-  the name. The downside is that you can't guess the name; read it from
-  `terraform output` or the console.
+  the name. The downside is that you can't guess the name; read it from the
+  `apply` output, `terraform state show google_storage_bucket.notes`, or the
+  console. (Chapter 6 shows how to print it with an output.)
 
 Chapter 4 covers the `random` provider in more detail. The rest of this
 chapter uses the project ID version.
-
-* `uniform_bucket_level_access = true` is the recommended, simpler
-  permission model.
-* `force_destroy = true` lets Terraform delete the bucket even if it contains
-  files. Handy for learning; think twice before using it in production.
 
 ## 3.3 `terraform init` — prepare the working directory `[3b]`
 
@@ -224,13 +228,15 @@ What goes into Git?
 | `.terraform/` | **No** — downloaded plugins, recreated by `init` |
 | `terraform.tfstate*` | **No** — may contain secrets (Chapter 9) |
 
-A typical `.gitignore`:
+A typical `.gitignore` (`tfplan` matches the plan file name used in this
+chapter; `*.tfplan` covers names like `prod.tfplan`):
 
 ```gitignore
 .terraform/
 *.tfstate
 *.tfstate.*
 crash.log
+tfplan
 *.tfplan
 override.tf
 override.tf.json
@@ -253,8 +259,9 @@ changed. Useful flags:
 |---|---|
 | `terraform fmt` | Format files in the current directory. |
 | `terraform fmt -recursive` | Also format sub-directories (modules). |
-| `terraform fmt -check` | Don't change anything; exit with an error if files need formatting. Perfect for CI. |
-| `terraform fmt -diff` | Show what would change. |
+| `terraform fmt -check` | Don't change anything; list the files that need formatting and exit with a non-zero code (3). Perfect for CI. |
+| `terraform fmt -diff` | Format the files **and** show the changes made. |
+| `terraform fmt -check -diff` | Show what would change without changing anything. |
 
 Formatting never changes the *meaning* of your code, only its layout.
 
@@ -351,8 +358,11 @@ $ terraform apply tfplan
 ```
 
 When you apply a saved plan, Terraform does **not** ask for confirmation and
-does exactly what the plan says — nothing more. If anything changed in the
-meantime so the plan is stale, Terraform refuses to apply it. This is how
+does exactly what the plan says — nothing more. If the **state** changed in
+the meantime (for example, someone else ran `apply`), the plan is *stale* and
+Terraform refuses to apply it. Changes made outside Terraform, such as an
+edit in the console, are not detected this way; they can make the apply fail
+or be silently overwritten. This is how
 CI/CD pipelines make sure that what was reviewed is what gets applied. (The
 apply can still *fail* — for example on a missing permission or a quota — as
 the warning in section 1.4 explains.)
@@ -494,7 +504,10 @@ Destroy complete! Resources: 1 destroyed.
 ```
 
 `destroy` removes **every resource managed by this configuration** (and only
-those — it never touches resources Terraform does not know about).
+those — it never touches resources Terraform does not know about). One
+exception to watch: with `force_destroy = true`, deleting a bucket also
+deletes every object in it, including files you uploaded by hand that
+Terraform never managed.
 `terraform destroy` is an alias for `terraform apply -destroy`. To preview it
 without destroying, use `terraform plan -destroy`.
 
@@ -518,16 +531,18 @@ exists but should be rare.
 
 > **Exam tip:** Know the order and purpose of each command. A favourite
 > question: "Which command(s) do NOT modify infrastructure?" Answer: `init`,
-> `fmt`, `validate`, `plan`, `show`, `output`, `state list`. Only `apply`,
-> `destroy`, and `import` (plus state-changing commands) change things.
+> `fmt`, `validate`, `plan`, `show`, `output`, `state list`, and also
+> `import`. Only `apply` and `destroy` change real infrastructure; `import`
+> and the `state` commands change the **state file** only (Chapters 9 and 11).
 
 ## Common mistakes and exam tips
 
 * **Typing `y` instead of `yes`** — Terraform cancels the apply.
 * **Skipping `init`** after adding a provider — you get "provider not
   installed" errors.
-* **Assuming `validate` checks the cloud** — it doesn't; only `plan`/`apply`
-  talk to the API.
+* **Assuming `validate` checks the cloud** — it doesn't; only commands that
+  read or change resources (`plan`, `apply`, `destroy`, `import`) talk to the
+  API.
 * **Not reading the plan** — especially lines saying `forces replacement`.
 * **Committing `terraform.tfstate` or `.terraform/` to Git.**
 * `terraform fmt -check` returns a non-zero exit code if formatting is needed;
@@ -568,14 +583,20 @@ Terraform workflow.
 ### Steps
 
 1. `cd code/ch03-core-workflow/exercise`.
-2. In `providers.tf`, replace `TODO-your-project-id` with your project ID.
-3. In `main.tf`, complete the `TODO`s to define a bucket named
+2. In `providers.tf`, replace `TODO-your-project-id` with your project ID
+   (`TODO (step 2)`).
+3. In `main.tf`, complete the `TODO (step 3)` items to define a bucket named
    `<your-project-id>-ch03` in location `EU` (or `US`) with uniform
    bucket-level access and `force_destroy = true`.
-4. The file is deliberately badly formatted. Run `terraform fmt -check`
-   (notice the exit code with `echo $?`), then `terraform fmt`, and open the
-   file to see what changed.
-5. Run `terraform init` and look at the generated `.terraform.lock.hcl`.
+4. The file is deliberately badly formatted. Run `terraform fmt -check -diff`
+   to preview the changes and check the exit code with `echo $?` (it prints
+   `3`, meaning "files need formatting"; `0` means all is well). Then run
+   `terraform fmt`, and open the file to see what changed.
+5. A copy of `.terraform.lock.hcl` is already in the folder, so `init` would
+   simply use it. To watch `init` create one, delete it first
+   (`rm .terraform.lock.hcl`), then run `terraform init` and open the new
+   file. Compare it with the copy in `../solution/`: the provider version
+   should be the same.
 6. Run `terraform validate`.
 7. Run `terraform plan -out=tfplan`, then `terraform show tfplan`, then
    `terraform apply tfplan`. Note that no confirmation was requested.
@@ -583,7 +604,10 @@ Terraform workflow.
 9. Add a label `environment = "learning"` and enable `versioning`. Plan and
    apply. Confirm the plan shows an **in-place update** (`~`).
 10. Change `storage_class` to `"NEARLINE"`. Is this an update or a
-    replacement? Apply it.
+    replacement? Apply it. (NEARLINE is cheaper for storage but has a 30-day
+    minimum storage charge; for one tiny file that is a fraction of a cent.
+    Note that changing the bucket's default class doesn't change the class of
+    objects already in it, such as `hello.txt`.)
 11. Run `terraform apply` once more and confirm "No changes".
 
 ### Expected result
@@ -601,9 +625,16 @@ script use them?
 
 ```console
 $ terraform destroy
+$ rm tfplan hello.txt
 ```
 
-Type `yes`. Confirm the bucket is gone with `gcloud storage buckets list`.
+Type `yes`. Thanks to `force_destroy = true`, the bucket is deleted together
+with `hello.txt` and its versions. Confirm the bucket is gone with
+`gcloud storage buckets list`. The `rm` removes the saved plan and the test
+file from your working folder.
+
+Answers to step 10 and the stretch goal are in
+`code/ch03-core-workflow/solution/answers.md`.
 
 ---
 
@@ -613,6 +644,7 @@ Type `yes`. Confirm the bucket is gone with `gcloud storage buckets list`.
    downloads modules.
 2. `terraform fmt -check` (often with `-recursive`).
 3. Terraform applies exactly that plan without asking for confirmation (and
-   refuses if the plan is stale).
+   refuses if the state has changed since the plan was made, i.e. the plan is
+   stale).
 4. The resource will be destroyed and then re-created (replaced).
 5. Yes.
