@@ -212,7 +212,10 @@ Terraform has been successfully initialized!
 3. **Downloads modules** if the configuration uses any (Chapter 12).
 
 You must re-run `init` whenever you add a provider or module, change a
-version constraint, or change the backend. It is always safe to run it again.
+version constraint, or change the backend. If a new version constraint no
+longer matches the version recorded in the lock file, plain `init` fails;
+run `terraform init -upgrade` instead (Chapter 4). It is always safe to run
+`init` again.
 
 > **Exam tip:** `terraform init` is the *first* command to run in a new or
 > freshly cloned working directory. Commands like `plan` fail with
@@ -287,7 +290,7 @@ $ terraform validate
 │ Error: Unsupported argument
 │
 │   on main.tf line 3, in resource "google_storage_bucket" "notes":
-│    3:   locaton  = "EU"
+│    3:   locaton                     = "EU"
 │
 │ An argument named "locaton" is not expected here. Did you mean "location"?
 ╵
@@ -308,6 +311,9 @@ Terraform will perform the following actions:
 
   # google_storage_bucket.notes will be created
   + resource "google_storage_bucket" "notes" {
+      + effective_labels            = {
+          + "goog-terraform-provisioned" = "true"
+        }
       + force_destroy               = true
       + id                          = (known after apply)
       + location                    = "EU"
@@ -315,6 +321,9 @@ Terraform will perform the following actions:
       + project                     = "tf-book-fatih-12345"
       + self_link                   = (known after apply)
       + storage_class               = "STANDARD"
+      + terraform_labels            = {
+          + "goog-terraform-provisioned" = "true"
+        }
       + uniform_bucket_level_access = true
       + url                         = (known after apply)
       ...
@@ -432,9 +441,15 @@ $ terraform apply
 google_storage_bucket.notes: Refreshing state... [id=tf-book-fatih-12345-notes]
 
 No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 ```
 
-Nothing to do — reality already matches the code.
+Nothing to do — reality already matches the code. (The "Apply complete!"
+line appears even when nothing changed; the counts tell you what happened.)
 
 ### Making a change
 
@@ -457,9 +472,17 @@ resource "google_storage_bucket" "notes" {
 $ terraform plan
   # google_storage_bucket.notes will be updated in-place
   ~ resource "google_storage_bucket" "notes" {
-        id     = "tf-book-fatih-12345-notes"
-      ~ labels = {
+      ~ effective_labels = {
+          + "course"                     = "terraform-book"
+            # (1 unchanged element hidden)
+        }
+        id               = "tf-book-fatih-12345-notes"
+      ~ labels           = {
           + "course" = "terraform-book"
+        }
+      ~ terraform_labels = {
+          + "course"                     = "terraform-book"
+            # (1 unchanged element hidden)
         }
         ...
     }
@@ -467,7 +490,22 @@ $ terraform plan
 Plan: 0 to add, 1 to change, 0 to destroy.
 ```
 
-The `~` means Terraform will update the existing bucket in place. Now change
+The `~` means Terraform will update the existing bucket in place.
+
+Why three label maps when you only wrote one? The Google provider tracks
+labels in three attributes:
+
+* `labels` — exactly what you wrote in your configuration.
+* `terraform_labels` — your labels plus the ones the provider adds itself. By
+  default it adds `goog-terraform-provisioned = "true"`, which marks the
+  resource as created by Terraform (the "1 unchanged element" above). You can
+  turn this off with `add_terraform_attribution_label = false` in the
+  provider block.
+* `effective_labels` — every label on the resource in Google Cloud, including
+  ones set outside Terraform.
+
+You only ever set `labels`; the other two are read-only and computed by the
+provider. Now change
 `location` from `"EU"` to `"US"` and plan again:
 
 ```console
@@ -541,8 +579,8 @@ exists but should be rare.
 * **Skipping `init`** after adding a provider — you get "provider not
   installed" errors.
 * **Assuming `validate` checks the cloud** — it doesn't; only commands that
-  read or change resources (`plan`, `apply`, `destroy`, `import`) talk to the
-  API.
+  read or change resources (`plan`, `apply`, `destroy`, `import`,
+  `refresh`) talk to the API.
 * **Not reading the plan** — especially lines saying `forces replacement`.
 * **Committing `terraform.tfstate` or `.terraform/` to Git.**
 * `terraform fmt -check` returns a non-zero exit code if formatting is needed;
@@ -604,10 +642,10 @@ Terraform workflow.
 9. Add a label `environment = "learning"` and enable `versioning`. Plan and
    apply. Confirm the plan shows an **in-place update** (`~`).
 10. Change `storage_class` to `"NEARLINE"`. Is this an update or a
-    replacement? Apply it. (NEARLINE is cheaper for storage but has a 30-day
-    minimum storage charge; for one tiny file that is a fraction of a cent.
-    Note that changing the bucket's default class doesn't change the class of
-    objects already in it, such as `hello.txt`.)
+    replacement? Apply it. (Changing the bucket's default class doesn't change
+    the class of objects already in it: `hello.txt` stays STANDARD. Files
+    uploaded from now on are NEARLINE, which is cheaper to store but has a
+    30-day minimum storage charge.)
 11. Run `terraform apply` once more and confirm "No changes".
 
 ### Expected result
@@ -629,7 +667,7 @@ $ rm tfplan hello.txt
 ```
 
 Type `yes`. Thanks to `force_destroy = true`, the bucket is deleted together
-with `hello.txt` and its versions. Confirm the bucket is gone with
+with `hello.txt`. Confirm the bucket is gone with
 `gcloud storage buckets list`. The `rm` removes the saved plan and the test
 file from your working folder.
 
