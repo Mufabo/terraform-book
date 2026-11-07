@@ -1,42 +1,42 @@
-# TODO: enable the Compute Engine API (compute.googleapis.com) with a
+# TODO (step 2): enable the Compute Engine API (compute.googleapis.com) with a
 # google_project_service resource named "compute". Set disable_on_destroy = false.
 
 resource "google_compute_network" "web" {
   name                    = "ch05-network"
   auto_create_subnetworks = false
 
-  # TODO: add depends_on so the API is enabled first
+  # TODO (step 2): add depends_on so the API is enabled first
 }
 
 resource "google_compute_subnetwork" "web" {
   name          = "ch05-subnet"
   ip_cidr_range = "10.10.0.0/24"
   region        = "europe-west1"
-  network       = "TODO" # TODO: reference the network's id (no quotes!)
+  network       = "TODO" # TODO (step 2): reference the network's id (no quotes!)
 }
 
-# TODO: create google_compute_firewall "allow_http" allowing TCP 80 from
+# TODO (step 2): create google_compute_firewall "allow_http" allowing TCP 80 from
 # 0.0.0.0/0 to instances tagged "web"
 
-# TODO: data source google_compute_image "debian" (family debian-12, project debian-cloud)
+# TODO (step 2): data source google_compute_image "debian" (family debian-12, project debian-cloud)
 
-# TODO: data source google_compute_zones "available" for region europe-west1
+# TODO (step 2): data source google_compute_zones "available" for region europe-west1
 # (it also needs the Compute API, so add depends_on)
 
 resource "google_compute_instance" "web" {
   name         = "ch05-web"
   machine_type = "e2-micro"
-  zone         = "TODO" # TODO: first zone from the zones data source
+  zone         = "TODO" # TODO (step 2): first zone from the zones data source
   tags         = ["web"]
 
   boot_disk {
     initialize_params {
-      image = "TODO" # TODO: self_link of the debian image data source
+      image = "TODO" # TODO (step 2): self_link of the debian image data source
     }
   }
 
   network_interface {
-    subnetwork = "TODO" # TODO: reference the subnet's id
+    subnetwork = "TODO" # TODO (step 2): reference the subnet's id
     access_config {}
   }
 

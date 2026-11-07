@@ -48,6 +48,9 @@ Besides the provider-specific arguments, every resource accepts a few
 | `for_each` | Create several instances from a map or set | 7 |
 | `lifecycle` | Customise create/update/destroy behaviour | 8 |
 
+`data` blocks (section 5.5) accept the same meta-arguments, though
+`lifecycle` supports only `precondition` and `postcondition` there.
+
 ## 5.2 Referencing attributes `[4b]`
 
 To use an attribute of one resource in another, write a **reference
@@ -76,7 +79,10 @@ Nested blocks are accessed like lists. For a VM's external IP:
 google_compute_instance.web.network_interface[0].access_config[0].nat_ip
 ```
 
-`network_interface` is a list of blocks; `[0]` picks the first one.
+`network_interface` is a list of blocks; `[0]` picks the first one. (Some
+nested blocks are *sets* instead, which have no order and can't be indexed.
+The provider docs don't always say which is which. If `[0]` gives an error,
+the block is a set.)
 
 ## 5.3 Implicit dependencies and the graph `[4f]`
 
@@ -136,9 +142,12 @@ Rules for `depends_on`:
 
 * Its value is a **list of references** (no quotes): `[google_project_service.compute]`.
 * You can depend on a whole resource or a module, not on a single attribute.
-* Use it **only when necessary** and add a comment explaining why. Excess
-  `depends_on` makes plans more conservative (more values become
-  "known after apply") and slows things down.
+* `data` blocks accept `depends_on` too (section 5.6 uses it).
+* Use it **only when necessary** and add a comment explaining why. Too many
+  `depends_on` entries add ordering that isn't needed, so less runs in
+  parallel. On a data source it also costs something at plan time: if anything
+  it depends on has pending changes, Terraform waits until the apply to read
+  it, so its values become "known after apply" (section 5.5).
 
 > **Exam tip:** "Terraform can't infer a dependency because there is no
 > reference — what do you use?" → `depends_on`. "Which is preferred, implicit
@@ -180,11 +189,31 @@ boot_disk {
 | Changes infrastructure? | Yes | Never |
 | Deleted by `destroy`? | Yes | No (nothing to delete) |
 | Reference syntax | `TYPE.NAME.ATTR` | `data.TYPE.NAME.ATTR` |
-| Plan symbol | `+`, `~`, `-` | `<=` (read) |
+| Plan symbol | `+`, `~`, `-`, `-/+` | `<=` (read during apply) |
 
-Data sources are usually read during `plan`. If a data source depends on a
-value that is only known after apply, Terraform defers reading it until the
-apply.
+Data sources are usually read during `plan` (and `refresh`). A data source
+read during plan doesn't appear in the plan's list of changes, only as
+`Reading...` / `Read complete` lines in the progress output. Terraform
+**defers** the read until the apply in two cases:
+
+* one of its arguments is only known after apply, or
+* it has `depends_on` on a resource or module that has pending changes.
+
+Only deferred reads show up in the plan, with the `<=` symbol:
+
+```
+  # data.google_compute_zones.available will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "google_compute_zones" "available" {
+      + id      = (known after apply)
+      + names   = (known after apply)
+      + project = (known after apply)
+      + region  = "europe-west1"
+    }
+```
+
+Anything that uses the data source's values is then "known after apply" as
+well.
 
 ### Useful Google data sources
 
@@ -294,7 +323,16 @@ A few new things:
 
 * `<<-EOT ... EOT` is a **heredoc**: a multi-line string. The `-` strips
   leading indentation.
-* `metadata_startup_script` runs the script when the VM boots.
+* `metadata_startup_script` runs the script every time the VM boots.
+  Changing it forces Terraform to replace the VM.
+* You already enabled the Compute Engine API with `gcloud` in Chapter 2.
+  `google_project_service` adopts an API that is already enabled, so the plan
+  still shows it as `+ create`. With `disable_on_destroy = false`, `destroy`
+  removes it from state but leaves the API enabled.
+* The zones data source has `depends_on` on the API. On the first plan, the API
+  resource is still to be created, so Terraform waits until the apply to read
+  the zones (section 5.5), and the VM's `zone` shows as `(known after apply)`.
+  The image data source has no dependencies, so Terraform reads it during plan.
 * `output` prints a value after `apply` (Chapter 6 covers outputs).
 
 The dependency graph:
@@ -370,18 +408,21 @@ using data sources and both implicit and explicit dependencies.
 
 1. `cd code/ch05-resources-data/exercise` and set your project ID in
    `providers.tf`.
-2. Complete the `TODO`s in `main.tf`:
+2. Complete the `TODO (step 2)`s in `main.tf`:
    * Enable `compute.googleapis.com` with `google_project_service`.
    * Create the network with `depends_on` on the API.
    * Create the subnet and firewall rule, referencing the network.
    * Add the `google_compute_image` and `google_compute_zones` data sources.
    * Create the VM using the data sources and the subnet.
 3. Run `terraform init`, `terraform validate`, and `terraform plan`. In the
-   plan, find the `<=` read actions and the `(known after apply)` values.
+   plan, find the one `<=` read (the zones data source, deferred because of
+   its `depends_on`) and the `(known after apply)` values. The image data
+   source doesn't appear in the plan; look for its `Read complete` line in the
+   output above the plan instead.
 4. Run `terraform apply`. Notice in the output which resources are created in
    parallel.
-5. Wait a minute for the startup script, then open the `web_url` output in a
-   browser. You should see "Hello from Terraform".
+5. Wait a minute or two for the startup script, then open the `web_url`
+   output (`terraform output web_url`) in a browser. You should see "Hello from Terraform".
 6. Run `terraform graph` and paste the output into
    <https://dreampuf.github.io/GraphvizOnline> (or use `dot` locally) to see
    the graph.
@@ -408,9 +449,13 @@ Identity-Aware Proxy range `35.235.240.0/20`, then connect with
 $ terraform destroy
 ```
 
-> **Cost note:** An `e2-micro` VM is in the free tier in some US regions
-> (`us-west1`, `us-central1`, `us-east1`). Elsewhere it costs a few cents per
-> hour. Always destroy when finished.
+The Compute Engine API stays enabled (`disable_on_destroy = false`). Later
+chapters need it.
+
+> **Cost note:** One `e2-micro` VM is in the free tier in some US regions
+> (`us-west1`, `us-central1`, `us-east1`). Elsewhere it costs around a cent an
+> hour, plus a small charge for its external IP address and boot disk. Always
+> destroy when finished.
 
 ---
 
