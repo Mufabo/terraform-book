@@ -10,7 +10,7 @@ By the end of this lesson you will be able to:
 * Explain how Terraform manages multi-cloud, hybrid-cloud, and
   service-agnostic workflows. `[1c]`
 * Describe the main building blocks of Terraform: configuration, providers,
-  state, and the core workflow. `[1c]`
+  state, and the core workflow. `[1c]` `[3a]`
 
 ---
 
@@ -31,7 +31,9 @@ open on port 80 or 8080? Which machine type did we choose? Someone takes
 screenshots, someone else writes a wiki page, and the two environments slowly
 become different. This is called **configuration drift**, and environments
 that cannot be recreated reliably are sometimes called **snowflakes** —
-unique, fragile, and impossible to reproduce.
+unique, fragile, and impossible to reproduce. (Later, in Chapter 11, you will
+meet drift in a narrower sense: real resources that no longer match your
+Terraform code, and how Terraform detects it.)
 
 Clicking ("ClickOps") has more problems:
 
@@ -64,7 +66,7 @@ just text, you can treat it exactly like application code.
 | Advantage | What it means in practice |
 |---|---|
 | **Repeatability / consistency** | Run the same code to get identical dev, staging, and prod environments. |
-| **Version control** | Store the code in Git. Every change has an author, a date, and a reason (the commit message). You can roll back. |
+| **Version control** | Store the code in Git. Every change has an author, a date, and a reason (the commit message). You can return to an earlier version of the code and apply it again — though that does not bring back data in resources that were deleted. |
 | **Code review** | Changes go through pull requests; colleagues review them before they reach production. |
 | **Automation** | A CI/CD pipeline can apply changes without humans clicking. |
 | **Speed** | Create a whole environment in minutes, destroy it when finished. |
@@ -114,7 +116,7 @@ out *how*.
 
 ## 1.4 What is Terraform?
 
-**Terraform** is an open-source-licensed IaC tool created by **HashiCorp**
+**Terraform** is a source-available IaC tool created by **HashiCorp**
 (now part of IBM). You write configuration in the **HashiCorp Configuration
 Language (HCL)**, a simple, human-friendly language. Terraform then talks to
 cloud and service APIs to create, change, and delete resources.
@@ -127,12 +129,13 @@ cloud and service APIs to create, change, and delete resources.
 ### The building blocks
 
 ```
- ┌──────────────────────┐      ┌───────────────┐      ┌───────────────────┐
- │  Your configuration  │      │   Terraform   │      │   Provider plugin │      Cloud APIs
- │   (*.tf files, HCL)  │ ───▶ │     Core      │ ───▶ │  (e.g. google)    │ ───▶ (Google Cloud)
- └──────────────────────┘      └──────┬────────┘      └───────────────────┘
-                                      │
-                                      ▼
+ ┌──────────────────────┐      ┌───────────────┐      ┌───────────────────┐      ┌───────────────┐
+ │  Your configuration  │      │   Terraform   │      │   Provider plugin │      │  Cloud APIs   │
+ │   (*.tf files, HCL)  │ ───▶ │     Core      │ ◀──▶ │  (e.g. google)    │ ◀──▶ │ (Google Cloud)│
+ └──────────────────────┘      └───────────────┘      └───────────────────┘      └───────────────┘
+                                     ▲   │
+                               reads │   │ writes
+                                     │   ▼
                               ┌───────────────┐
                               │     State     │  (what Terraform has created)
                               └───────────────┘
@@ -178,7 +181,9 @@ infrastructure.
 >
 > If an apply fails halfway, the resources created so far stay and are
 > recorded in state. Fix the cause and run `terraform apply` again —
-> Terraform continues from where it stopped.
+> Terraform continues from where it stopped. One exception: a resource whose
+> creation started but did not finish is marked **tainted**, and the next
+> apply destroys and recreates it rather than resuming.
 
 ## 1.5 Multi-cloud, hybrid-cloud, and service-agnostic workflows `[1c]`
 
@@ -192,8 +197,8 @@ Many organisations use more than one platform:
   DNS records, PagerDuty schedules, Okta users.
 
 Each platform has its own console, CLI, and native IaC tool (Google Cloud has
-Infrastructure Manager and Deployment Manager, AWS has CloudFormation, Azure
-has Bicep). Learning all of them is expensive.
+Infrastructure Manager, which replaced the retired Deployment Manager; AWS has
+CloudFormation; Azure has Bicep). Learning all of them is expensive.
 
 Terraform solves this with its **provider** architecture. The *workflow and
 language are the same* no matter which platform you target; only the
@@ -201,13 +206,17 @@ provider and resource types differ. One configuration can even use several
 providers at once:
 
 ```hcl
-# A Google Cloud bucket...
+# A Google Cloud bucket that serves a static website. For a CNAME to reach
+# it, the bucket name must be exactly the hostname (and you must have
+# verified that you own the domain).
 resource "google_storage_bucket" "site" {
-  name     = "acme-website"
+  name     = "www.example.com"
   location = "EU"
 }
 
 # ...and a DNS record at Cloudflare pointing to it, in the same configuration.
+# (The Cloudflare provider is published as cloudflare/cloudflare, so a real
+# configuration also lists it in required_providers — see Chapter 4.)
 resource "cloudflare_dns_record" "www" {
   zone_id = var.zone_id
   name    = "www"
@@ -310,7 +319,7 @@ install anything. (You will install the tools in the next chapter.)
    environment called `staging`?
 3. Write down the clicks you would need to perform in the Google Cloud console
    to create the same infrastructure by hand. Compare the effort with the
-   ~40 lines of code.
+   roughly 40 lines of resource blocks.
 4. **Reflection:** Write two or three sentences on how you would explain IaC
    to a colleague who has only ever used the console.
 
@@ -318,6 +327,14 @@ install anything. (You will install the tools in the next chapter.)
 
 You can identify the four resources, the dependencies between them, and the
 values you would change for a new environment.
+
+### Stretch goal
+
+Sketch, on paper or in a copy of `main.tf`, a fifth resource: a Cloud Storage
+bucket for uploaded images (`google_storage_bucket`, location `EU`). Then add a
+second VM. Which existing resources does each new resource depend on, and
+which values in the VM block would you have to change so the two VMs don't
+clash?
 
 ### Check your answers
 

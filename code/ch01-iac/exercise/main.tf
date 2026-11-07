@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "google" {
-  project = "my-project-id"
+  project = "tf-book-fatih-12345"
   region  = "europe-west1"
 }
 

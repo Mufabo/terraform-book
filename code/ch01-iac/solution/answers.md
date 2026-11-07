@@ -19,3 +19,13 @@
    steps to create them. Terraform works out the order from the references.
 10. Roughly 30–50 clicks and form fields — and you would need to repeat them
     exactly for every environment.
+
+## Stretch goal
+
+* A bucket has no references to the other resources, so it depends on nothing
+  and Terraform can create it in parallel with the network. Its name must be
+  globally unique.
+* A second VM depends on the subnet (and through it on the network), just like
+  the first. Its block label (e.g. `google_compute_instance.web2`) and its
+  `name` must differ from the first VM's; it can share the zone, subnet, and
+  `web` tag, so the existing firewall rule applies to it too.
