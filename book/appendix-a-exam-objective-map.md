@@ -94,5 +94,4 @@ practice:
 | Testing (`terraform test`, mocks, TFLint, pre-commit) | 19 |
 | Policy as code with `gcloud terraform vet` | 20 |
 | CI/CD with GitHub Actions and Workload Identity Federation | 21 |
-| CI/CD with Google Cloud Build | 22 |
-| Capstone project | 23 |
+| Capstone project | 22 |

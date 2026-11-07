@@ -211,7 +211,7 @@ $ terraform init -backend-config="bucket=acme-dev-tfstate" -backend-config="pref
 ```
 
 This is the standard technique for multiple environments and CI/CD
-(Chapters 18 – 22).
+(Chapters 18 – 21).
 
 > **Security tip:** Don't put credentials into backend configuration files.
 > The `gcs` backend picks up ADC or Workload Identity Federation credentials

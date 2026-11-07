@@ -312,7 +312,6 @@ Terraform also needs credentials to call Google Cloud. Best practices:
 |---|---|---|
 | Your laptop | Application Default Credentials (`gcloud auth application-default login`) | Downloaded key files |
 | GitHub Actions / GitLab CI | **Workload Identity Federation** (OIDC, Chapter 21) | Key file in CI secrets |
-| Cloud Build | The build's **service account** (Chapter 22) | Key files |
 | HCP Terraform | **Dynamic provider credentials** (OIDC, Chapter 16) | Key file in a workspace variable |
 | Need to act as another account | Service account **impersonation** (`impersonate_service_account` in the provider) | Sharing keys |
 

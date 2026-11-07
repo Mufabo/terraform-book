@@ -1,10 +1,10 @@
 # Capstone — web-shop platform
 
 Build the complete web-shop infrastructure on your own, reusing what you
-wrote in Chapters 18–22. Start from your Chapter 21 repository (or copy
+wrote in Chapters 18–21. Start from your Chapter 21 repository (or copy
 `code/ch21-github-actions/solution/repo`).
 
-Compare your result with `code/ch23-capstone/solution/` when you're done.
+Compare your result with `code/ch22-capstone/solution/` when you're done.
 
 ## Requirements
 
@@ -45,13 +45,12 @@ Compare your result with `code/ch23-capstone/solution/` when you're done.
 
 ### Delivery
 
-9. Deploy via **one** of the pipelines:
-   * GitHub Actions (Chapter 21): PR checks + plan comments, dev auto-apply,
-     prod behind a required reviewer; or
-   * Cloud Build (Chapter 22): plan triggers on PRs, apply triggers on main,
-     prod approval.
+9. Deploy with GitHub Actions (Chapter 21): PR checks + plan comments, dev
+   auto-apply, prod behind a required reviewer (needs a public repository,
+   or a paid plan for a private one).
 10. Prove it works: open a PR that changes `max_instances`, show the plans,
-    merge, approve prod, and open both service URLs.
+    merge, approve prod, and call both service URLs with an identity token
+    (the services are private; the policy library bans `allUsers`).
 
 ### Documentation
 

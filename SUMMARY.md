@@ -40,8 +40,7 @@
 * [19. Testing Terraform Code](book/19-testing.md)
 * [20. Policy as Code with gcloud terraform vet](book/20-policy-as-code.md)
 * [21. CI/CD with GitHub Actions](book/21-cicd-github-actions.md)
-* [22. CI/CD with Google Cloud Build](book/22-cicd-cloud-build.md)
-* [23. Capstone Project and Exam Preparation](book/23-capstone-exam-prep.md)
+* [22. Capstone Project and Exam Preparation](book/22-capstone-exam-prep.md)
 
 ## Appendices
 

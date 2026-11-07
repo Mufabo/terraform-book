@@ -320,7 +320,6 @@ $ gcloud services enable \
     secretmanager.googleapis.com \
     run.googleapis.com \
     artifactregistry.googleapis.com \
-    cloudbuild.googleapis.com \
     iamcredentials.googleapis.com \
     sts.googleapis.com
 ```
@@ -359,7 +358,7 @@ Terraform itself using the `google_project_service` resource.)
 > and use the `gcloud` command above.
 
 The `project-bootstrap` configuration from section 2.4 also enables these
-APIs. One `google_project_service` resource per API would mean ten nearly
+APIs. One `google_project_service` resource per API would mean nine nearly
 identical blocks, so it uses `for_each` (Chapter 7) to create one for each
 entry in a set:
 

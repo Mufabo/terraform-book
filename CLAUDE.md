@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-A beginner book, *Introduction to Terraform on Google Cloud*: 23 one-hour
+A beginner book, *Introduction to Terraform on Google Cloud*: 22 one-hour
 lessons plus appendices in `book/` (Markdown), and runnable Terraform for every
 chapter in `code/`. It must cover the full Terraform Associate (004) exam, plus
 multiple environments, testing, policy as code (`gcloud beta terraform vet`),
-and CI/CD (GitHub Actions and Cloud Build). `SUMMARY.md` is the table of
+and CI/CD (GitHub Actions). `SUMMARY.md` is the table of
 contents (mdBook/MkDocs style).
 
 ## Versions are a hard constraint
@@ -22,8 +22,8 @@ contents (mdBook/MkDocs style).
 * Root modules commit `.terraform.lock.hcl`; exercise directories carry a copy
   of the matching solution's lock file.
 * If a version changes, update `VERSIONS.md`, every `versions.tf`, workflows,
-  `cloudbuild/*.yaml`, `.tflint.hcl`, `.pre-commit-config.yaml`, and the
-  chapter text, then regenerate lock files.
+  `.tflint.hcl`, `.pre-commit-config.yaml`, and the chapter text, then
+  regenerate lock files.
 * The exam targets Terraform 1.12; features newer than that are marked
   **"Newer than the exam"** in the text.
 
@@ -55,16 +55,18 @@ Code that is shared across chapters is **copied**, not referenced, so a change
 must be applied to every copy:
 
 * `web-app` module: identical in `ch18-environments/solution/modules/web-app`,
-  `ch19-testing/solution/web-app`, `ch21-github-actions/solution/repo/infra/modules/web-app`,
-  and `ch22-cloud-build/solution/repo/infra/modules/web-app`. The ch23 capstone
+  `ch19-testing/solution/web-app`, and
+  `ch21-github-actions/solution/repo/infra/modules/web-app`. The ch22 capstone
   version is an extended variant (VPC egress, `secret_env`).
-* `infra/` is identical between ch21 and ch22 `repo/`.
-* The ch20 `policy-library/` is copied into the ch21/ch22/ch23 repos.
+* The ch20 `policy-library/` is copied into the ch21 repo and the ch22
+  capstone. It bans `allUsers` on Cloud Run, so the ch21/ch22 envs set
+  `public = false`.
 
 Multi-root chapters have an apply order: ch10 `bootstrap` → `network` → `app`
-(app reads network outputs via `terraform_remote_state`); ch16/21/22 run a
-`bootstrap/` (WIF pool, service accounts, triggers) before the pipeline repo;
-ch18 `envs/dev|prod` use gcs prefix `envs/<env>`.
+(app reads network outputs via `terraform_remote_state`); ch16/21 run a
+`bootstrap/` (WIF pool, service accounts) and the ch22 capstone a
+`bootstrap-github/` before the pipeline repo; ch18 `envs/dev|prod` use gcs
+prefix `envs/<env>`.
 
 Expected failures, not bugs:
 
@@ -89,7 +91,7 @@ terraform validate
 Mocked unit tests (offline, `mock_provider`):
 
 ```bash
-cd code/ch19-testing/solution/web-app            # or ch23-capstone/solution/infra/modules/web-app
+cd code/ch19-testing/solution/web-app            # or ch22-capstone/solution/infra/modules/web-app
 terraform init -backend=false
 terraform test -filter=tests/unit.tftest.hcl     # single file; integration.tftest.hcl needs a real project
 ```
@@ -98,8 +100,11 @@ Lint (TFLint 0.65.0 with the google ruleset from the directory's `.tflint.hcl`):
 
 ```bash
 tflint --init && tflint --recursive
-actionlint code/ch21-github-actions/solution/repo/.github/workflows/*.yml
 ```
+
+actionlint (1.7.12) resolves `uses: ./.github/workflows/...` relative to the
+Git root, so run it in a copy of `repo/` that is its own repository:
+`cp -r code/ch21-github-actions/solution/repo/.github /tmp/x/ && cd /tmp/x && git init -q && actionlint`.
 
 Policy as code (ch20): `./vet.sh [CONFIG_DIR] [POLICY_LIBRARY]` plans, converts
 to JSON and runs `gcloud beta terraform vet` (needs the `terraform-tools`

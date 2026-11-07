@@ -151,4 +151,3 @@ Environment variables: `TF_TOKEN_app_terraform_io`, `TF_CLOUD_ORGANIZATION`,
 | `gcloud components install terraform-tools` | Install `terraform vet` |
 | `gcloud beta terraform vet tfplan.json --policy-library=DIR` | Policy check (exit 2 = violations) |
 | `gcloud storage ls -r gs://BUCKET/` | Inspect a state bucket |
-| `gcloud builds approve BUILD_ID` | Approve a Cloud Build build |

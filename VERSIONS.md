@@ -11,7 +11,7 @@ after newer releases come out.
 | Provider `hashicorp/google` | **8.9.0** | `version = "8.9.0"` in `required_providers` |
 | Provider `hashicorp/google-beta` | **8.9.0** | `version = "8.9.0"` (Chapter 4 only) |
 | Provider `hashicorp/random` | **3.9.1** | `version = "3.9.1"` |
-| Google Cloud CLI (`gcloud`) | **591.0.0** | Chapter 2 install instructions; Cloud Build image `gcr.io/google.com/cloudsdktool/google-cloud-cli:591.0.0-debian_component_based`; GitHub Actions `setup-gcloud` input `version: 591.0.0` |
+| Google Cloud CLI (`gcloud`) | **591.0.0** | Chapter 2 install instructions; GitHub Actions `setup-gcloud` input `version: 591.0.0` |
 | TFLint | **0.65.0** | Chapter 19, CI pipelines |
 | TFLint Google ruleset | **0.41.0** | `.tflint.hcl` |
 | pre-commit-terraform hooks | **v1.109.3** | `.pre-commit-config.yaml` |
@@ -19,8 +19,6 @@ after newer releases come out.
 | GitHub Action `hashicorp/setup-terraform` | **v4.0.1** | Chapter 21 workflows |
 | GitHub Action `google-github-actions/auth` | **v3.0.0** | Chapter 21 workflows |
 | GitHub Action `google-github-actions/setup-gcloud` | **v3.0.1** | Chapter 21 workflows |
-| Container image `hashicorp/terraform` | **1.17.0** | Chapter 22 Cloud Build steps |
-| Container image `ghcr.io/terraform-linters/tflint` | **v0.65.0** | Chapter 22 Cloud Build steps |
 | `gcloud` component `terraform-tools` | **0.12.3** | Chapter 20 (`gcloud beta terraform vet`) |
 | Provider `hashicorp/http` | **3.6.3** | Chapters 8 and 19 |
 | Provider `hashicorp/tfe` | **0.82.0** | Chapter 16 |

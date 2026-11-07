@@ -39,7 +39,6 @@ $ gcloud run services list
 $ gcloud secrets list
 $ gcloud iam service-accounts list
 $ gcloud iam workload-identity-pools list --location=global
-$ gcloud builds triggers list
 ```
 
 Or look at **all** resources in the project at once with Cloud Asset

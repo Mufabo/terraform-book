@@ -225,7 +225,7 @@ modules.
 With local module paths (`../../modules/web-app`), a module change affects
 every environment the next time it's applied. The **pipeline** controls the
 order: apply dev automatically, then staging, then prod after approval
-(Chapters 21–22).
+(Chapter 21).
 
 For stricter control, **version the module** (Git tags or a private
 registry) and pin each environment to a version:
@@ -300,7 +300,7 @@ CLI workspaces for comparison.
 
 **Files:** `code/ch18-environments/exercise/`
 
-This layout is also used in Chapters 19 – 23.
+This layout is also used in Chapters 19 – 22.
 
 ### Steps
 

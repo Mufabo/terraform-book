@@ -24,12 +24,11 @@ if you forget to clean up.
 | Boot disk (10 GB standard persistent disk) | 5, 8, 10, 12 | ≈ $0.04 per GB-month (≈ $0.0006 per hour) | 30 GB-month in the same US regions |
 | External IPv4 address on a VM | 5, 8, 12 | $0.005 per hour | None |
 | Cloud Storage (Standard, `EU`) | Most chapters | ≈ $0.026 per GB-month, plus fractions of a cent per 1,000 operations | 5 GB-month, US regions only |
-| Cloud Run (`min_instances = 0`) | 14, 18–23 | Billed only while handling requests | 180,000 vCPU-seconds, 360,000 GiB-seconds and 2 million requests per month |
-| Secret Manager | 14, 23 | $0.06 per active secret version per month; $0.03 per 10,000 accesses | 6 active versions and 10,000 accesses per month |
-| Cloud Build (default pool) | 22, 23 | ≈ $0.006 per build-minute | 2,500 build-minutes per month |
+| Cloud Run (`min_instances = 0`) | 14, 18–22 | Billed only while handling requests | 180,000 vCPU-seconds, 360,000 GiB-seconds and 2 million requests per month |
+| Secret Manager | 14, 22 | $0.06 per active secret version per month; $0.03 per 10,000 accesses | 6 active versions and 10,000 accesses per month |
 | Cloud Logging | All | $0.50 per GiB ingested | 50 GiB per project per month |
-| VPC networks, subnets, firewall rules | 5–7, 10, 12, 15, 23 | Free | — |
-| IAM, service accounts, Workload Identity Federation | 14, 16, 18–23 | Free | — |
+| VPC networks, subnets, firewall rules | 5–7, 10, 12, 15, 22 | Free | — |
+| IAM, service accounts, Workload Identity Federation | 14, 16, 18–22 | Free | — |
 | Enabling APIs, billing budgets | 2 and most chapters | Free | — |
 
 Services outside Google Cloud:
@@ -37,7 +36,7 @@ Services outside Google Cloud:
 | Service | Used in chapters | Cost |
 |---|---|---|
 | HCP Terraform | 16, 17 | Free tier is enough for the exercises. |
-| GitHub Actions | 21, 23 | Free for public repositories; private repositories on the Free plan get 2,000 minutes per month. |
+| GitHub Actions | 21, 22 | Free for public repositories; private repositories on the Free plan get 2,000 minutes per month. |
 
 The Cloud Run services run Google's public sample image
 (`us-docker.pkg.dev/cloudrun/container/hello`), so there is no Artifact
@@ -70,8 +69,7 @@ free trial. The "billable" column lists only resources that cost anything.
 | 19 | Integration test creates and destroys Cloud Run and a bucket | < $0.01 |
 | 20 | None (plan and `vet` only) | $0.00 |
 | 21 | State bucket, Cloud Run in dev and prod, GitHub Actions | < $0.01 |
-| 22 | State bucket, Cloud Run in dev and prod, Cloud Build runs | < $0.01 (free tier) |
-| 23 | State bucket, Cloud Run, secrets, Cloud Build, GitHub Actions | < $0.01 (free tier) |
+| 22 | State bucket, Cloud Run, secrets, GitHub Actions | < $0.01 (free tier) |
 | **Total** | | **≈ $0.15–0.25** |
 
 Almost the whole total comes from the four chapters with a VM. If you work

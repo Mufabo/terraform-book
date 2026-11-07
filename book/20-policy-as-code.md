@@ -52,8 +52,8 @@ be created or changed.
 
 Chapter 17 showed policy as code in HCP Terraform (Sentinel and OPA). This
 chapter uses a Google Cloud–native tool that works with **any** Terraform
-workflow, including the GitHub Actions and Cloud Build pipelines in the next
-two chapters: **`gcloud beta terraform vet`**.
+workflow, including the GitHub Actions pipeline in the next chapter:
+**`gcloud beta terraform vet`**.
 
 > **Note:** As the `beta` in the command suggests, `terraform vet` is a
 > **Preview** (pre-GA) feature. It is supported and actively documented, but

@@ -31,7 +31,6 @@ variable "services" {
     "secretmanager.googleapis.com",
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
-    "cloudbuild.googleapis.com",
     "iamcredentials.googleapis.com",
     "sts.googleapis.com",
   ]

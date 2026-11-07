@@ -1,4 +1,4 @@
-# Chapter 23 — Capstone Project and Exam Preparation
+# Chapter 22 — Capstone Project and Exam Preparation
 
 ## Learning objectives
 
@@ -45,7 +45,7 @@ Each environment (own state under gs://<bucket>/envs/<env>/):
 
 ### A.2 Requirements
 
-The full requirement list is in `code/ch23-capstone/exercise/README.md`. In
+The full requirement list is in `code/ch22-capstone/exercise/README.md`. In
 short:
 
 1. A new `network` module and an extended `web-app` module (Direct VPC
@@ -55,8 +55,8 @@ short:
    **write-only** argument.
 3. Quality gates: `fmt`, TFLint, `terraform test`, `gcloud terraform vet`
    with at least one constraint you wrote yourself.
-4. Delivery through GitHub Actions *or* Cloud Build with a production
-   approval.
+4. Delivery through GitHub Actions with a production approval (a public
+   repository, or a paid plan; see Chapter 21).
 5. A README.
 
 Plan for **two to three hours** — this is the one chapter that's longer than
@@ -91,20 +91,18 @@ whole book:
 | Why does the Cloud Run service `depends_on` the secret version and IAM binding? | Ch. 5 |
 | What do the unit tests prove, and what can't they prove? | Ch. 19 |
 | Which policy would have caught a public bucket, and at what point in the pipeline? | Ch. 20 |
-| How does the pipeline authenticate, and why can't a pull request deploy to prod? | Ch. 21–22 |
+| How does the pipeline authenticate, and why can't a pull request deploy to prod? | Ch. 21 |
 | How would you detect someone changing the service in the console? | Ch. 11, 21 |
 | What would you change to move prod into its own Google Cloud project? | Ch. 18 |
 
 ### A.5 Reference solution
 
-`code/ch23-capstone/solution/` contains a complete, validated solution:
+`code/ch22-capstone/solution/` contains a complete, validated solution:
 
 ```
 solution/
 ├── .github/workflows/          # GitHub Actions (Chapter 21)
-├── cloudbuild/                 # Cloud Build (Chapter 22)
 ├── bootstrap-github/           # WIF + service accounts for GitHub Actions
-├── bootstrap-cloudbuild/       # service accounts + triggers for Cloud Build
 ├── policy-library/             # Chapter 20 policies
 ├── .tflint.hcl
 └── infra/
@@ -410,8 +408,8 @@ in B.2 before booking.
 ## Hands-on exercise
 
 The capstone project in Part A *is* this chapter's exercise. Work through the
-requirements in `code/ch23-capstone/exercise/README.md`, then compare with
-`code/ch23-capstone/solution/`.
+requirements in `code/ch22-capstone/exercise/README.md`, then compare with
+`code/ch22-capstone/solution/`.
 
 ### Cleanup
 
