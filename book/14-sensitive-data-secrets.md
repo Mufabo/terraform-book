@@ -392,30 +392,43 @@ Secret Manager, and give a Cloud Run service access to a secret at runtime.
    * Create a service account, grant it `secretAccessor` on `ch14-api-key`,
      and deploy the Cloud Run `hello` container with the secret as the
      environment variable `API_KEY`.
-3. Add the API key value yourself:
+3. `terraform init` and `terraform apply`. Terraform creates the secrets and
+   the service account, but the Cloud Run service fails: `ch14-api-key` has
+   no version yet, so there's nothing for `API_KEY` to read. That's expected
+   with pattern 1, where a human supplies the value.
+4. Add the API key value yourself, then apply again:
 
    ```console
    $ printf '%s' "demo-key-123" | gcloud secrets versions add ch14-api-key --data-file=-
+   $ terraform apply
    ```
 
-   (Do this before `apply`, or Cloud Run fails to start because the secret
-   has no version.)
-4. `terraform init` and `terraform apply`.
+   The plan says the service "is tainted, so must be replaced": Terraform
+   marks a resource whose creation failed as tainted (Chapter 11) and
+   re-creates it.
 5. **Prove the password isn't in state:**
 
    ```console
-   $ terraform state pull | grep -i -c secret_data_wo     # attribute is null
+   $ terraform state pull | grep secret_data_wo
+               "secret_data_wo": null,
+               "secret_data_wo_version": "1",
    $ gcloud secrets versions access latest --secret=ch14-db-password  # the real value
-   $ terraform state pull | grep -c "$(gcloud secrets versions access latest --secret=ch14-db-password)"
+   $ terraform state pull | grep -cF -- "$(gcloud secrets versions access latest --secret=ch14-db-password)"
    0
    ```
+
+   `-F` makes `grep` treat the password as plain text and `--` stops it from
+   reading a leading `-` as an option; generated passwords often contain
+   characters such as `[` or `*` that would otherwise break the search.
 
 6. **Sensitive outputs:** Add an output that exposes the service URL and
    another that contains `var.demo_token` (a sensitive variable). Run
    `terraform apply` without `sensitive = true` on the second output and read
    the error. Fix it.
 7. **Rotate:** Increase `secret_data_wo_version` to `2` and apply. List the
-   versions with `gcloud secrets versions list ch14-db-password`.
+   versions with `gcloud secrets versions list ch14-db-password`. Version 2
+   is `enabled` and version 1 is `destroyed`: changing the version number
+   replaces the version resource, so the old password is gone.
 
 ### Expected result
 
@@ -426,8 +439,14 @@ only in Secret Manager — not in your state.
 ### Stretch goal
 
 Add `impersonate_service_account` to the provider with a dedicated
-`terraform` service account (create it with `gcloud` first and grant yourself
-`roles/iam.serviceAccountTokenCreator`).
+`terraform` service account. Create it with `gcloud` first, grant yourself
+`roles/iam.serviceAccountTokenCreator` on it, and grant the service account
+itself the project roles it needs to manage this exercise's resources.
+Without those roles, every read in `terraform plan` fails with
+`Error 403: The caller does not have permission`, because Terraform now acts
+only as the service account. A new service account also takes a minute to
+become usable; until then, the provider reports `impersonate: status code
+404`.
 
 ### Cleanup
 
