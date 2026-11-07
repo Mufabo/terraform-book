@@ -372,9 +372,9 @@ it from a workspace, and block non-compliant changes with a policy.
    VCS connection when asked), choose the repository, and select
    **tag-based** publishing. Version `1.0.0` appears.
 4. In `consumer/versions.tf`, set your organisation in the `cloud` block. In
-   `consumer/main.tf`, complete the `module` block using the private
-   registry source `app.terraform.io/<org>/secure-bucket/google` and
-   `version = "~> 1.0"`.
+   `consumer/main.tf`, uncomment and complete the `module` block (and the
+   output below it), using the private registry source
+   `app.terraform.io/<org>/secure-bucket/google` and `version = "~> 1.0"`.
 5. Reuse the Chapter 16 setup: run `wif/` from Chapter 16 again with
    `hcp_workspace = "ch17-consumer"` (or add a second binding), and set the
    same variables on the new `ch17-consumer` workspace (a variable set on the

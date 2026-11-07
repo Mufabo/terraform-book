@@ -1,9 +1,11 @@
-output "workload_provider_name" {
-  description = "Value for TFC_GCP_WORKLOAD_PROVIDER_NAME."
-  value       = google_iam_workload_identity_pool_provider.hcp.name
-}
+# TODO (step 3): uncomment these outputs once the resources in main.tf exist.
 
-output "service_account_email" {
-  description = "Value for TFC_GCP_RUN_SERVICE_ACCOUNT_EMAIL."
-  value       = google_service_account.terraform.email
-}
+# output "workload_provider_name" {
+#   description = "Value for TFC_GCP_WORKLOAD_PROVIDER_NAME."
+#   value       = google_iam_workload_identity_pool_provider.hcp.name
+# }
+
+# output "service_account_email" {
+#   description = "Value for TFC_GCP_RUN_SERVICE_ACCOUNT_EMAIL."
+#   value       = google_service_account.terraform.email
+# }

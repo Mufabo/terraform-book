@@ -1,4 +1,4 @@
-# ch16 app — workspace variables
+# ch17 consumer — workspace variables
 
 Set these in the `ch17-consumer` workspace (or a variable set on the
 `terraform-book` project):
