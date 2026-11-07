@@ -71,18 +71,22 @@ name = "${var.environment}-web-${random_id.suffix.hex}"
 
 ```hcl
 locals {
-  greeting = "Hello, %{ if var.name != "" }${var.name}%{ else }stranger%{ endif }!"
+  greeting = "Hello, %{if var.name != ""}${var.name}%{else}stranger%{endif}!"
 
-  hosts_file = <<-EOT
-    %{ for name, ip in var.hosts ~}
-    ${ip} ${name}
-    %{ endfor ~}
-  EOT
+  hosts_file = <<EOT
+%{for name, ip in var.hosts~}
+${ip} ${name}
+%{endfor~}
+EOT
 }
 ```
 
-The `~` strips whitespace and newlines next to the directive. For anything
-complex, the `templatefile()` function (7.8) is clearer.
+The `~` strips whitespace and newlines next to the directive, so
+`hosts_file` becomes one `IP name` line per host. Write such templates with
+`<<EOT` and no indentation: with the indented `<<-EOT` form, the `~` markers
+also keep the indentation from being removed, and every line would start
+with spaces. For anything complex, the `templatefile()` function (7.9) is
+clearer.
 
 ## 7.4 `for` expressions
 
@@ -114,7 +118,11 @@ comprehension in Python.
 
 ```hcl
 > [for p in [22, 80, 443, 3306] : p if p != 22]
-[80, 443, 3306]
+[
+  80,
+  443,
+  3306,
+]
 ```
 
 **Iterate over a map** with two symbols (key and value):
@@ -152,7 +160,7 @@ meta-argument creates **several instances** of the same resource:
 ```hcl
 resource "google_compute_instance" "web" {
   count        = 3
-  name         = "web-${count.index}"   # web-0, web-1, web-2
+  name         = "web-${count.index}" # web-0, web-1, web-2
   machine_type = "e2-micro"
   zone         = "europe-west1-b"
   # ...
@@ -481,8 +489,12 @@ functions to build a network driven entirely by variables.
 4. In `outputs.tf`, output a map of subnet name → CIDR and a list of bucket
    URLs (use a `for` expression or `values()`).
 5. Run `terraform init`, `plan`, and `apply`.
-6. Add a third subnet `asia` in `asia-southeast1` to `terraform.tfvars`.
-   Plan: only one subnet is added, and nothing else changes. Apply.
+6. Add a third subnet `us-east = { region = "us-east1" }` to
+   `terraform.tfvars`. Plan: only one subnet is added, and nothing else
+   changes. Apply. (The name matters: `subnet_cidrs` numbers the subnets in
+   alphabetical order, and `us-east` sorts after `europe` and `us`. A name
+   that sorts earlier, such as `asia`, would shift the CIDRs of the existing
+   subnets and force their replacement. The stretch goal explores this.)
 7. Set `enable_ssh = true`, plan, and note the address
    `google_compute_firewall.ssh[0]`.
 
