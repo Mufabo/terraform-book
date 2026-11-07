@@ -311,16 +311,17 @@ This layout is also used in Chapters 19 – 23.
      ID.
    * Copy `backend.hcl.example` to `backend.hcl` with your state bucket from
      Chapter 10.
-   * Complete the `module "web_app"` call (`environment = "dev"`,
-     `min_instances = 0`, `max_instances = 2`).
+   * Complete the `module "web_app"` call (`min_instances = 0`,
+     `max_instances = 2`; `environment = "dev"` is already set).
    * `terraform init -backend-config=backend.hcl` and `terraform apply`.
      Open the `url` output.
-3. **prod.** Do the same in `envs/prod/` with `environment = "prod"`,
-   `max_instances = 5`, and `deletion_protection = true`.
+3. **prod.** Do the same in `envs/prod/` with `max_instances = 5` and
+   `deletion_protection = true` (`environment = "prod"` is already set).
 4. List the state objects: `gcloud storage ls -r gs://<state-bucket>/envs/`.
    Two separate states.
-5. **Change the module**: add a label `app = "web-shop"` to the bucket in
-   `modules/web-app/main.tf`. Plan in `envs/dev` (one change) and apply.
+5. **Change the module**: add a label `team = "shop"` to the bucket in
+   `modules/web-app/main.tf` (for example
+   `labels = merge(local.labels, { team = "shop" })`). Plan in `envs/dev` (one change) and apply.
    Plan in `envs/prod` — the same change is pending there. In a real team,
    the pipeline would apply it to prod after approval. Apply it.
 6. **Compare with CLI workspaces.** In `workspaces-demo/`, run:
@@ -355,6 +356,11 @@ Keep `envs/dev` and `envs/prod` if you plan to continue with Chapters 19 –
 $ (cd envs/dev && terraform destroy)
 $ (cd envs/prod && terraform destroy)   # set deletion_protection = false and apply first
 ```
+
+If you run `destroy` in `envs/prod` while `deletion_protection` is still
+`true`, it doesn't stop at the start: Terraform destroys the other resources
+and then fails on the Cloud Run service with `cannot destroy service without
+setting deletion_protection=false and running terraform apply`.
 
 ---
 

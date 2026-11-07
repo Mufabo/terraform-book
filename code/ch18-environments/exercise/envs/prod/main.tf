@@ -4,7 +4,7 @@ module "web_app" {
   project_id = var.project_id
   region     = var.region
 
-  # TODO: environment = "prod"
+  environment = "prod"
   # TODO: min_instances / max_instances (see the exercise steps)
   # TODO: deletion_protection = true
 }
