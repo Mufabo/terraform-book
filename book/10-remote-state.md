@@ -373,9 +373,12 @@ into it, and read its outputs from a second configuration.
 4. Find the state in the bucket:
    `gcloud storage ls -r gs://<state-bucket>/`. Run `terraform plan` again
    and, while it runs, list the bucket again to spot the `.tflock` file.
-5. Enable versioning proof: add a label to the subnet in `network/`, apply,
-   and list object versions with
-   `gcloud storage ls -a gs://<state-bucket>/ch10/network/`.
+5. Enable versioning proof: in `network/main.tf`, add
+   `private_ip_google_access = true` to the subnet (an in-place update),
+   apply, and list object versions with
+   `gcloud storage ls -a gs://<state-bucket>/ch10/network/`. Every apply
+   adds a `default.tfstate#<generation>` version. You'll also see old
+   versions of `default.tflock`, because the bucket keeps those too.
 6. **App.** In `app/`, configure the `gcs` backend with prefix `ch10/app`
    (via `backend.hcl`). Complete the `terraform_remote_state` data source to
    read the network's outputs, and use `subnet_id` for the VM. Apply.
@@ -397,8 +400,9 @@ into it, and read its outputs from a second configuration.
       (as `module.iap_ssh.target_tag`), not in its state's root outputs.
    2. In `network/outputs.tf`, complete the `TODO`: add a root output
       `ssh_tag` with `value = module.iap_ssh.target_tag`. Run
-      `terraform apply` in `network/`. The plan shows the new firewall rule
-      and the new output.
+      `terraform apply` in `network/`. The plan changes no resources (the
+      module's firewall rule has existed since step 2) and shows only the
+      new output under "Changes to Outputs".
    3. Run `terraform plan` in `app/` again. It now shows the VM's `tags`
       changing in place. Apply, then check the tag:
       `gcloud compute instances describe ch10-app --zone=europe-west1-b --format="value(tags.items)"`.
