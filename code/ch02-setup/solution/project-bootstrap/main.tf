@@ -26,7 +26,8 @@ resource "google_billing_budget" "book" {
   display_name    = "terraform-book-budget"
 
   budget_filter {
-    # Budgets filter by project number, not project ID.
+    # Budgets store projects by number. The API converts an ID to a number,
+    # so using the ID here would show a change on every plan.
     projects = ["projects/${google_project.book.number}"]
   }
 

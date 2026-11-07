@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "google" {
-  project = "TODO-your-project-id" # TODO: replace with your project ID
+  project = "TODO-your-project-id" # TODO (step 3): replace with your project ID
   region  = "europe-west1"
 }
 

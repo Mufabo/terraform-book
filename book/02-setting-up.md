@@ -24,7 +24,7 @@ By the end of this lesson you will be able to:
 |---|---|---|
 | Terraform CLI | 1.17.0 | Reads your configuration and manages infrastructure. |
 | Google Cloud CLI (`gcloud`) | 591.0.0 | Creates the project, logs you in, and provides credentials to Terraform. |
-| Git | any recent | Version control (needed from Chapter 12 onwards). |
+| Git | any recent | Downloads the book's code (section 2.8) and provides version control. |
 | Visual Studio Code + HashiCorp Terraform extension | latest | Syntax highlighting, autocompletion, formatting. |
 
 **Windows users:** use **WSL2** (Windows Subsystem for Linux) with Ubuntu and
@@ -40,6 +40,9 @@ match the book.
 
 ### Option A — Manual download (all platforms, recommended)
 
+A fresh Ubuntu (or WSL2) install doesn't include `unzip`; install it first
+with `sudo apt-get install -y unzip`.
+
 ```console
 $ TF_VERSION=1.17.0
 $ OS=linux        # or: darwin (macOS)
@@ -52,8 +55,11 @@ $ unzip "terraform_${TF_VERSION}_${OS}_${ARCH}.zip"
 $ sudo mv terraform /usr/local/bin/
 ```
 
-The checksum step proves that the file you downloaded is exactly the file
-HashiCorp published.
+The checksum step proves that the download is complete and not corrupted.
+Because the checksum file comes from the same server, it does not prove on
+its own that HashiCorp made the file. For that, also download
+`terraform_${TF_VERSION}_SHA256SUMS.sig` and check it with HashiCorp's
+public GPG key, as described at <https://www.hashicorp.com/security>.
 
 ### Option B — Linux package manager (Ubuntu/Debian)
 
@@ -102,13 +108,20 @@ $ terraform -install-autocomplete
 
 The Google Cloud CLI provides the `gcloud` command. Follow the instructions
 for your platform at <https://cloud.google.com/sdk/docs/install>. On
-Ubuntu/WSL2 the pinned install looks like this:
+Ubuntu/WSL2 the pinned install looks like this. Run it from your home folder,
+because the archive unpacks a `google-cloud-sdk/` folder where you run it,
+and that folder is the installation:
 
 ```console
+$ cd ~
 $ curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-591.0.0-linux-x86_64.tar.gz
 $ tar -xf google-cloud-cli-591.0.0-linux-x86_64.tar.gz
 $ ./google-cloud-sdk/install.sh
 ```
+
+On other machines, replace `linux-x86_64` in both file names with
+`linux-arm` (ARM Linux), `darwin-arm` (Apple Silicon), or `darwin-x86_64`
+(Intel Mac).
 
 Open a new terminal, then:
 
@@ -119,8 +132,8 @@ Google Cloud SDK 591.0.0
 $ gcloud init
 ```
 
-`gcloud init` opens a browser so you can log in with your Google account, then
-asks you to pick or create a project. You can skip project selection for now;
+`gcloud init` runs `gcloud auth login` for you: it opens a browser so you can
+log in with your Google account. It then asks you to pick or create a project. You can skip project selection for now;
 we create one in the next step.
 
 ## 2.4 Creating a Google Cloud project
@@ -129,8 +142,9 @@ Everything in Google Cloud lives inside a **project**. A project groups
 resources, permissions, and billing. Deleting a project deletes everything in
 it, which makes projects a fantastic safety net for learning.
 
-Project IDs are **globally unique** across all of Google Cloud, so add
-something personal, such as your initials and a random number:
+Project IDs are **globally unique** across all of Google Cloud, and an ID can
+never be used again, not even after its project is deleted. The command below
+therefore adds your username and a random number:
 
 ```console
 $ export PROJECT_ID="tf-book-$(whoami | tr -dc 'a-z0-9' | cut -c1-8)-$RANDOM"
@@ -141,7 +155,15 @@ $ gcloud config set project "$PROJECT_ID"
 ```
 
 Save the project ID somewhere — you will use it in every chapter. A good idea
-is to add the `export PROJECT_ID=...` line to your `~/.bashrc` or `~/.zshrc`.
+is to add it to your `~/.bashrc` (or `~/.zshrc`) with the actual value, not
+the command above. That command contains `$RANDOM`, so it would create a new,
+non-existent ID in every new terminal:
+
+```console
+$ echo "export PROJECT_ID=$PROJECT_ID" >> ~/.bashrc
+$ tail -n1 ~/.bashrc
+export PROJECT_ID=tf-book-fatih-12345
+```
 
 ### Link a billing account
 
@@ -161,21 +183,41 @@ $ gcloud billing projects link "$PROJECT_ID" --billing-account="$BILLING_ACCOUNT
 A budget alert emails you when spending approaches a limit. It does **not**
 stop spending, but it warns you early.
 
+First find your billing account's currency, because the budget amount must
+use it:
+
+```console
+$ gcloud billing accounts describe "$BILLING_ACCOUNT" --format='value(currencyCode)'
+USD
+```
+
+Then create the budget:
+
 ```console
 $ gcloud services enable billingbudgets.googleapis.com
+$ export PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
 $ gcloud billing budgets create \
     --billing-account="$BILLING_ACCOUNT" \
+    --billing-project="$PROJECT_ID" \
     --display-name="terraform-book-budget" \
     --budget-amount=10USD \
-    --filter-projects="projects/$PROJECT_ID" \
+    --filter-projects="projects/$PROJECT_NUMBER" \
     --threshold-rule=percent=0.5 \
     --threshold-rule=percent=0.9 \
     --threshold-rule=percent=1.0
 ```
 
+* `--budget-amount` must use the currency from the first command, for
+  example `10EUR`. A different currency is rejected.
+* `--billing-project` tells the Budget API which project to bill the API call
+  itself to. Without it, the API rejects the end-user credentials that
+  `gcloud` uses.
+* `--filter-projects` uses the project **number**, because that is how
+  budgets store projects.
+
 > **Cost note:** The exercises in this book are designed to stay well within
-> the free tier or cost a few cents. A budget of 10 USD (or your local
-> currency) gives you a comfortable warning margin.
+> the free tier or cost a few cents. A budget of 10 (in your billing
+> account's currency) gives you a comfortable warning margin.
 
 ### Alternative: the same steps with Terraform
 
@@ -217,7 +259,8 @@ resource "google_billing_budget" "book" {
   display_name    = "terraform-book-budget"
 
   budget_filter {
-    # Budgets filter by project number, not project ID.
+    # Budgets store projects by number. The API converts an ID to a number,
+    # so using the ID here would show a change on every plan.
     projects = ["projects/${google_project.book.number}"]
   }
 
@@ -239,7 +282,16 @@ resource "google_billing_budget" "book" {
 
 To use it, copy `terraform.tfvars.example` to `terraform.tfvars`, fill in your
 project ID and billing account, and run `terraform init` and
-`terraform apply`. Three things are different from the `gcloud` version:
+`terraform apply`. If you already created your project with `gcloud`, use a
+**new** project ID here; Terraform can't create a project that already
+exists. (Alternatively, bring the existing project under Terraform's control
+with an `import` block, section 11.5.)
+
+If the budget fails with an error saying the Billing Budget API is not
+enabled, wait a minute and run `terraform apply` again: a newly enabled API
+can take a moment to become active.
+
+Three things are different from the `gcloud` version:
 
 * **The quota project.** When Terraform uses your personal credentials, the
   Budget and Service Usage APIs need a project to bill API calls to. The
@@ -328,7 +380,9 @@ provider for Terraform automatically finds and uses this file — you never put
 credentials in your Terraform code.
 
 Some APIs need to know which project to charge for API usage (the "quota
-project"):
+project"). Recent `gcloud` versions set it automatically to your current
+`gcloud` project during the login above. Running this command makes sure it
+is set:
 
 ```console
 $ gcloud auth application-default set-quota-project "$PROJECT_ID"
@@ -341,7 +395,8 @@ $ gcloud auth application-default set-quota-project "$PROJECT_ID"
 | `gcloud auth login` | The `gcloud` command itself. |
 | `gcloud auth application-default login` | Libraries and tools such as **Terraform**. |
 
-You need both.
+You need both. `gcloud init` in section 2.3 already ran `gcloud auth login`
+for you, so the only extra login is the `application-default` one above.
 
 ### What about service account keys?
 
@@ -362,28 +417,47 @@ Install [Visual Studio Code](https://code.visualstudio.com/) and the
 * Hover documentation for the Google provider.
 * Format on save (runs `terraform fmt` for you).
 
-Enable format on save by adding this to your VS Code `settings.json`:
+Enable format on save by adding these two entries inside the outer `{ }` of
+your VS Code `settings.json`. The second one formats `.tfvars` files too:
 
 ```json
 "[terraform]": {
   "editor.defaultFormatter": "hashicorp.terraform",
   "editor.formatOnSave": true
+},
+"[terraform-vars]": {
+  "editor.defaultFormatter": "hashicorp.terraform",
+  "editor.formatOnSave": true
 }
 ```
+
+**Windows users:** install VS Code on Windows, plus Microsoft's **WSL**
+extension. Open your work folder from the Ubuntu terminal with `code .`, and
+install the HashiCorp Terraform extension when VS Code offers to install it
+"in WSL". The extension then runs inside Ubuntu, where Terraform is
+installed. Otherwise format on save can't find the `terraform` command.
 
 JetBrains IDEs (IntelliJ, PyCharm, GoLand) have an equivalent "Terraform and
 HCL" plugin.
 
 ## 2.8 A folder for your work
 
-Create a folder for the book's exercises and clone or copy the book's `code`
-folder into it:
+Download the book's repository with Git. This creates a `terraform-book`
+folder in your home directory:
 
 ```console
-$ mkdir -p ~/terraform-book && cd ~/terraform-book
+$ cd ~
+$ git clone https://github.com/Mufabo/terraform-book.git
+$ cd terraform-book
+$ ls
+book  code  ...
 ```
 
-Throughout the book, you run Terraform commands *inside* a chapter's
+If `git` is missing, install it with `sudo apt-get install -y git` (Ubuntu
+and WSL2) or `xcode-select --install` (macOS).
+
+Paths such as `code/ch02-setup/exercise` in this book are relative to this
+`~/terraform-book` folder. You run Terraform commands *inside* a chapter's
 `exercise/` folder. Each folder is an independent Terraform **working
 directory**.
 
@@ -407,8 +481,8 @@ directory**.
 * Create a dedicated Google Cloud project for learning, link billing, and set
   a budget alert.
 * Enable the APIs you need.
-* Use **Application Default Credentials** for Terraform on your laptop; never
-  use or commit service account keys.
+* Use **Application Default Credentials** for Terraform on your laptop; avoid
+  service account keys, and never commit credentials of any kind.
 
 ## Quick check
 
@@ -432,18 +506,21 @@ by running a configuration that *reads* information but creates nothing.
 
 ### Steps
 
-1. Complete sections 2.2 – 2.7 if you have not already.
-2. Run the setup check script, which verifies every tool and setting:
+1. Complete sections 2.2 – 2.8 if you have not already.
+2. Run the setup check script. It checks the tool versions, your `gcloud`
+   project, billing, the APIs from section 2.5, ADC, and its quota project:
 
    ```console
-   $ cd code/ch02-setup/exercise
+   $ cd ~/terraform-book/code/ch02-setup/exercise
    $ ./check-setup.sh
    ```
 
-   Fix anything it reports as `MISSING` or `WRONG`.
+   Fix anything it reports as `MISSING` or `WRONG`. A `WARN` (for example a
+   different `gcloud` version) doesn't stop you, but your output may differ
+   slightly from the book's.
 3. Open `main.tf`. It contains a `data` block that reads details about your
    project (you will learn about data sources in Chapter 5). Replace the
-   `TODO` with your project ID.
+   value marked `TODO (step 3)` with your project ID.
 4. Run:
 
    ```console
@@ -473,8 +550,10 @@ lists the provider version that was downloaded (`registry.terraform.io/hashicorp
 
 ### Cleanup
 
-Nothing was created, so nothing needs to be destroyed. You can delete the
-`.terraform` folder if you want to save disk space.
+No cloud resources were created, so nothing needs to be destroyed. The apply
+did write a local `terraform.tfstate` file holding the two outputs (state is
+Chapter 9's topic). You can delete it, and the `.terraform` folder, to tidy
+up. Keep `.terraform.lock.hcl`.
 
 ---
 
@@ -484,7 +563,8 @@ Nothing was created, so nothing needs to be destroyed. You can delete the
    team gets identical results. New versions can change behaviour.
 2. `gcloud auth application-default login`.
 3. They are all deleted (after a 30-day recovery window during which the
-   project can be restored).
+   project can be restored). The project ID stays reserved forever and can't
+   be used for a new project.
 4. No. It only sends notifications.
 5. They are long-lived secrets that can be leaked or stolen and are hard to
    rotate. Prefer ADC locally and Workload Identity Federation in CI/CD.
