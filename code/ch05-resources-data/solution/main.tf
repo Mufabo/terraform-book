@@ -54,6 +54,10 @@ resource "google_compute_instance" "web" {
     }
   }
 
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
   network_interface {
     subnetwork = google_compute_subnetwork.web.id
     access_config {} # gives the VM a public IP address

@@ -301,6 +301,10 @@ resource "google_compute_instance" "web" {
     }
   }
 
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
   network_interface {
     subnetwork = google_compute_subnetwork.web.id
     access_config {} # gives the VM a public IP address
@@ -325,6 +329,13 @@ A few new things:
   leading indentation.
 * `metadata_startup_script` runs the script every time the VM boots.
   Changing it forces Terraform to replace the VM.
+* `shielded_instance_config` turns on **Secure Boot**, which only lets
+  verified boot software start; the Debian image supports it. Many companies
+  require it with the organization policy `compute.requireShieldedVm`.
+  Without the block, creating the VM in such an organization fails with
+  `Constraint constraints/compute.requireShieldedVm violated ... Secure Boot
+  is not enabled`. Every VM in this book sets it, so the code works with or
+  without that policy.
 * You already enabled the Compute Engine API with `gcloud` in Chapter 2.
   `google_project_service` adopts an API that is already enabled, so the plan
   still shows it as `+ create`. With `disable_on_destroy = false`, `destroy`
@@ -442,6 +453,21 @@ A browser page showing "Hello from Terraform" served by your VM.
 Add a second firewall rule that allows SSH (TCP 22) only from Google's
 Identity-Aware Proxy range `35.235.240.0/20`, then connect with
 `gcloud compute ssh ch05-web --tunnel-through-iap --zone <zone>`.
+
+> **Info: where your SSH key goes.** The first time you run
+> `gcloud compute ssh`, it creates a key pair in `~/.ssh/google_compute_engine`
+> (it may ask for a passphrase) and adds the public key to your **project's**
+> metadata under `ssh-keys`. Every VM in the project then accepts it.
+> `terraform destroy` doesn't remove it, because Terraform never managed it.
+> It does no harm, but you can see it with
+> `gcloud compute project-info describe --format="value(commonInstanceMetadata.items)"`
+> and remove it with
+> `gcloud compute project-info remove-metadata --keys=ssh-keys`.
+
+> **Info: the NumPy warning.** When connecting through IAP, `gcloud` may print
+> `To increase the performance of the tunnel, consider installing NumPy`.
+> You can ignore it: the connection works without NumPy, only large file
+> transfers over the tunnel are slower.
 
 ### Cleanup
 

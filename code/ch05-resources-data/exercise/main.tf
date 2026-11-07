@@ -35,6 +35,10 @@ resource "google_compute_instance" "web" {
     }
   }
 
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
   network_interface {
     subnetwork = "TODO" # TODO (step 2): reference the subnet's id
     access_config {}

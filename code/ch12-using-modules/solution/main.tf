@@ -72,6 +72,10 @@ resource "google_compute_instance" "web" {
     }
   }
 
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
   network_interface {
     subnetwork = module.vpc.subnets["${var.region}/web"].self_link
     access_config {}

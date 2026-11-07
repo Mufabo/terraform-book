@@ -19,6 +19,10 @@ resource "google_compute_instance" "app" {
     }
   }
 
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
   network_interface {
     subnetwork = "TODO" # TODO: the subnet_id output of the network configuration
   }
