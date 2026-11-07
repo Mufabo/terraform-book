@@ -2,22 +2,10 @@
 
 ## What the exercises cost
 
-The exercises use small or free-tier resources and are designed to be
-destroyed at the end of each chapter. Typical costs if you clean up promptly:
-
-| Resource | Used in | Cost notes |
-|---|---|---|
-| Cloud Storage buckets (tiny files) | Most chapters | A few cents per month at most; free tier covers 5 GB in some US regions. |
-| VPC networks, subnets, firewall rules | 1, 5–7, 12, 23 | Free. |
-| `e2-micro` VM | 5, 8, 10, 12 | Free tier: one per month in `us-west1`, `us-central1`, or `us-east1`. Elsewhere about a cent per hour. Public IPv4 addresses are billed by the hour. |
-| Cloud Run (scales to zero) | 14, 18–23 | Generous free tier; no cost while idle. |
-| Secret Manager | 14, 23 | A few cents per secret version per month; free tier covers a small number. |
-| Cloud Build | 22 | Free tier of build minutes per day. |
-| Workload Identity Federation, IAM, service accounts | 16, 21, 22 | Free. |
-| HCP Terraform | 16–17 | Free tier is sufficient for the exercises. |
-
-Prices change; check the [Google Cloud pricing calculator](https://cloud.google.com/products/calculator)
-and the free tier page for current details.
+If you destroy your resources at the end of each exercise, the whole book
+costs well under US$1 — usually nothing, thanks to the free tier and the
+free-trial credits. Appendix D breaks the estimate down by resource and by
+chapter, and lists what forgotten resources cost per month.
 
 ## Always destroy
 

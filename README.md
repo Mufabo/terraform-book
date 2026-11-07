@@ -52,7 +52,9 @@ Cloud resources cost money while they exist. Exercises use free-tier or very
 small resources, and every exercise ends with a cleanup step. Chapter 2 shows
 you how to set a **budget alert** before you create anything.
 [Appendix C](book/appendix-c-cleanup-and-costs.md) explains how to find and
-delete anything you forgot.
+delete anything you forgot, and
+[Appendix D](book/appendix-d-cost-estimate.md) estimates what the exercises
+cost (well under US$1 in total if you clean up).
 
 ## Building the book (optional)
 

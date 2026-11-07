@@ -217,7 +217,8 @@ $ gcloud billing budgets create \
 
 > **Cost note:** The exercises in this book are designed to stay well within
 > the free tier or cost a few cents. A budget of 10 (in your billing
-> account's currency) gives you a comfortable warning margin.
+> account's currency) gives you a comfortable warning margin. Appendix D
+> estimates the cost of every chapter.
 
 ### Alternative: the same steps with Terraform
 
