@@ -6,7 +6,7 @@ terraform {
       source  = "hashicorp/google"
       version = "8.9.0"
     }
-    # TODO: add google-beta (source hashicorp/google-beta, version 8.9.0)
-    # TODO: add random (source hashicorp/random, version 3.9.1)
+    # TODO (step 1): add google-beta (source hashicorp/google-beta, version 8.9.0)
+    # TODO (step 1): add random (source hashicorp/random, version 3.9.1)
   }
 }

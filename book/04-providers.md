@@ -123,15 +123,20 @@ Combine constraints with commas: `">= 8.5.0, < 9.0.0"`.
   exercises): pin tightly — an exact version or `~> X.Y.0`. The lock file
   gives an additional guarantee.
 * **Reusable modules** (Chapter 13): use a *minimum* version, e.g.
-  `">= 8.0"`, so the module works in many root configurations.
+  `">= 8.0"`, so the module works in many root configurations. Some authors
+  add an upper bound for the next major version (this book's modules use
+  `">= 7.0, < 9.0"`) so that a future release with breaking changes isn't
+  picked up untested.
 
 `required_version` uses the same operators to constrain the Terraform CLI
 version. Running with a version outside the range fails immediately with
 "Unsupported Terraform Core version".
 
 > **Newer than the exam:** Terraform 1.17 allows variables and locals inside
-> provider requirements. The exam assumes literal values, and literal values
-> remain the clearest choice.
+> provider requirements. A variable used there must be declared with
+> `const = true` (its value has to be known during `init`); otherwise `init`
+> fails with "Unknown provider version". The exam assumes literal values, and
+> literal values remain the clearest choice.
 
 ## 4.4 The dependency lock file `[2a]`
 
@@ -151,13 +156,25 @@ provider "registry.terraform.io/hashicorp/google" {
 
 It records:
 
-* the **exact version** selected for each provider, and
+* the **exact version** selected for each provider,
+* the **constraints** it was selected against, and
 * **checksums** of the provider packages.
 
-On subsequent `init` runs, Terraform installs exactly the recorded version
-(as long as it still satisfies your constraints) and verifies the checksum.
-If someone tampered with the download, `init` fails. Commit this file to Git
-so your colleagues and CI get identical providers.
+On subsequent `init` runs, Terraform installs exactly the recorded version and
+verifies the checksum. If someone tampered with the download, `init` fails.
+Commit this file to Git so your colleagues and CI get identical providers.
+
+If you change a constraint so that the recorded version no longer satisfies
+it, `init` does **not** quietly pick another version. It stops:
+
+```console
+$ terraform init
+...
+Could not retrieve the list of available versions for provider
+hashicorp/random: locked provider registry.terraform.io/hashicorp/random
+3.9.1 does not match configured version constraint 3.8.0; must use terraform
+init -upgrade to allow selection of new versions
+```
 
 The lock file only covers **providers**, not modules.
 
@@ -174,14 +191,24 @@ $ terraform init -upgrade
 ```
 
 `-upgrade` ignores the lock file's versions, picks the newest allowed version,
-and updates the lock file. Review the provider's changelog, run `plan`, and
-commit the lock file change.
+and updates the lock file. It also upgrades **modules** to the newest versions
+their constraints allow (Chapter 12). Review the provider's changelog, run
+`plan`, and commit the lock file change.
 
 ### Lock files and multiple platforms
 
-The lock file contains checksums for the platform where you ran `init`
-(e.g. `linux_amd64`). If teammates use macOS on Apple Silicon, add their
-checksums too:
+The lock file holds two kinds of checksums:
+
+* `zh:` hashes are the SHA-256 sums of the provider's zip files for **every**
+  platform, as published in the registry.
+* `h1:` hashes cover the unpacked package, and `init` records one only for
+  the platform it ran on (e.g. `linux_amd64`).
+
+A teammate on macOS can still run `init`: Terraform checks the download
+against the `zh:` hash and then adds an `h1:` line for `darwin_arm64`, which
+shows up as an unexpected change to the lock file. Installs that can only use
+`h1:` hashes, such as from a plugin cache or a local mirror, fail instead. To
+avoid both, record every platform your team and CI use up front:
 
 ```console
 $ terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=windows_amd64
@@ -198,20 +225,36 @@ Providers required by configuration:
 └── provider[registry.terraform.io/hashicorp/random] 3.9.1
 ```
 
-`terraform version` also lists installed providers.
+Note that `terraform providers` shows the **constraints** from your
+configuration, not the installed versions. Here they look the same because
+the versions are pinned exactly; with `version = "~> 3.9"` it would print
+`~> 3.9`. To see which versions are actually installed, run
+`terraform version`:
+
+```console
+$ terraform version
+Terraform v1.17.0
+on linux_amd64
++ provider registry.terraform.io/hashicorp/google v8.9.0
++ provider registry.terraform.io/hashicorp/random v3.9.1
+```
 
 ### Where providers are stored
 
 `init` downloads providers to `.terraform/providers/` in each working
 directory. To avoid re-downloading the same provider for every project, set a
-shared plugin cache in `~/.terraformrc`:
+shared plugin cache in the CLI configuration file (`~/.terraformrc` on Linux
+and macOS, `%APPDATA%\terraform.rc` on Windows):
 
 ```hcl
 plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"
 ```
 
-(Create the directory first.) Air-gapped environments can use a local
-**provider mirror** instead of the public registry.
+The `TF_PLUGIN_CACHE_DIR` environment variable does the same. Create the
+directory first. Terraform only uses a cached package if its checksum is
+already in the lock file, which is another reason to record all platforms.
+Air-gapped environments can use a local **provider mirror** instead of the
+public registry.
 
 ## 4.5 Configuring providers `[2b]`
 
@@ -296,6 +339,10 @@ Note that `provider = google.us` is a reference, not a string — no quotes.
 > configuration. You may have only one default per provider. Resources select
 > an alias with `provider = <name>.<alias>`.
 
+Child modules inherit only the **default** configurations. To give a module an
+aliased configuration, pass it with the `providers` argument of the `module`
+block (Chapter 12).
+
 ## 4.7 Multiple providers in one configuration `[2c]`
 
 A configuration can use any number of different providers. Two very common
@@ -372,8 +419,12 @@ of it in Chapter 7.
 
 ## Common mistakes and exam tips
 
-* **Forgetting `terraform init` after adding a provider** — "Required plugins
-  are not installed".
+* **Forgetting `terraform init` after adding a provider** — `validate` reports
+  "Missing required provider" and `plan` reports "Inconsistent dependency lock
+  file".
+* **Tightening a constraint below the locked version** — `init` fails with
+  "locked provider … does not match configured version constraint"; run
+  `init -upgrade`.
 * **Expecting `init` to upgrade providers** — it uses the lock file; you
   need `init -upgrade`.
 * **Quoting the provider reference** — `provider = "google.us"` is wrong;
@@ -417,27 +468,42 @@ provider alias in one configuration.
 ### Steps
 
 1. `cd code/ch04-providers/exercise` and open `versions.tf`. Complete the
-   `TODO`s to require `hashicorp/google` 8.9.0, `hashicorp/google-beta` 8.9.0,
-   and `hashicorp/random` 3.9.1.
-2. In `providers.tf`, set your project ID. Add a **second** `google` provider
-   configuration with `alias = "us"` and `region = "us-central1"`. Configure
-   `google-beta` too.
-3. In `main.tf`:
+   `TODO (step 1)` items to require `hashicorp/google` 8.9.0,
+   `hashicorp/google-beta` 8.9.0, and `hashicorp/random` 3.9.1.
+2. In `providers.tf`, replace `TODO-your-project-id` with your project ID.
+   Add a **second** `google` provider configuration with `alias = "us"` and
+   `region = "us-central1"`. Configure `google-beta` with the same project and
+   region as the default (`TODO (step 2)`).
+3. In `main.tf`, complete the `TODO (step 3)` items:
    * Create a `random_id` resource named `suffix` with `byte_length = 4`.
-   * Create a bucket `eu` in location `EUROPE-WEST1` using the default
-     provider, named `ch04-eu-<suffix>`.
+   * Name the bucket `eu` (location `EUROPE-WEST1`, default provider)
+     `ch04-eu-<suffix>`.
    * Create a bucket `us` in location `US-CENTRAL1` using the `google.us`
      provider, named `ch04-us-<suffix>`.
-   * Create a third bucket `beta` that uses the `google-beta` provider.
-4. Run `terraform init`. Open `.terraform.lock.hcl` and find all three providers.
-5. Run `terraform providers` and `terraform version`.
+   * Create a third bucket `beta` in location `EUROPE-WEST1` using the
+     `google-beta` provider, named `ch04-beta-<suffix>`.
+
+   Copy `uniform_bucket_level_access` and `force_destroy` from the `eu`
+   bucket. A bucket's location comes only from its own (required) `location`
+   argument, not from the provider's `region`, so here `google.us` shows how
+   to select an alias rather than what moves the bucket. Resources without a
+   location argument of their own, such as the subnetwork in 4.6, do take
+   their region from the provider.
+4. A copy of `.terraform.lock.hcl` is already in the folder, so all three
+   providers are listed before you run anything. Run `terraform init`; it
+   installs exactly the recorded versions. (If you run `init` before
+   finishing step 1, Terraform removes the providers that aren't declared yet
+   from the lock file; they come back the next time you run `init`.)
+5. Run `terraform providers` and `terraform version`. Which one shows
+   constraints, and which one shows installed versions?
 6. Run `terraform plan` and `terraform apply`.
 7. Run `gcloud storage buckets list --format="table(name,location)"` and
    confirm the locations.
 8. Change the `random` version constraint to `"~> 3.9"` and run
-   `terraform init`. Was a different version installed? Now try
-   `terraform init -upgrade`. Change it back to `"3.9.1"` afterwards and run
-   `terraform init -upgrade` again.
+   `terraform init`. Was a different version installed (check with
+   `terraform version`)? Now try `terraform init -upgrade`. Change the
+   constraint back to `"3.9.1"` afterwards and run `terraform init` again.
+   When would that last `init` fail, and what would you run instead?
 
 ### Expected result
 
@@ -452,7 +518,15 @@ Add checksums for macOS and Windows to the lock file with
 
 ```console
 $ terraform destroy
+$ git checkout -- .terraform.lock.hcl
 ```
+
+Type `yes`. Thanks to `force_destroy = true`, the buckets are deleted even if
+you put files in them. The `git checkout` restores the committed lock file,
+which step 8 and the stretch goal may have changed.
+
+Answers to steps 5 and 8 and the stretch goal are in
+`code/ch04-providers/solution/answers.md`.
 
 ---
 
