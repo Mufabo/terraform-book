@@ -12,4 +12,7 @@ $ terraform state rm 'google_storage_bucket.this["archive"]'
 $ gcloud storage rm -r gs://ch09-archive-<suffix>
 ```
 
-`terraform plan` should report **No changes** afterwards.
+After each step, `terraform plan` shows only "Changes to Outputs" (the
+renamed `docs_bucket` output, then the `other_buckets` list without the
+archive bucket). Run `terraform apply` to save the outputs; it changes no
+infrastructure. After that, `terraform plan` reports **No changes**.

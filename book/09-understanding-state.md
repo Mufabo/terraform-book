@@ -160,6 +160,7 @@ $ terraform apply
 ╷
 │ Error: Error acquiring the state lock
 │
+│ Error message: resource temporarily unavailable
 │ Lock Info:
 │   ID:        4f6d9a5e-1b2c-...
 │   Path:      terraform.tfstate
@@ -365,21 +366,28 @@ forget resources without touching real infrastructure.
    $ terraform state pull | jq '.serial'
    ```
 
-4. **Locking:** In one terminal, run `terraform apply` and leave it waiting at
-   the "Enter a value" prompt. In a second terminal, run `terraform plan`. Read
-   the lock error. Then try `terraform plan -lock-timeout=30s` and answer the
+4. **Locking:** In one terminal, run
+   `terraform apply -var 'buckets=["logs", "archive", "extra"]'` and leave it
+   waiting at the "Enter a value" prompt. (The extra bucket gives `apply`
+   something to do; with no changes it would finish at once without asking.)
+   In a second terminal, run `terraform plan`. Read the lock error. Then try `terraform plan -lock-timeout=30s` and answer the
    first prompt with `no` within 30 seconds — the second command proceeds.
 5. **Rename:** In `main.tf`, rename `google_storage_bucket.notes` to
    `google_storage_bucket.docs` (and its references in `outputs.tf`). Run
    `terraform plan` — it wants to destroy and create! Now run
    `terraform state mv google_storage_bucket.notes google_storage_bucket.docs`
-   and plan again: no changes.
+   and plan again: no changes. (If you also renamed the output to
+   `docs_bucket`, as the solution does, the plan shows only "Changes to
+   Outputs". Run `terraform apply` to save the new output name; no
+   infrastructure changes.)
 6. **Forget:** Run `terraform state rm 'google_storage_bucket.this["archive"]'`.
    Confirm the bucket still exists with `gcloud storage ls`. Run
    `terraform plan`: Terraform wants to create it again (and would fail,
    because the name is taken). Remove the `archive` entry from
-   `terraform.tfvars` so Terraform no longer manages it. Delete the bucket
-   with `gcloud storage rm -r gs://<name>`.
+   `terraform.tfvars` so Terraform no longer manages it. `terraform plan` now
+   shows only "Changes to Outputs": the `other_buckets` output saved in state
+   still lists the archive bucket. Run `terraform apply` to update it. Delete
+   the bucket with `gcloud storage rm -r gs://<name>`.
 7. Look at the `serial` again. How many times did it change?
 
 ### Expected result
