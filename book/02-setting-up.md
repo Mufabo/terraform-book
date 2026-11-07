@@ -172,7 +172,7 @@ free tier. New Google Cloud customers receive free trial credits.
 
 ```console
 $ gcloud billing accounts list
-ACCOUNT_ID            NAME                OPEN
+ACCOUNT_ID            NAME                OPEN  MASTER_ACCOUNT_ID
 0X0X0X-0X0X0X-0X0X0X  My Billing Account  True
 $ export BILLING_ACCOUNT=0X0X0X-0X0X0X-0X0X0X
 $ gcloud billing projects link "$PROJECT_ID" --billing-account="$BILLING_ACCOUNT"
@@ -210,8 +210,10 @@ $ gcloud billing budgets create \
 * `--budget-amount` must use the currency from the first command, for
   example `10EUR`. A different currency is rejected.
 * `--billing-project` tells the Budget API which project to bill the API call
-  itself to. Without it, the API rejects the end-user credentials that
-  `gcloud` uses.
+  itself to (the "quota project"). By default `gcloud` already uses your
+  current project, which you set above, so the flag only makes this explicit.
+  It matters when your current project is a different one, or one without
+  the Billing Budget API enabled.
 * `--filter-projects` uses the project **number**, because that is how
   budgets store projects.
 
