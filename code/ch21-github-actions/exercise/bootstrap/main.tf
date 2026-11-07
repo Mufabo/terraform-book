@@ -25,9 +25,10 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   display_name                       = "GitHub OIDC"
 
   attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
+    "google.subject"        = "assertion.sub"
+    "attribute.repository"  = "assertion.repository"
+    "attribute.ref"         = "assertion.ref"
+    "attribute.environment" = "assertion.environment"
   }
 
   # TODO: only accept tokens issued for var.github_repository
@@ -94,13 +95,16 @@ resource "google_project_iam_member" "apply_iam_admin" {
 # Only jobs that run in the matching GitHub *environment* may impersonate
 # the apply identity. The environment's protection rules (e.g. required
 # reviewers for prod) therefore guard the credentials too.
-resource "google_service_account_iam_member" "apply_wif" {
-  for_each = var.environments
-
-  service_account_id = google_service_account.apply[each.key].name
-  role               = "roles/iam.workloadIdentityUser"
-  member             = "TODO" # TODO: principal://iam.googleapis.com/<pool name>/subject/repo:<OWNER/NAME>:environment:<env>
-}
+# TODO (step 2): uncomment and complete the member: a principalSet for all
+# tokens whose attribute.environment equals each.key, i.e.
+#   principalSet://iam.googleapis.com/<pool name>/attribute.environment/<env>
+# resource "google_service_account_iam_member" "apply_wif" {
+#   for_each = var.environments
+#
+#   service_account_id = google_service_account.apply[each.key].name
+#   role               = "roles/iam.workloadIdentityUser"
+#   member             = "TODO"
+# }
 
 # --- State bucket access ----------------------------------------------------
 

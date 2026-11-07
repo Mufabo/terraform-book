@@ -125,9 +125,10 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   display_name                       = "GitHub OIDC"
 
   attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
+    "google.subject"        = "assertion.sub"
+    "attribute.repository"  = "assertion.repository"
+    "attribute.ref"         = "assertion.ref"
+    "attribute.environment" = "assertion.environment"
   }
 
   # Only tokens issued for our repository are accepted.
@@ -149,8 +150,9 @@ resource "google_service_account_iam_member" "plan_wif" {
 }
 ```
 
-The apply identities only by jobs in the matching environment (the token's
-subject is `repo:OWNER/NAME:environment:ENV`):
+The apply identities only by jobs in the matching environment. A job that
+runs in a GitHub environment gets an `environment` claim in its token, which
+the provider maps to `attribute.environment`:
 
 ```hcl
 resource "google_service_account_iam_member" "apply_wif" {
@@ -158,9 +160,18 @@ resource "google_service_account_iam_member" "apply_wif" {
 
   service_account_id = google_service_account.apply[each.key].name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principal://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/subject/repo:${var.github_repository}:environment:${each.key}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.environment/${each.key}"
 }
 ```
+
+This principal set alone would match an environment of that name in *any*
+repository; the provider's `attribute_condition` is what limits it to yours.
+Why not bind to the token's subject, `repo:OWNER/NAME:environment:ENV`, as
+older guides do? GitHub now issues **immutable subjects** for new
+repositories, with numeric owner and repository IDs
+(`repo:OWNER@123/NAME@456:environment:prod`), so a subject written with names
+no longer matches. The `repository` and `environment` claims keep their plain
+values.
 
 > **Security tip:** Always set an `attribute_condition`. Without it, tokens
 > from *any* GitHub repository could be presented to your pool.
@@ -201,6 +212,7 @@ The bootstrap outputs the values the workflows need. Store them as
       - name: Install TFLint
         run: |
           curl -sSLo tflint.zip "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip"
+          mkdir -p "$HOME/.local/bin"
           unzip -q tflint.zip -d "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
@@ -329,7 +341,9 @@ In GitHub: *Settings → Branches → Add branch ruleset* for `main`: require a
 pull request with at least one approval and require the status checks
 *Static checks and unit tests*, *Plan and vet (dev)*, and *Plan and vet
 (prod)*. Now nobody can merge code that's unformatted, fails tests, or
-violates policies.
+violates policies. (Rulesets on private repositories also need a paid plan,
+and GitHub doesn't let you approve your own pull request, so on a
+one-person repository leave out the approval requirement.)
 
 > **Security tip:** Pull requests from **forks** don't get OIDC tokens or
 > repository variables by default, so they can't plan. That's intentional:
@@ -425,6 +439,10 @@ In GitHub: *Settings → Environments*:
   a wait timer and "prevent self-review", and restrict deployment branches to
   `main`.
 
+On GitHub Free, required reviewers work only in **public** repositories;
+private repositories need a paid plan. Without them, prod deploys right after
+dev.
+
 When the apply workflow reaches the prod job, it pauses with *Waiting for
 review*. A reviewer opens the run, reads the dev result (and ideally the PR's
 prod plan), and clicks **Approve and deploy**.
@@ -474,8 +492,8 @@ on:
 
 1. Which workflow permission is required for keyless authentication to
    Google Cloud?
-2. Why is the prod apply service account bound to the subject
-   `repo:OWNER/NAME:environment:prod` instead of the whole repository?
+2. Why is the prod apply service account bound to the token's
+   `environment` claim (`prod`) instead of the whole repository?
 3. Why do we use `terraform_wrapper: false`?
 4. What does `concurrency` achieve in the apply workflow?
 5. Why shouldn't pull requests from forks run Terraform plans with cloud
@@ -496,11 +514,15 @@ comments, policy checks, and a production approval.
 
 ### Steps
 
-1. **Create a GitHub repository** (private is fine), e.g. `web-shop-infra`.
+1. **Create a GitHub repository**, e.g. `web-shop-infra`. Make it public
+   if you want to try the prod approval (step 3) and the branch ruleset
+   (step 9): on GitHub Free, both are available only for public
+   repositories. With a private repository, everything else works, and prod
+   deploys without an approval.
 2. **Bootstrap Google Cloud.** In `bootstrap/`, create `terraform.tfvars`
    (project, `OWNER/web-shop-infra`, state bucket from Chapter 10). Complete
-   the two `TODO`s in `main.tf` (the attribute condition and the
-   environment-bound principal). `terraform init && terraform apply`. Keep the
+   the two `TODO`s in `main.tf` (the attribute condition, and the
+   `apply_wif` binding for `attribute.environment`, which you uncomment). `terraform init && terraform apply`. Keep the
    `github_variables` output open.
 3. **Configure GitHub.**
    * *Settings → Secrets and variables → Actions → Variables*: create one
@@ -513,18 +535,25 @@ comments, policy checks, and a production approval.
    [actionlint](https://github.com/rhysd/actionlint).
 5. **Push.** Copy the contents of `repo/` into your repository clone, commit
    to `main`, and push. The apply workflow runs: dev deploys, prod waits for
-   your approval. Approve it. (If you deployed `envs/dev`/`envs/prod` locally
+   your approval. Approve it. The services are **private** (`public =
+   false`), because the policy library bans `allUsers` on Cloud Run. Call
+   one with an identity token:
+   `curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" <url>`. (If you deployed `envs/dev`/`envs/prod` locally
    in Chapter 18 with the same state bucket, the pipeline simply takes over
    that state.)
 6. **Make a change through a pull request.** Create a branch, change
    `max_instances` in `infra/envs/dev/main.tf` to `3`, push, and open a PR.
    Watch the checks and the plan comments for dev and prod.
-7. **Break a policy.** On the same branch, set `public_access_prevention` in
-   the module to `"inherited"`. Push. The *Plan and vet* jobs fail with a
-   policy violation. Revert the change and push again.
+7. **Break a policy.** On the same branch, remove the `managed_by` label from
+   `local.labels` in the module. Push. The static checks pass (the unit tests
+   only check the `environment` label), but the *Plan and vet* jobs fail with
+   a policy violation. Restore the label and push again. (Setting
+   `public_access_prevention = "inherited"` would be caught even earlier: a
+   unit test fails, and *Plan and vet* doesn't run at all.)
 8. **Merge** the PR. Dev applies automatically; approve prod.
 9. **Require checks:** add a branch ruleset for `main` requiring the three
-   checks and one approval.
+   checks (public repository, or a paid plan for a private one). Add the
+   one-approval rule only if someone else can review your pull requests.
 
 ### Expected result
 
@@ -549,6 +578,11 @@ $ cd ../../../../bootstrap && terraform destroy
 (Set `deletion_protection = false` in prod and apply before destroying.)
 Archive or delete the GitHub repository.
 
+Google keeps a deleted workload identity pool for 30 days, and its ID can't
+be reused in that time. To run the bootstrap again within 30 days, restore
+the pool first (`gcloud iam workload-identity-pools undelete github
+--location=global`) and import it, or choose a different pool ID.
+
 ---
 
 ## Quick check answers
@@ -556,6 +590,9 @@ Archive or delete the GitHub repository.
 1. `id-token: write`.
 2. So that only jobs running in the protected `prod` GitHub environment
    (which require a reviewer's approval) can obtain production credentials.
+   (The book binds to the token's `environment` claim rather than its
+   subject, because new repositories get immutable subjects with numeric
+   IDs.)
    Any other workflow in the repository, including a modified one in a pull
    request, can't.
 3. The wrapper script changes how output and exit codes are handled; disabling

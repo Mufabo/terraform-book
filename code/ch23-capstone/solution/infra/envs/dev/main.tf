@@ -51,7 +51,7 @@ module "web_app" {
   environment         = "dev"
   min_instances       = 0
   max_instances       = 2
-  public              = true
+  public              = false # the policy library bans allUsers on Cloud Run (Chapter 20)
   deletion_protection = false
   subnet_id           = module.network.subnet_id
 

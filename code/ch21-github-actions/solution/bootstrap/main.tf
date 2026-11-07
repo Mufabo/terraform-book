@@ -25,9 +25,10 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   display_name                       = "GitHub OIDC"
 
   attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
+    "google.subject"        = "assertion.sub"
+    "attribute.repository"  = "assertion.repository"
+    "attribute.ref"         = "assertion.ref"
+    "attribute.environment" = "assertion.environment"
   }
 
   # Only tokens issued for our repository are accepted.
@@ -93,13 +94,14 @@ resource "google_project_iam_member" "apply_iam_admin" {
 
 # Only jobs that run in the matching GitHub *environment* may impersonate
 # the apply identity. The environment's protection rules (e.g. required
-# reviewers for prod) therefore guard the credentials too.
+# reviewers for prod) therefore guard the credentials too. The
+# attribute_condition above already limits the pool to our repository.
 resource "google_service_account_iam_member" "apply_wif" {
   for_each = var.environments
 
   service_account_id = google_service_account.apply[each.key].name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principal://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/subject/repo:${var.github_repository}:environment:${each.key}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.environment/${each.key}"
 }
 
 # --- State bucket access ----------------------------------------------------
