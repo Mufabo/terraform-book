@@ -169,7 +169,13 @@ $ terraform output -raw bucket_url        # no quotes, ideal for scripts
 gs://tf-book-fatih-12345-data
 
 $ terraform output -json
-{"bucket_url":{"sensitive":false,"type":"string","value":"gs://tf-book-fatih-12345-data"}}
+{
+  "bucket_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "gs://tf-book-fatih-12345-data"
+  }
+}
 ```
 
 Output arguments:
@@ -250,9 +256,9 @@ Terraform converts between primitives automatically where it can
 ```hcl
 variable "bucket" {
   type = object({
-    name          = string
-    location      = string
-    versioning    = bool
+    name           = string
+    location       = string
+    versioning     = bool
     retention_days = number
   })
 }
@@ -448,8 +454,8 @@ locals, outputs, and complex types.
    default `{}`), and `network` — an object with `name` (string) and
    `subnet_cidr` (string), plus an optional `allowed_ports` list of strings
    defaulting to `["80"]`.
-3. In `main.tf`, replace every hard-coded value marked `TODO` with a variable
-   or local. Create a local `common_labels` that merges `var.labels` with
+3. In `main.tf` and `providers.tf`, replace every hard-coded value marked
+   `TODO` with a variable or local. Create a local `common_labels` that merges `var.labels` with
    `environment` and `managed_by`.
 4. In `outputs.tf`, output the bucket URL, the network ID, and the subnet's
    CIDR range.
@@ -462,8 +468,11 @@ locals, outputs, and complex types.
    ```
 
 6. **Precedence experiment:** Without applying, run
-   `TF_VAR_environment=test terraform plan` and check the bucket name in the
-   plan. Then also add `-var environment=prod`. Which wins? Now create
+   `TF_VAR_environment=test terraform plan`. The plan says "No changes",
+   because your `terraform.tfvars` sets `environment = "dev"`, and a tfvars
+   file beats an environment variable. Then also add
+   `-var environment=prod`. Which wins now? (Look at the bucket name in the
+   plan: renaming forces replacement.) Now create
    `override.auto.tfvars` with `environment = "auto"` and run plain
    `terraform plan`. Delete the file afterwards.
 7. Open `terraform console` and evaluate `var.network`, `local.common_labels`,
