@@ -125,12 +125,18 @@ To focus on one part of the system:
 $ TF_LOG_PROVIDER=DEBUG terraform apply 2> provider.log
 ```
 
-For Google Cloud problems, provider logs at `DEBUG` show the exact HTTP
-requests sent to Google APIs and the full responses — invaluable for
-mysterious API errors:
+For Google Cloud problems, a `DEBUG` log shows the exact HTTP requests sent
+to Google APIs and the full responses — invaluable for mysterious API
+errors. Use `TF_LOG=DEBUG` for this: the Google provider's request and
+response details are missing from a log made with only `TF_LOG_PROVIDER`
+set, even at `TRACE`.
+
+```console
+$ TF_LOG=DEBUG terraform apply 2> debug.log
+```
 
 ```
-[DEBUG] provider.terraform-provider-google_v8.9.0: Google API Request Details:
+[DEBUG] provider.terraform-provider-google_v8.9.0_x5: ... [DEBUG] Google API Request Details:
 ---[ REQUEST ]---------------------------------------
 POST /compute/v1/projects/tf-book-fatih-12345/global/networks?alt=json HTTP/1.1
 ...
@@ -227,7 +233,8 @@ their own resource).
 | HTTP code / message | Meaning | Typical fix |
 |---|---|---|
 | `could not find default credentials` | No ADC | `gcloud auth application-default login` |
-| **400** `Invalid value` | Bad argument value (name format, CIDR, region) | Check the value against the API's rules |
+| **400** `Invalid value` | Bad argument value (name format, CIDR) | Check the value against the API's rules |
+| **403** `Permission denied on 'locations/...' (or it may not exist)` | A region or zone that doesn't exist (or that you may not use) | Check the spelling against `gcloud compute regions list` |
 | **403** `... has not been used in project ... or it is disabled` | API not enabled | `google_project_service` or `gcloud services enable` |
 | **403** `Required '...' permission` / `PERMISSION_DENIED` | Missing IAM role for the identity Terraform uses | Grant the role; check which identity is used (`gcloud auth list`, impersonation) |
 | **403** `BILLING_DISABLED` | No billing account linked | Link billing (Chapter 2) |
@@ -310,9 +317,11 @@ using error messages, `validate`, `console`, and logs.
    ```
 
    Look at `debug.log`: it's empty, because no log level was set. Now run
-   `TF_LOG_PROVIDER=DEBUG TF_LOG_PATH=./debug.log terraform apply` and search
-   the log for the failing HTTP request and response:
-   `grep -n "HTTP/2.0 4" debug.log`.
+   `TF_LOG=DEBUG TF_LOG_PATH=./debug.log terraform apply` and search the log
+   for the failing HTTP request and response:
+   `grep -n "HTTP/2.0 4" debug.log`. (With `TF_LOG_PROVIDER=DEBUG` instead,
+   the search finds nothing: the Google provider's HTTP details only appear
+   with `TF_LOG`.)
 4. Write down for each bug: the category (language/state/core/provider), the
    command that revealed it, and the fix. Compare with
    `code/ch15-troubleshooting/solution/BUGS.md`.
