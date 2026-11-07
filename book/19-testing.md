@@ -295,6 +295,11 @@ are for.
 Integration tests use the real provider and `command = apply`:
 
 ```hcl
+variable "project_id" {
+  description = "Project to create the test resources in."
+  type        = string
+}
+
 provider "google" {
   project = var.project_id
   region  = "europe-west1"
@@ -303,7 +308,7 @@ provider "google" {
 variables {
   region      = "europe-west1"
   environment = "dev"
-  app_name    = "tftest"         # avoid clashing with real environments
+  app_name    = "tftest" # avoid clashing with real environments
 }
 
 run "service_responds" {
@@ -315,6 +320,12 @@ run "service_responds" {
   }
 }
 ```
+
+The `variable "project_id"` block declares a variable that is used only in
+the test file (the provider block needs it). Without it, Terraform 1.17
+reads the value from `TF_VAR_project_id` as an expression, so
+`tf-book-fatih-12345` looks like a subtraction and the test fails with
+`Variables not allowed`.
 
 ```console
 $ TF_VAR_project_id=tf-book-fatih-12345 terraform test -filter=tests/integration.tftest.hcl

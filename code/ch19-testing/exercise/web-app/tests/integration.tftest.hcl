@@ -5,6 +5,11 @@
 #
 # It needs credentials (ADC) and takes a couple of minutes.
 
+variable "project_id" {
+  description = "Project to create the test resources in."
+  type        = string
+}
+
 provider "google" {
   project = var.project_id
   region  = "europe-west1"
