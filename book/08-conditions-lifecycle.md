@@ -66,6 +66,8 @@ $ terraform plan -var environment=qa
 │
 │   on variables.tf line 1:
 │    1: variable "environment" {
+│     ├────────────────
+│     │ var.environment is "qa"
 │
 │ environment must be one of: dev, staging, prod.
 │
@@ -311,16 +313,22 @@ resource "google_compute_instance" "web" {
   # ...
   labels = {
     environment = "dev"
+    last_backup = "never" # a backup tool updates this after each backup
   }
 
   lifecycle {
     ignore_changes = [
-      labels["last_backup"],          # set by a backup tool
-      metadata["ssh-keys"],           # managed by OS Login / users
+      labels["last_backup"],
+      metadata["ssh-keys"], # managed by OS Login / users
     ]
   }
 }
 ```
+
+With the Google provider, `ignore_changes` on a label only matters for a
+label you set in `labels`, like `last_backup` above. The provider compares
+only those; a label that someone adds outside Terraform never shows up as a
+change in the first place.
 
 `ignore_changes = all` ignores every attribute — rarely a good idea.
 
@@ -421,15 +429,26 @@ rules to a small configuration, and watch them fire.
      website returns status 200.
 4. `terraform init` and `terraform apply`. Immediately after the first apply,
    the check probably **warns** (nginx is still installing). Wait a minute and
-   run `terraform plan` — the warning disappears.
+   run `terraform plan` — the warning disappears. The plan still lists
+   `data.http.home` as "will be read during apply (config will be reloaded
+   to verify a check block)" and ends with `Plan: 0 to add, 0 to change,
+   0 to destroy` instead of "No changes": a check's data source is always
+   read again during the apply.
 5. Trigger each rule and read the messages:
    * `terraform plan -var environment=qa`
    * `terraform plan -var machine_type=n2-standard-2`
    * `terraform plan -var environment=prod`
    * `terraform plan -var allowed_cidr=banana`
-6. Add a label manually:
+
+   The `prod` plan shows a second error, `Instance cannot be destroyed`: the
+   bucket name contains the environment, so renaming it means replacing it,
+   and `prevent_destroy` forbids that.
+6. Change the VM's `owner` label (set to `platform-team` in `main.tf`)
+   outside Terraform:
    `gcloud compute instances add-labels ch08-web --labels=owner=alice --zone=<zone>`.
    Run `terraform plan` — no change proposed, thanks to `ignore_changes`.
+   Comment out the `ignore_changes` line and plan again: now Terraform wants
+   to set `owner` back from `alice` to `platform-team`. Restore the line.
 7. Run `terraform destroy`. It fails because of `prevent_destroy`. Read the
    error.
 

@@ -54,6 +54,7 @@ resource "google_compute_instance" "web" {
 
   labels = {
     environment = var.environment
+    owner       = "platform-team" # step 6 changes this outside Terraform
   }
 
   boot_disk {
