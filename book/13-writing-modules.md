@@ -374,7 +374,10 @@ existing resource into it without re-creating it.
    `terraform plan`. The bucket must **not** be replaced — only updated in
    place (new settings like public access prevention).
 5. **Reuse.** Add a second module call `module "reports"` using `for_each`
-   over `toset(["finance", "marketing"])` to create two more buckets.
+   over `toset(["finance", "marketing"])` to create two more buckets. Run
+   `terraform init` again: every new `module` block needs it, even when it
+   uses the same source as an existing one. Otherwise `plan` fails with
+   "Module not installed".
 6. **Scope experiment.** Inside `modules/secure-bucket/main.tf`, try using
    `var.environment` (which only exists in the root). Run
    `terraform validate` and read the error. Remove it again.
