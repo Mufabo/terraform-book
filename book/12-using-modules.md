@@ -263,6 +263,26 @@ above.
 4. Are module versions recorded in `.terraform.lock.hcl`?
 5. What does `//` mean in `github.com/acme/modules//network`?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A module block has `source = "git::https://example.com/network.git"` and
+   `version = "1.2.0"`. `terraform init` reports an error. Why?
+
+   * A. Git sources need a lock file entry.
+   * B. Terraform can't download modules from Git.
+   * C. `version` works only with registry sources; a Git source is pinned
+     with `?ref=v1.2.0`.
+   * D. The module needs `terraform init -upgrade`.
+
+7. A module is called with `version = "~> 18.0"`. Your working directory has
+   18.1.0 installed, and 18.3.1 has been released. You run `terraform init`.
+   Which version do you have afterwards?
+
+   * A. 18.1.0, until you run `terraform init -upgrade`
+   * B. 18.3.1
+   * C. None; `init` fails
+   * D. Whatever the lock file says
+
 ---
 
 ## Hands-on exercise: Build with public modules
@@ -348,3 +368,7 @@ $ terraform destroy
 3. `module.vpc.network_name`
 4. No — only providers.
 5. A sub-directory inside the repository (`network`).
+6. **C.** For Git, the tag, branch, or commit is part of the `source` URL.
+7. **A.** An installed module that satisfies the constraint is kept. A fresh
+   clone would get 18.3.1, because the lock file doesn't cover modules; that
+   is why exact pins are safer.

@@ -423,6 +423,26 @@ that just stores a value; it's handy exactly for this kind of trigger.
 5. You add `prevent_destroy = true` and then delete the whole resource block.
    What happens on the next apply?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A team wants Terraform to report on every run whether their website still
+   answers with HTTP 200, but a failing check must never block a deployment.
+   Which construct fits?
+
+   * A. A `postcondition` on the VM
+   * B. A `validation` block
+   * C. A `precondition` on an output
+   * D. A `check` block with a scoped data source
+
+7. A database resource has `prevent_destroy = true`. An engineer changes an
+   argument that forces replacement and runs `terraform plan`. What happens?
+
+   * A. Terraform replaces it, creating the new one first.
+   * B. The plan fails with an error, because replacing the resource would
+     destroy it.
+   * C. Terraform ignores the changed argument.
+   * D. The plan succeeds with a warning.
+
 ---
 
 ## Hands-on exercise: Guard rails for a web server
@@ -532,3 +552,7 @@ $ terraform destroy
 4. `create_before_destroy = true`.
 5. The resource is destroyed — `prevent_destroy` was removed along with the
    block, so it no longer protects anything.
+6. **D.** Check blocks produce warnings; the other three stop the run with an
+   error.
+7. **B.** `prevent_destroy` rejects every plan that includes destroying the
+   resource, and a replacement does.

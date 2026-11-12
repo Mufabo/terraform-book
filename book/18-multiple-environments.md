@@ -292,6 +292,25 @@ Promotion is then a small, reviewable pull request that bumps `v1.3.2` to
 5. How can you roll out a module change to dev before prod in a
    directory-per-environment layout?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A team separates environments with CLI workspaces. A change meant for dev
+   was applied to prod. Which weakness of this strategy made that easy?
+
+   * A. Workspaces share one state file.
+   * B. Workspaces can't use variables.
+   * C. The selected workspace isn't visible in the code or the folder; `prod`
+     was still selected from an earlier command.
+   * D. Workspaces don't support locking.
+
+7. Dev should run a new version of a shared module for a week before prod gets
+   it. Which layout supports that?
+
+   * A. A directory per environment, each pinning the module to a version
+   * B. CLI workspaces
+   * C. One configuration with a tfvars file per environment
+   * D. None; all environments must always use the same module code
+
 ---
 
 ## Hands-on exercise: dev and prod from one module
@@ -410,3 +429,6 @@ setting deletion_protection=false and running terraform apply`.
    compromised identity in dev can't affect prod.
 5. Apply dev first in the pipeline and prod after approval; or version the
    module and bump the version in `envs/dev` before `envs/prod`.
+6. **C.** Each workspace has its own state, but nothing on screen says which
+   one is active unless you ask.
+7. **A.** Only separate root modules can pin different module versions.

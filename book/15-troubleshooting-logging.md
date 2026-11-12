@@ -300,6 +300,26 @@ made them, and why.
    project`. What's the fix?
 5. Why should you be careful when sharing debug logs?
 
+**Scenario questions** (exam style; one answer each)
+
+6. You suspect a provider bug and want to attach a log to a bug report. It
+   should contain the provider's messages, not Terraform Core's, and go to a
+   file. Which settings fit?
+
+   * A. `TF_LOG=ERROR`
+   * B. `TF_LOG_CORE=TRACE`
+   * C. `TF_DEBUG=1`
+   * D. `TF_LOG_PROVIDER=TRACE` and `TF_LOG_PATH=./provider.log`
+
+7. `terraform apply` fails with `Error 409: ... already exists` while creating
+   a bucket. The bucket is yours and should be managed by this configuration,
+   but it isn't in the state. What is the right fix?
+
+   * A. Run `terraform force-unlock`.
+   * B. Import the bucket into the state.
+   * C. Run the apply with `-replace`.
+   * D. Enable `TF_LOG=TRACE`.
+
 ---
 
 ## Hands-on exercise: Fix the broken configuration
@@ -390,3 +410,8 @@ $ rm -f debug.log trace.log
 4. Enable the API — with `gcloud services enable` or a
    `google_project_service` resource (plus `depends_on`).
 5. They can contain secrets, access tokens, and other sensitive request data.
+6. **D.** `TF_LOG_PROVIDER` limits logging to providers; `TF_LOG_PATH` writes
+   it to a file. (Section 15.3 notes one Google provider quirk: its HTTP
+   details need `TF_LOG`.)
+7. **B.** The object exists but Terraform doesn't know it; importing links it
+   to the resource block.

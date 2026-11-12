@@ -34,14 +34,14 @@ Most chapters take **about an hour**. Every chapter has the same parts:
 |---|---|---|
 | Learning objectives | 1 min | What you will be able to do afterwards. Exam objective IDs such as `[3d]` show which part of the exam it covers. |
 | Concepts, common mistakes, and summary | 15–35 min | Explanations with small examples you can type along, the traps beginners and exam candidates fall into, and a recap. |
-| Quick check | ~5 min | Five questions to test yourself. Answers are at the end of the chapter. |
+| Quick check | ~5 min | Five recall questions and two exam-style scenario questions. Answers are at the end of the chapter. |
 | Hands-on exercise | 20–45 min | Build something real in your own Google Cloud project. |
 | Stretch goal and challenge | optional | Go further without step-by-step guidance. |
 
 ### How long each chapter takes
 
 Each chapter states its own estimate below the learning objectives. Plan for
-about **23 hours** for the whole book:
+about **24 hours** for the whole book:
 
 | Chapter | Reading | Exercise | Total |
 |---|---|---|---|
@@ -66,7 +66,7 @@ about **23 hours** for the whole book:
 | 19. Testing Terraform Code | 20 min | 30 min | 55 minutes |
 | 20. Policy as Code with `gcloud terraform vet` | 25 min | 30 min | 1 hour |
 | 21. CI/CD with GitHub Actions | 25 min | 45 min | 1 hour 15 minutes |
-| 22. Capstone Project and Exam Preparation | 15 min | 2–3 h + 40 min test | 3–4 hours |
+| 22. Capstone Project and Exam Preparation | 15 min | 2–3 h + two 40-min tests | 3½–4½ hours |
 
 The totals include five minutes for the quick check. Reading is counted at
 about 100 words a minute, a careful pace that leaves room for code and

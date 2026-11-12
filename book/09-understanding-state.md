@@ -341,6 +341,26 @@ state without showing you what will change.)
 4. Which command shows all attributes of a single resource from state?
 5. What is the risk of storing state in a Git repository?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A CI job crashed in the middle of an apply. Every later run fails with
+   "Error acquiring the state lock" and shows a lock ID. You have confirmed
+   that no other run is in progress. What do you do?
+
+   * A. Delete the state file.
+   * B. Add `-lock=false` to all commands from now on.
+   * C. Run `terraform state rm` for all resources.
+   * D. Run `terraform force-unlock <LOCK_ID>`.
+
+7. A bucket should move to another team's configuration without being deleted.
+   What is the first step in the configuration that manages it today?
+
+   * A. Delete its resource block and apply.
+   * B. Make Terraform forget it with `terraform state rm` (or a `removed`
+     block), then remove the block.
+   * C. Run `terraform destroy -target` for it.
+   * D. Replace it with `-replace`.
+
 ---
 
 ## Hands-on exercise: Exploring and changing state
@@ -447,3 +467,7 @@ $ terraform destroy
 4. `terraform state show <address>`.
 5. State can contain secrets in plain text, Git has no locking, and it's easy
    to commit stale or conflicting versions.
+6. **D.** `force-unlock` removes only the stale lock; the state itself is
+   untouched.
+7. **B.** Removing it from state leaves the real bucket alone; deleting only
+   the block would destroy it.

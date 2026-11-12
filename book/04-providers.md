@@ -466,6 +466,27 @@ of it in Chapter 7.
 4. What is the full source address of the Google provider?
 5. Name two things recorded in `.terraform.lock.hcl`.
 
+**Scenario questions** (exam style; one answer each)
+
+6. A configuration has `version = "~> 8.9"` for the Google provider, and the
+   committed lock file records 8.9.0. Version 8.11.0 has been released. A
+   teammate clones the repository and runs `terraform init`. Which version is
+   installed?
+
+   * A. 8.9.0, the version in the lock file
+   * B. 8.11.0, the newest version the constraint allows
+   * C. None; `init` fails because a newer version exists
+   * D. 9.0.0
+
+7. You change a provider constraint from `"3.9.1"` to `"3.8.0"`. `terraform
+   init` fails with "locked provider ... does not match configured version
+   constraint". What do you run?
+
+   * A. `terraform init -reconfigure`
+   * B. `terraform providers`
+   * C. `terraform init -upgrade`
+   * D. `terraform validate`
+
 ---
 
 ## Hands-on exercise: Buckets in two regions with random names
@@ -576,3 +597,7 @@ Answers to steps 5 and 8 and the stretch goal are in
 4. `registry.terraform.io/hashicorp/google`.
 5. The selected version, the constraints, and the package checksums
    (hashes).
+6. **A.** `init` installs the locked version as long as it satisfies the
+   constraint; only `init -upgrade` moves forward.
+7. **C.** `-upgrade` lets `init` select a version other than the locked one
+   (here an older one) and rewrites the lock file.

@@ -451,6 +451,28 @@ in parallel.
 4. What plan symbol is used for reading a data source?
 5. In which order does Terraform destroy a network, a subnet, and a VM?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A Cloud Run service needs an IAM grant to exist before it can start, but
+   its configuration doesn't use any attribute of the grant. Sometimes
+   Terraform creates the service first, and the apply fails. What is the fix?
+
+   * A. Move the IAM resource above the service in the file.
+   * B. Add `depends_on = [<the IAM resource>]` to the service.
+   * C. Always run with `-parallelism=1`.
+   * D. Replace the IAM resource with a data source.
+
+7. A plan lists a data source with the `<=` symbol and "will be read during
+   apply", and resources that use it show `(known after apply)`. What is the
+   most likely reason?
+
+   * A. The data source's object doesn't exist.
+   * B. Data sources are always read during apply.
+   * C. The credentials are missing.
+   * D. The data source depends on something with pending changes (through
+     `depends_on` or an argument that isn't known yet), so its read is
+     deferred.
+
 ---
 
 ## Hands-on exercise: A web server in its own network
@@ -583,3 +605,7 @@ chapters need it.
    use it; granting an IAM role before a service that needs it starts.
 4. `<=`
 5. Reverse dependency order: VM, then subnet, then network.
+6. **B.** Without a reference Terraform can't see the dependency; file order
+   never matters.
+7. **D.** Data sources are normally read during plan; only deferred reads
+   appear in the plan.

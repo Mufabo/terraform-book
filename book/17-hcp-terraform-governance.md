@@ -348,6 +348,26 @@ Results appear in the workspace's *Health* tab and can trigger notifications.
 4. Name two things a health assessment can detect.
 5. What is a run trigger?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A security team wants every plan scanned by an external tool after the plan
+   and before the apply, and the run must stop if the tool reports a critical
+   finding. Which feature fits?
+
+   * A. A run trigger
+   * B. A post-plan run task with mandatory enforcement
+   * C. A notification
+   * D. A health assessment
+
+7. Developers should be able to start plans in the production workspace and
+   read the results, but not apply. Which workspace role is the smallest that
+   allows this?
+
+   * A. Read
+   * B. Write
+   * C. Admin
+   * D. Plan
+
 ---
 
 ## Hands-on exercise: Private registry and policy enforcement
@@ -461,3 +481,6 @@ the UI. Archive or delete the two GitHub repositories
    blocks or pre/postconditions (continuous validation).
 5. A setting that automatically queues a run in one workspace after a
    successful apply in another workspace.
+6. **B.** Run tasks call external services at a stage of the run and can block
+   it.
+7. **D.** Plan can queue plans; applying needs Write.

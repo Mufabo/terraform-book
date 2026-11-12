@@ -462,6 +462,27 @@ is the index.
 4. When is `count` a better choice than `for_each`?
 5. What does `try(var.config.port, 8080)` do?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A resource uses `count = length(var.names)` with `names = ["a", "b", "c"]`.
+   You remove `"a"` from the list. What does the plan show?
+
+   * A. Only the instance for `a` is destroyed.
+   * B. No changes.
+   * C. The instances at indexes 0 and 1 are changed or replaced and index 2
+     is destroyed, because every remaining element moved to a new index.
+   * D. An error, because the list got shorter.
+
+7. In a new configuration, `for_each = toset([for s in
+   google_compute_subnetwork.this : s.id])` fails with "Invalid for_each
+   argument". Why?
+
+   * A. The keys come from values that are only known after apply; `for_each`
+     keys must be known at plan time.
+   * B. `for_each` doesn't accept sets.
+   * C. `toset()` can't be used with a `for` expression.
+   * D. The subnets need `count` first.
+
 ---
 
 ## Hands-on exercise: A dynamic multi-region network
@@ -564,3 +585,7 @@ $ terraform destroy
    conditionally (`count = var.enabled ? 1 : 0`).
 5. Returns `var.config.port` if it can be evaluated without error, otherwise
    `8080`.
+6. **C.** `count` identifies instances by position. `for_each` identifies them
+   by key and would remove only `a`.
+7. **A.** Use keys that are known during planning, such as the keys of the
+   subnet map.

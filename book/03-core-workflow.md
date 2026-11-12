@@ -667,6 +667,27 @@ exists but should be rare.
 4. What does `-/+` mean in a plan?
 5. Should `.terraform.lock.hcl` be committed to version control?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A CI job must fail when any `.tf` file, including those in module
+   sub-directories, is not formatted. It must not change files. Which command
+   fits?
+
+   * A. `terraform fmt`
+   * B. `terraform validate`
+   * C. `terraform fmt -diff`
+   * D. `terraform fmt -check -recursive`
+
+7. On Monday an engineer runs `terraform plan -out=tfplan`. On Tuesday a
+   colleague applies another change to the same configuration. On Wednesday
+   the engineer runs `terraform apply tfplan`. What happens?
+
+   * A. Terraform asks for confirmation and applies.
+   * B. Terraform refuses: the saved plan is stale, because the state changed
+     after it was made.
+   * C. Terraform merges both changes.
+   * D. Terraform silently creates a new plan and applies that.
+
 ---
 
 ## Hands-on exercise: Your first bucket, end to end
@@ -775,3 +796,6 @@ Answers to step 10 and the stretch goal are in
    stale).
 4. The resource will be destroyed and then re-created (replaced).
 5. Yes.
+6. **D.** `-check` only reports and exits non-zero; `-recursive` includes
+   sub-directories. `-diff` alone still rewrites the files.
+7. **B.** A saved plan is tied to the state it was made from; make a new plan.

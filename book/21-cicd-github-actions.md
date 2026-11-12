@@ -513,6 +513,27 @@ on:
 5. Why shouldn't pull requests from forks run Terraform plans with cloud
    credentials?
 
+**Scenario questions** (exam style; one answer each)
+
+6. The auth step of a workflow fails with `Unable to get
+   ACTIONS_ID_TOKEN_REQUEST_URL`. What is missing?
+
+   * A. A service account key in the repository secrets
+   * B. The `gcloud` CLI on the runner
+   * C. A GitHub environment
+   * D. `permissions: id-token: write` for the job
+
+7. A malicious pull request changes the PR workflow so that it runs `terraform
+   apply` for prod with the apply service account. Why does this fail in the
+   chapter's design?
+
+   * A. Pull requests can't change workflow files.
+   * B. Google only lets tokens with the `environment` claim `prod` use that
+     service account, and only jobs in the protected `prod` GitHub environment
+     get that claim.
+   * C. The state bucket is read-only.
+   * D. `terraform apply` doesn't run on pull request events.
+
 ---
 
 ## Hands-on exercise: A keyless GitHub Actions pipeline
@@ -646,3 +667,7 @@ the pool first (`gcloud iam workload-identity-pools undelete github
 5. Fork code is untrusted; running it with cloud credentials could leak or
    abuse them. GitHub therefore doesn't give fork PRs OIDC tokens by
    default.
+6. **D.** Without that permission the job can't request the OIDC token that
+   Workload Identity Federation exchanges.
+7. **B.** The trust is bound to the GitHub environment, whose protection rules
+   the pull request can't bypass.

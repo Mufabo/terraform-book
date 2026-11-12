@@ -310,6 +310,28 @@ forever in Git.
 5. True or false: with Terraform you can write a single virtual-machine
    resource that runs unchanged on Google Cloud and AWS.
 
+**Scenario questions** (exam style; one answer each)
+
+6. A team builds environments with a shell script of `gcloud` commands. The
+   second run of the script fails because the resources already exist. Which
+   property of Terraform's approach removes this problem?
+
+   * A. It is imperative, so the steps always run in the same order.
+   * B. It deletes all resources before every run.
+   * C. It is declarative and idempotent: it compares the desired state with
+     what exists and makes only the changes that are needed.
+   * D. It ignores errors from the cloud API.
+
+7. A manager says: "Terraform is cloud-agnostic, so we write our virtual
+   machine once and deploy it to Google Cloud and AWS." Which answer is
+   accurate?
+
+   * A. Incorrect: resource definitions are provider-specific. What the clouds
+     share is the workflow, the language, and the tooling.
+   * B. Correct: one resource block works on every cloud.
+   * C. Correct, but only with HCP Terraform.
+   * D. Incorrect: a configuration can use only one provider.
+
 ---
 
 ## Hands-on exercise: Your first look at Terraform code
@@ -396,3 +418,7 @@ Nothing to clean up — you did not create any cloud resources yet.
    infrastructure; once reality matches the code, further applies change
    nothing.
 5. False. Resources are provider-specific; the *workflow* is cloud-agnostic.
+6. **C.** Terraform works out the difference itself; applying the same
+   configuration again changes nothing.
+7. **A.** A `google_compute_instance` is not an `aws_instance`; one
+   configuration can still use both providers.

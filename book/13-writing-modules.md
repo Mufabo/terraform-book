@@ -364,6 +364,27 @@ without re-creation.
 5. You move `google_storage_bucket.logs` into `module.logs`. What do you add
    to avoid re-creating it?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A child module uses `var.environment` but doesn't declare that variable.
+   The root module has a variable with the same name. What does `terraform
+   validate` report?
+
+   * A. Nothing; child modules inherit the root's variables.
+   * B. A warning; the value is `null`.
+   * C. An error: the child refers to an undeclared input variable. Declare it
+     in the child and pass the value in the `module` block.
+   * D. Nothing; the value is an empty string.
+
+7. The author of a published module renames a resource inside it from `this`
+   to `main`. What should the new release contain so that users don't get a
+   destroy and re-create when they upgrade?
+
+   * A. A `moved` block inside the module.
+   * B. Nothing; Terraform detects renames.
+   * C. An instruction for users to run `terraform state rm`.
+   * D. A higher patch version number.
+
 ---
 
 ## Hands-on exercise: Your own secure-bucket module
@@ -463,3 +484,7 @@ $ terraform destroy
 4. `terraform-<PROVIDER>-<NAME>`, e.g. `terraform-google-secure-bucket`.
 5. A `moved` block from `google_storage_bucket.logs` to
    `module.logs.google_storage_bucket.this`.
+6. **C.** Each module has its own namespace; values enter only through its
+   input variables.
+7. **A.** Module authors ship `moved` blocks; every user's state is updated
+   automatically on the next apply.

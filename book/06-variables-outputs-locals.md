@@ -436,6 +436,27 @@ resource block.
 5. Write a variable type for a map of objects where each object has a
    required `cidr` string and an optional `private` bool defaulting to `true`.
 
+**Scenario questions** (exam style; one answer each)
+
+6. `terraform.tfvars` sets `region = "europe-west1"`, a file
+   `prod.auto.tfvars` sets `region = "us-central1"`, and the environment has
+   `TF_VAR_region=asia-east1`. You run `terraform plan` without flags. Which
+   value is used?
+
+   * A. `europe-west1`
+   * B. `asia-east1`
+   * C. `us-central1`
+   * D. The variable's default
+
+7. You need one variable that describes several subnets by name. Each subnet
+   has a required CIDR range (a string) and an optional flag (a bool) that
+   defaults to `true`. Which type fits?
+
+   * A. `map(object({ cidr = string, private = optional(bool, true) }))`
+   * B. `map(string)`
+   * C. `list(any)`
+   * D. `tuple([string, bool])`
+
 ---
 
 ## Hands-on exercise: Parameterise a configuration
@@ -536,3 +557,7 @@ $ terraform destroy
 4. No. It only hides the value in CLI output; the value is stored in state in
    plain text.
 5. `map(object({ cidr = string, private = optional(bool, true) }))`
+6. **C.** `*.auto.tfvars` beats `terraform.tfvars`, which beats `TF_VAR_`
+   environment variables.
+7. **A.** A map gives the names, an object the differently typed attributes,
+   and `optional()` the default.

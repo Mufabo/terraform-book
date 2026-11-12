@@ -512,6 +512,26 @@ feedback in pull requests.
    including bindings that already exist, and why?
 5. What must the Rego rule in a template be called, and what must it return?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A pipeline script treats every non-zero exit code of `gcloud beta terraform
+   vet` as "the tool crashed, try again". What is wrong with that?
+
+   * A. Nothing; non-zero always means a crash.
+   * B. Exit code 2 means there were no violations.
+   * C. `vet` never returns non-zero codes.
+   * D. Exit code 2 means policy violations were found. The build should fail
+     on it, not retry; only other codes are errors.
+
+7. A required-labels template also reports violations for resources that the
+   plan **deletes**. What is missing from its Rego rule?
+
+   * A. A higher `severity`
+   * B. A guard such as `is_object(resource.change.after)`, so that deletes
+     (where `after` is `null`) are skipped
+   * C. A `match.addresses` entry
+   * D. A file in `lib/`
+
 ---
 
 ## Hands-on exercise: Enforce your company's rules
@@ -615,3 +635,6 @@ Nothing was applied — `vet.sh` only plans. Delete any leftover `tfplan` and
    full IAM policy (existing bindings merged with planned changes) and its
    ancestry.
 5. `violation`; it must produce objects with `msg` and `details` keys.
+6. **D.** 0 = no violations, 2 = violations, anything else = error.
+7. **B.** With a helper that falls back to `{}`, a missing `after` looks like
+   "no labels" unless deletes are excluded first.

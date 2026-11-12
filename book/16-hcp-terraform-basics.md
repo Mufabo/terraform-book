@@ -390,6 +390,26 @@ This is how platform teams provision dozens of consistent workspaces.
    credentials.
 5. What is a variable set?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A team wants HCP Terraform's state storage, UI, and run history, but the
+   runs must reach an API that is only available inside the company network.
+   Which execution mode fits?
+
+   * A. Agent
+   * B. Remote
+   * C. Local
+   * D. VCS-driven
+
+7. Every workspace in a project needs the same three environment variables for
+   cloud credentials. New workspaces should get them without extra work. What
+   do you use?
+
+   * A. Workspace variables, copied to each workspace
+   * B. A `terraform.tfvars` file in each repository
+   * C. A variable set applied to the project
+   * D. A run trigger
+
 ---
 
 ## Hands-on exercise: Run Terraform in HCP Terraform with keyless auth
@@ -492,3 +512,7 @@ Then delete the `ch16-app` workspace in the HCP Terraform UI
    `TFC_GCP_WORKLOAD_PROVIDER_NAME`.
 5. A reusable group of variables that can be applied to multiple workspaces,
    projects, or the whole organisation.
+6. **A.** Agents run in your own network and carry out the runs there.
+   VCS-driven is a workflow, not an execution mode.
+7. **C.** Variable sets attached to a project apply to all its workspaces,
+   present and future.

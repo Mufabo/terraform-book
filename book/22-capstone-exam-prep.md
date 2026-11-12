@@ -13,9 +13,9 @@ By the end of this lesson you will be able to:
 * Check your readiness against every exam objective.
 * Answer exam-style questions under time pressure.
 
-**Time:** 3 to 4 hours — about 15 minutes of reading (Parts A and B), 2 to 3
-hours for the capstone project, and 40 minutes for the practice test and its
-review.
+**Time:** 3½ to 4½ hours — about 15 minutes of reading (Parts A and B), 2 to
+3 hours for the capstone project, and 40 minutes for each of the two practice
+tests with its review.
 
 ---
 
@@ -157,10 +157,10 @@ Official resources:
 | 3–4 | Chapters 9–15 the same way. Re-run the Chapter 9 and 11 exercises — state and import questions are common. |
 | 5 | Chapters 16–17 (HCP Terraform). If you skipped the exercises, at least create a free organisation and click through workspaces, variables, variable sets, the registry, and policy sets. |
 | 6 | Walk through Appendix A. Mark every objective you can't explain out loud in two sentences. |
-| 7 | Take the practice test below (Part C) under exam conditions: 30 questions, 30 minutes. |
+| 7 | Take the first practice test (Part C) under exam conditions: 30 questions, 30 minutes. |
 | 8–11 | Study your marked objectives. Read the official documentation pages linked from the exam content list. |
 | 12 | Memorise the cheat sheet (Appendix B): commands, flags, precedence, `~>`. |
-| 13 | Retake the practice test; review every wrong answer *and* every guess. |
+| 13 | Take the second practice test (Part E), which is scenario-based. Review every wrong answer *and* every guess. |
 | 14 | Rest. Check your exam setup (ID, webcam, quiet room). |
 
 ### B.3 Topics that trip people up
@@ -195,7 +195,7 @@ Official resources:
 
 ---
 
-## Part C — Practice test
+## Part C — First practice test
 
 30 questions, 30 minutes. Write down your answers, then check them in
 Part D. Questions marked *(choose two)* have exactly two correct answers.
@@ -377,7 +377,7 @@ D. An apply run
 
 ---
 
-## Part D — Answers and explanations
+## Part D — Answers to the first test
 
 | # | Answer | Explanation | Chapter |
 |---|---|---|---|
@@ -415,6 +415,320 @@ D. An apply run
 **Scoring:** 24 or more correct → you're likely ready. 18–23 → review the
 chapters of the questions you missed. Below 18 → work through the study plan
 in B.2 before booking.
+
+---
+
+## Part E — Second practice test: scenarios
+
+30 questions, 30 minutes. These are harder than Part C: most describe a
+situation and ask what happens or what you would do, which is how many
+questions in the real exam are written. Questions marked *(choose two)* have
+exactly two correct answers. Take this test only after you have reviewed your
+mistakes from Part C.
+
+**1.** A start-up's infrastructure was built in the console by one engineer,
+who has left. Nobody can rebuild the staging environment or say who changed
+what. Which IaC benefits address this directly? *(choose two)*
+
+* A. Lower prices from the cloud provider
+* B. The code documents what exists, and environments can be re-created from
+  it
+* C. There is no longer any need for access control
+* D. Every change is recorded in version control with an author and a reason
+
+**2.** A company manages GitHub repositories, Cloudflare DNS records, and
+Google Cloud resources. Which statement describes how Terraform handles this?
+
+* A. One configuration can use several providers, and values can pass between
+  their resources
+* B. Each platform needs its own IaC tool
+* C. A state file can hold resources of only one provider
+* D. Several providers require HCP Terraform
+
+**3.** A lock file was committed from a Linux machine. Whenever a colleague on
+macOS runs `terraform init`, Git shows the lock file as changed. What stops
+this from recurring?
+
+* A. Add `.terraform.lock.hcl` to `.gitignore`
+* B. Run `terraform init -upgrade` on every machine
+* C. Run `terraform providers lock` with a `-platform` flag for each platform
+  in use and commit the result
+* D. Delete the lock file in CI
+
+**4.** A root module requires the Google provider `>= 8.0`. A child module it
+calls requires `>= 7.0, < 9.0`. Versions 8.9.0 and 9.1.0 are available, and
+there is no lock file. Which version does `terraform init` select?
+
+* A. 9.1.0
+* B. 7.0.0
+* C. None; the constraints conflict
+* D. 8.9.0
+
+**5.** A resource of type `google_compute_network` must be created with the
+`google-beta` provider. Both providers are declared and configured. How do you
+select it?
+
+* A. Rename the resource type to `google-beta_compute_network`
+* B. Add `provider = google-beta` to the resource
+* C. Nothing; Terraform chooses the beta provider when needed
+* D. Declare an alias; without one it's impossible
+
+**6.** You delete a resource block from the configuration. The next `terraform
+apply` destroys the real object. How did Terraform know that the object
+existed, and which provider manages it?
+
+* A. It asked the cloud for a list of all resources
+* B. It read the Git history
+* C. It read the dependency lock file
+* D. The state records the object, its provider, and its dependencies
+
+**7.** A CI job should run `terraform validate` on a configuration that uses a
+`gcs` backend. The job has no credentials for the state bucket. What do you
+run first?
+
+* A. `terraform init -backend=false`
+* B. `terraform init -reconfigure`
+* C. `terraform plan -refresh=false`
+* D. Nothing; `validate` needs no `init`
+
+**8.** A script runs `terraform plan -detailed-exitcode` and receives exit
+code 2. What does that mean?
+
+* A. The plan failed with an error
+* B. The saved plan is stale
+* C. The plan succeeded and there are changes to apply
+* D. The plan succeeded and there is nothing to change
+
+**9.** An apply creates five resources. The third fails because a quota is
+exhausted. What is the situation afterwards?
+
+* A. Terraform rolled back the first two resources
+* B. The first two resources exist and are recorded in state; after fixing the
+  cause, another apply continues
+* C. The state file is corrupt and must be restored
+* D. Everything must be destroyed before trying again
+
+**10.** One of twenty resources in a configuration is no longer needed. What
+is the normal way to remove it?
+
+* A. Run `terraform destroy`
+* B. Run `terraform state rm` for it
+* C. Run `terraform destroy -target` for it and leave the code as it is
+* D. Delete its block from the configuration and apply
+
+**11.** A VM is declared with `image =
+"data.google_compute_image.debian.self_link"`. The apply fails because the
+image is invalid. What is wrong?
+
+* A. The data source needs `depends_on`
+* B. The reference is in quotes, so the literal text is sent as the image name
+* C. Data sources have no `self_link` attribute
+* D. The `data.` prefix is not allowed in arguments
+
+**12.** A variable has no default. A pipeline runs `terraform plan
+-input=false` without setting it anywhere. What happens?
+
+* A. Terraform asks for the value interactively
+* B. The value is `null`
+* C. The plan fails: no value for a required variable
+* D. The value is an empty string
+
+**13.** A variable is declared as `set(string)`. The code uses `var.zones[0]`.
+What is the result?
+
+* A. An error: sets have no order and can't be indexed
+* B. The first element in alphabetical order
+* C. A random element
+* D. `null`
+
+**14.** What does `[for k, v in { a = 1, b = 2 } : "${k}=${v}" if v > 1]`
+evaluate to?
+
+* A. `["a=1", "b=2"]`
+* B. `{ b = 2 }`
+* C. An error
+* D. `["b=2"]`
+
+**15.** A firewall rule is created with `count = var.enable_ssh ? 1 : 0`. An
+output should return the rule's name, or `null` when the rule doesn't exist.
+Which expression works in both cases?
+
+* A. `google_compute_firewall.ssh.name`
+* B. `google_compute_firewall.ssh[0].name`
+* C. `one(google_compute_firewall.ssh[*].name)`
+* D. `google_compute_firewall.ssh[count.index].name`
+
+**16.** Which of these stop a plan or apply with an **error** when their
+condition is false? *(choose two)*
+
+* A. A `validation` block in a variable
+* B. An `assert` in a `check` block
+* C. The `description` of an output
+* D. A `postcondition` in a resource's `lifecycle` block
+
+**17.** Which of these keep a secret's value out of the Terraform state?
+*(choose two)*
+
+* A. `sensitive = true` on the variable
+* B. An ephemeral resource whose result goes into a write-only argument
+* C. `sensitive = true` on the output
+* D. Letting the application read the secret from a secret manager at runtime,
+  so Terraform never handles the value
+
+**18.** A configuration reads a database password from Vault with an ordinary
+data source and passes it to a resource's `password` argument. Where is the
+password afterwards, besides Vault and the database?
+
+* A. Nowhere else
+* B. In the dependency lock file, encrypted
+* C. In the provider's cache directory
+* D. In the state (and in saved plan files) in plain text
+
+**19.** What does `source = "github.com/acme/modules//network?ref=v1.2.0"`
+select?
+
+* A. The sub-directory `network` of the repository, at the tag `v1.2.0`
+* B. A branch called `network`
+* C. Two modules, `modules` and `network`
+* D. Nothing; the double slash is a syntax error
+
+**20.** A root module calls the modules `network` and `app`. `app` needs the
+ID of a subnet that `network` creates. What is required? *(choose two)*
+
+* A. `app` refers to `module.network.subnet_id` in its own code
+* B. `network` declares an output for the subnet ID
+* C. A `terraform_remote_state` data source in `app`
+* D. The root passes `module.network.subnet_id` to an input variable of `app`
+
+**21.** A module is called with `version = "~> 18.0"`. One engineer installed
+it months ago and has 18.1.0. A new colleague clones the repository today,
+when 18.3.1 is available, and gets different plans. What prevents this?
+
+* A. Committing the `.terraform` directory
+* B. The dependency lock file
+* C. Pinning the module to an exact version
+* D. Never running `terraform init -upgrade`
+
+**22.** Two engineers each run `terraform apply` for the same project from
+their own laptops, with the default local backend. What is the problem?
+
+* A. The second apply waits for the first one's lock
+* B. Each laptop has its own state file and its own lock, so they create
+  duplicates or collide; they need a shared remote backend
+* C. Nothing; Terraform merges the state files
+* D. The second engineer's apply is always rejected
+
+**23.** A configuration with existing local state gets a `backend "gcs"`
+block. During `terraform init` the engineer answers **no** to copying the
+existing state. What does the next `terraform plan` show?
+
+* A. No changes
+* B. An error about a missing state
+* C. A plan to create every resource again, because the new backend's state is
+  empty
+* D. A plan to destroy every resource
+
+**24.** A nightly job should detect drift and report it, without changing
+infrastructure or state. Which command fits?
+
+* A. `terraform plan -refresh-only -detailed-exitcode`
+* B. `terraform apply -refresh-only -auto-approve`
+* C. `terraform refresh`
+* D. `terraform plan -destroy`
+
+**25.** A VM's startup script failed halfway. The configuration hasn't
+changed, and you want Terraform to re-create the VM. What do you run?
+
+* A. `terraform state rm` for the VM, then `terraform apply`
+* B. `terraform destroy`
+* C. `terraform apply -refresh-only`
+* D. `terraform apply -replace=<address>`
+
+**26.** After importing a bucket, `terraform plan` shows in-place changes for
+it. What does that tell you?
+
+* A. The import failed
+* B. The resource block doesn't match the real bucket's settings; adjust the
+  configuration until the plan is clean, or accept the changes on purpose
+* C. The state is corrupt
+* D. Import always requires one corrective apply
+
+**27.** A script needs the addresses of all resources in the state, and then
+every attribute of one of them. Which commands does it use?
+
+* A. `terraform output`, then `terraform console`
+* B. `terraform providers`, then `terraform graph`
+* C. `terraform state list`, then `terraform state show <address>`
+* D. `terraform validate`, then `terraform show`
+
+**28.** Terraform crashes with a panic during `terraform plan`. What helps the
+maintainers diagnose it? *(choose two)*
+
+* A. The `crash.log` file Terraform wrote
+* B. The dependency lock file
+* C. A log made with `TF_LOG=TRACE`
+* D. Your `terraform.tfvars`
+
+**29.** A workspace uses the VCS-driven workflow, and auto-apply is off. A
+pull request is merged into the main branch. What happens?
+
+* A. Nothing, until someone starts a run by hand
+* B. A run plans the change and then waits for someone with permission to
+  confirm the apply
+* C. The change is applied immediately
+* D. Only a speculative plan runs, which can't be applied
+
+**30.** A team keeps a Google Cloud service account key in a sensitive
+workspace variable. What is the more secure alternative in HCP Terraform?
+
+* A. Dynamic provider credentials: each run gets short-lived credentials
+  through OIDC and Workload Identity Federation
+* B. The key in a `terraform.tfvars` file in the repository
+* C. The key in a variable set that isn't marked sensitive
+* D. A key that is rotated every year
+
+---
+
+## Part F — Answers to the second test
+
+| # | Answer | Explanation | Chapter |
+|---|---|---|---|
+| 1 | B, D | Repeatability and version history. IaC doesn't change prices or replace IAM. | 1 |
+| 2 | A | Service-agnostic workflow: one language and workflow, many providers in one configuration. | 1 |
+| 3 | C | The lock file then holds the checksums for all platforms up front. It must stay in version control. | 4 |
+| 4 | D | Terraform picks the newest version that satisfies the constraints of **all** modules. | 4, 12 |
+| 5 | B | Resource types start with `google_` in both providers, so the `provider` meta-argument decides. | 4 |
+| 6 | D | State maps configuration to real objects and keeps this metadata even after the code is gone. | 9 |
+| 7 | A | `validate` needs the providers installed, but not the backend. | 3, 10 |
+| 8 | C | 0 = no changes, 1 = error, 2 = changes present. | 3 |
+| 9 | B | Terraform doesn't roll back. State reflects what was created, and the next apply does the rest. | 1, 3 |
+| 10 | D | The configuration is the desired state. `destroy` removes everything, `state rm` leaves the object running, and `-target` is for exceptions. | 3 |
+| 11 | B | A quoted reference is just a string. References are written without quotes. | 5 |
+| 12 | C | Without a default the variable is required, and `-input=false` forbids the prompt. | 6 |
+| 13 | A | Convert with `tolist()` (and `sort()` for a defined order), or declare a list. | 6, 7 |
+| 14 | D | Square brackets produce a list; the `if` clause filters out `a`. | 7 |
+| 15 | C | With zero instances `[0]` is an error; `one()` returns `null` for an empty list. | 7 |
+| 16 | A, D | Validations, preconditions, and postconditions block. Check blocks only warn. | 8 |
+| 17 | B, D | `sensitive` only hides values in CLI output; the state still contains them. | 14 |
+| 18 | D | Values read by data sources and stored resource arguments are written to state. Vault's benefits don't change that; ephemeral resources do. | 14 |
+| 19 | A | `//` separates the repository from a sub-directory; `?ref=` selects a tag, branch, or commit. | 12 |
+| 20 | B, D | Siblings can't see each other. The parent wires an output of one into an input of the other. | 13 |
+| 21 | C | The lock file covers providers only, so a fresh `init` takes the newest module version the constraint allows. | 12 |
+| 22 | B | Local state isn't shared. A remote backend gives one state and locking across machines. | 9, 10 |
+| 23 | C | The state stayed behind in the local file. Terraform now knows of no resources, although they exist. | 10 |
+| 24 | A | A refresh-only **plan** changes nothing, and the exit code tells the job whether drift was found. The apply variant and `refresh` write the state. | 11 |
+| 25 | D | `-replace` plans the re-creation and shows it before anything happens. `state rm` would leave the old VM running and collide with the new one. | 11 |
+| 26 | B | Import only records the object in state. Any difference between your block and reality shows up as a planned change. | 11 |
+| 27 | C | `state list` prints addresses; `state show` prints one resource's attributes. | 9 |
+| 28 | A, C | The crash log holds the stack trace and a trace log shows what led to it. Redact secrets before sharing either. | 15 |
+| 29 | B | Merges start a real run. Without auto-apply it stops after the plan (and policy checks) for confirmation. Speculative plans belong to pull requests. | 16 |
+| 30 | A | No long-lived secret is stored at all; the run's identity is exchanged for temporary credentials. | 16 |
+
+**Scoring:** 24 or more correct → you can handle scenario questions; book the
+exam. 18–23 → for each miss, write down *why* the right answer is right and
+why your answer isn't, then reread that chapter's "Common mistakes and exam
+tips". Below 18 → the facts are there but applying them isn't yet: redo the
+chapter challenges for your weakest objectives.
 
 ---
 

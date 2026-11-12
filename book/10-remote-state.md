@@ -354,6 +354,30 @@ More about the remote state data source:
 4. What does `terraform_remote_state` give you access to?
 5. Name three settings that make a state bucket more secure.
 
+**Scenario questions** (exam style; one answer each)
+
+6. A team deploys the same code to dev and prod, with a different state bucket
+   for each. `bucket = var.state_bucket` in the `backend` block fails. What is
+   the recommended solution?
+
+   * A. Partial configuration: leave the setting out of the `backend` block
+     and pass it with `terraform init -backend-config=...`.
+   * B. Edit the bucket name in the code before every run.
+   * C. Put the bucket name into a local.
+   * D. Use `terraform_remote_state`.
+
+7. The app configuration reads
+   `data.terraform_remote_state.network.outputs.subnet_id` and fails with
+   "This object does not have an attribute named subnet_id". In the network
+   configuration the value exists as `module.network.subnet_id`. What fixes
+   it?
+
+   * A. Read `outputs.module.network.subnet_id` instead.
+   * B. Give the app configuration access to the module's source.
+   * C. Add a root-level `output` to the network configuration that passes the
+     module output on, and apply it.
+   * D. Add `depends_on` to the data source.
+
 ---
 
 ## Hands-on exercise: Move to remote state and share outputs
@@ -485,3 +509,7 @@ destroy in `bootstrap/`.)
 4. The root-module output values of another configuration's state.
 5. Any three: versioning, uniform bucket-level access, public access
    prevention, least-privilege IAM, CMEK encryption, `prevent_destroy`.
+6. **A.** Backends are configured before variables exist; `-backend-config`
+   supplies the values at init time.
+7. **C.** Remote state exposes only root-module outputs, and outputs are
+   written to state by an apply.

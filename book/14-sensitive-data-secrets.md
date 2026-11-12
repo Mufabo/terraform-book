@@ -401,6 +401,27 @@ You need `roles/iam.serviceAccountTokenCreator` on that service account.
 4. Name two benefits of Vault's dynamic secrets.
 5. How should a GitHub Actions pipeline authenticate Terraform to Google Cloud?
 
+**Scenario questions** (exam style; one answer each)
+
+6. An audit finds a database password in plain text in the state file,
+   although the variable has `sensitive = true`. Which change keeps a new
+   password out of state?
+
+   * A. Mark the output `sensitive` as well.
+   * B. Encrypt `terraform.tfvars`.
+   * C. Use a longer password.
+   * D. Pass an ephemeral value to a write-only argument (such as
+     `password_wo`).
+
+7. A secret is stored through `secret_data_wo`. The team changes the value
+   that feeds it, but `terraform plan` shows no changes. Why?
+
+   * A. It is a provider bug.
+   * B. Terraform doesn't store write-only values, so it can't see the change.
+     Increase `secret_data_wo_version` to send the new value.
+   * C. The state must be refreshed first.
+   * D. Secret versions can't be changed.
+
 ---
 
 ## Hands-on exercise: Secrets without leaks
@@ -526,3 +547,7 @@ $ terraform destroy
 4. Any two: short-lived credentials, generated on demand, automatic expiry,
    unique per consumer, audited, nothing long-lived to leak.
 5. With Workload Identity Federation (OIDC) — no service account keys.
+6. **D.** `sensitive` only redacts output. Ephemeral values and write-only
+   arguments are never written to plan or state.
+7. **B.** The version number is the only signal Terraform has for a write-only
+   argument.

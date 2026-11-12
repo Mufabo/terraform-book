@@ -492,6 +492,29 @@ directory**.
 4. Does a budget alert stop spending when it is reached?
 5. Why should you avoid service account key files?
 
+**Scenario questions** (exam style; one answer each)
+
+6. `terraform plan` fails with `could not find default credentials`, although
+   `gcloud projects list` works in the same terminal. What is the most likely
+   cause?
+
+   * A. No billing account is linked.
+   * B. The Terraform version is too old.
+   * C. The Compute Engine API is not enabled.
+   * D. You ran `gcloud auth login`, but never `gcloud auth
+     application-default login`.
+
+7. A colleague suggests downloading a service account key and committing it to
+   the team's private repository, so everyone can run Terraform. What is the
+   best answer?
+
+   * A. Fine, as long as the repository is private.
+   * B. Use Application Default Credentials for each person and Workload
+     Identity Federation in pipelines; a key is a long-lived secret that leaks
+     easily.
+   * C. Fine, if the key is rotated once a year.
+   * D. Put the key into `terraform.tfvars` instead.
+
 ---
 
 ## Hands-on exercise: Verify your setup
@@ -589,3 +612,7 @@ up. Keep `.terraform.lock.hcl`.
 4. No. It only sends notifications.
 5. They are long-lived secrets that can be leaked or stolen and are hard to
    rotate. Prefer ADC locally and Workload Identity Federation in CI/CD.
+6. **D.** `gcloud` and Terraform use separate credentials; Terraform needs
+   Application Default Credentials.
+7. **B.** No key means nothing to leak; a private repository doesn't make a
+   committed secret safe.

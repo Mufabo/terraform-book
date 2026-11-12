@@ -413,6 +413,27 @@ Pre-commit is a convenience for developers. The **CI pipeline** (Chapters
    cannot.
 5. Why must CI repeat the checks that pre-commit hooks run?
 
+**Scenario questions** (exam style; one answer each)
+
+6. A unit test with `command = plan` asserts `output.url == "https://..."` and
+   fails because the value is unknown. How do you test it without creating
+   real resources?
+
+   * A. Add `-refresh=false`.
+   * B. Delete the assertion.
+   * C. Use `command = apply` with a `mock_provider` whose `mock_resource`
+     defaults set the URL.
+   * D. Add `depends_on` to the run.
+
+7. You want a test proving that the module rejects `max_instances = 0`. Which
+   construct do you use?
+
+   * A. `expect_failures = [var.max_instances]` in a run that sets the bad
+     value
+   * B. An `assert` whose condition is `false`
+   * C. `try()` around the module call
+   * D. A `precondition` inside the test file
+
 ---
 
 ## Hands-on exercise: Test the web-app module
@@ -535,3 +556,7 @@ service remains.
    provider-specific values.
 5. Hooks run locally and can be skipped or not installed; only CI guarantees
    every change is checked.
+6. **C.** A mocked apply produces values for computed attributes without
+   calling any API.
+7. **A.** The run passes when the listed validation fails, and fails when it
+   doesn't.

@@ -390,6 +390,26 @@ the block simply documents an intentional deletion.
    `google_storage_bucket.this["logs"]`. How do you avoid re-creating it?
 5. How do you stop managing a resource without destroying it, declaratively?
 
+**Scenario questions** (exam style; one answer each)
+
+6. During an incident someone opened an extra port on a firewall rule in the
+   console. The team decides that the change should stay. What should they do?
+
+   * A. Run `terraform apply`.
+   * B. Change the configuration to match and check that the plan shows no
+     changes.
+   * C. Run `terraform state rm` for the rule.
+   * D. Run `terraform apply -replace` for the rule.
+
+7. A company wants to bring 40 hand-made buckets under Terraform, with every
+   step reviewed in a pull request. Which approach fits best?
+
+   * A. Run `terraform import` 40 times from a laptop.
+   * B. Delete the buckets and re-create them with Terraform.
+   * C. Run `terraform apply -refresh-only`.
+   * D. `import` blocks (with `for_each` if useful) and `terraform plan
+     -generate-config-out`, applied through the normal workflow.
+
 ---
 
 ## Hands-on exercise: Adopt, drift, and refactor
@@ -518,3 +538,7 @@ $ gcloud storage rm -r gs://<project-id>-legacy-media   # released in step 7
    `google_storage_bucket.this["logs"]` (or run `terraform state mv`).
 5. Replace the resource block with a `removed` block containing
    `lifecycle { destroy = false }`.
+6. **B.** Accepting drift means updating the code; a plain apply would revert
+   the manual change.
+7. **D.** Import blocks are planned, reviewable, and can import many objects
+   in one apply.
