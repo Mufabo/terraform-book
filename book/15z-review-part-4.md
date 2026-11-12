@@ -72,4 +72,4 @@ twice from a root module with `for_each`. `terraform validate` is enough.
 9. `state rm` makes Terraform forget the object, which keeps running. Deleting
    the block makes the next apply destroy it. Sections 9.6 and 11.7.
 10. `module.<name>["key"].<output>`, and `{ for k, m in module.<name> : k =>
-   m.<output> }`. Sections 7.7 and 12.2.
+   m.<output> }`. Sections 7.8 and 12.2.

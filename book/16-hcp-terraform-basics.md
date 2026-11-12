@@ -410,6 +410,35 @@ This is how platform teams provision dozens of consistent workspaces.
    * C. A variable set applied to the project
    * D. A run trigger
 
+8. A configuration has a `backend "gcs"` block. A colleague adds a `cloud`
+   block to connect it to HCP Terraform and keeps the backend "as a fallback".
+   What happens at `terraform init`?
+
+   * A. Terraform uses the `cloud` block and ignores the backend.
+   * B. Terraform stores the state in both places.
+   * C. Terraform uses the backend and ignores the `cloud` block.
+   * D. An error: a configuration can't have both. Remove the `backend` block;
+     `init` then offers to migrate the state.
+
+9. A workspace uses remote execution. An engineer runs `terraform plan` on a
+   laptop in the CLI-driven workflow. Where does the plan run, and can its
+   result be applied?
+
+   * A. On the laptop; yes, with `terraform apply`.
+   * B. On HCP Terraform's workers, with the output streamed to the terminal;
+     it is a speculative plan and can't be applied.
+   * C. On HCP Terraform's workers; it is applied automatically if it
+     succeeds.
+   * D. On the laptop; the result is uploaded as a saved plan.
+
+10. An engineer marks a workspace variable as sensitive. A month later nobody
+   remembers its value. How can it be read?
+
+   * A. It can't: sensitive variables are write-only. Set a new value.
+   * B. In the UI, by clicking "show".
+   * C. Through the API with an owner's token.
+   * D. With `terraform output`.
+
 ---
 
 ## Hands-on exercise: Run Terraform in HCP Terraform with keyless auth
@@ -516,3 +545,8 @@ Then delete the `ch16-app` workspace in the HCP Terraform UI
    VCS-driven is a workflow, not an execution mode.
 7. **C.** Variable sets attached to a project apply to all its workspaces,
    present and future.
+8. **D.** The `cloud` block replaces a backend.
+9. **B.** Only the configuration is uploaded. A later `terraform apply` starts
+   a new run with its own plan.
+10. **A.** Nobody can read a sensitive variable back, in the UI or through the
+   API; it is only available to runs.

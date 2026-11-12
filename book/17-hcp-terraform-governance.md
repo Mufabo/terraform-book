@@ -368,6 +368,32 @@ Results appear in the workspace's *Health* tab and can trigger notifications.
    * C. Admin
    * D. Plan
 
+8. A module is published to the private registry with tag-based publishing
+   from the repository `terraform-google-secure-bucket`. How do you release
+   version 1.1.0?
+
+   * A. Upload a zip file in the registry UI.
+   * B. Change a `version` variable in the module and merge.
+   * C. Push the Git tag `v1.1.0` to the repository.
+   * D. Re-publish the module from scratch.
+
+9. A policy set contains two Sentinel policies. In a run, the advisory one
+   fails and the hard-mandatory one passes. What happens?
+
+   * A. The run stops, and nobody can override.
+   * B. The run stops until an authorised user overrides.
+   * C. The run is discarded.
+   * D. The run shows a warning and continues to the apply stage.
+
+10. A team wants to be told when someone changes a workspace's infrastructure
+   in the cloud console, without anyone starting a run. Which feature does
+   that?
+
+   * A. Health assessments with drift detection
+   * B. A run trigger
+   * C. A pre-plan run task
+   * D. Cost estimation
+
 ---
 
 ## Hands-on exercise: Private registry and policy enforcement
@@ -484,3 +510,8 @@ the UI. Archive or delete the two GitHub repositories
 6. **B.** Run tasks call external services at a stage of the run and can block
    it.
 7. **D.** Plan can queue plans; applying needs Write.
+8. **C.** Every semantic-version tag becomes a module version.
+9. **D.** An advisory failure only warns. A failing hard-mandatory policy
+   would stop the run for good.
+10. **A.** Drift detection runs refresh-only plans on a schedule and reports
+   differences.

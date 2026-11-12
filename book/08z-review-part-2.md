@@ -53,7 +53,7 @@ URL. `terraform plan` is enough; don't apply.
    (and `-var-file`) on the command line. Section 6.3.
 4. With `count`, every later element shifts to a new index, so several buckets
    change or are replaced. With `for_each`, only the removed key's bucket is
-   destroyed. Convert the list with `toset()`. Sections 7.6–7.7.
+   destroyed. Convert the list with `toset()`. Sections 7.7–7.8.
 5. `[for name, cidr in var.subnets : "${name}: ${cidr}"]`. Section 7.4.
 6. (a) `validation`; (b) `precondition` on the VM (or a validation that refers
    to both variables); (c) `postcondition` on the data source; (d) `check`

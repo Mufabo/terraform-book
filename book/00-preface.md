@@ -7,7 +7,23 @@ built anything in a cloud before. Maybe you are a developer who keeps being
 asked to "just spin up a database", a system administrator moving to the
 cloud, a student, or someone preparing for the **HashiCorp Certified:
 Terraform Associate (004)** exam. If you can open a terminal and edit a text
-file, you have enough background.
+file, you have enough background to start.
+
+### What you need to know, and when
+
+Parts I to IV (everything the exam covers except HCP Terraform) need very
+little. The last Part asks for more, because it builds a real delivery
+pipeline:
+
+| Part | You should be able to | If you can't yet |
+|---|---|---|
+| I–IV (Chapters 1–15) | Move around in a terminal (`cd`, `ls`), set an environment variable, edit text files. Chapter 2 walks you through installing everything. From Chapter 2 on you run `git clone` once; that is all the Git you need. | An hour with any command-line introduction is enough. |
+| V (Chapters 16–17) | The same, plus a free HCP Terraform account. Chapter 17's exercise uses a GitHub account and `git push`. | You can read both chapters for the exam without doing the exercises. |
+| VI (Chapters 18–22) | Use Git branches and pull requests on GitHub, read YAML, and read a short shell script. Chapter 20 teaches the little Rego it needs. | Work through a Git and GitHub tutorial first. These chapters are not on the exam, so you can also sit the exam and return to them later. |
+
+You also need a Google account and a payment method to open a Google Cloud
+billing account. Appendix D shows that the exercises cost next to nothing,
+but Google asks for the payment method anyway.
 
 ## What you will learn
 

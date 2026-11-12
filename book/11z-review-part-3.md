@@ -64,7 +64,7 @@ it with `terraform state list` and `terraform state show`; change a label with
    -refresh-only` / `refresh`. Section 11.8.
 8. The addresses change from `x[0]` to `x["key"]`, and Terraform identifies
    objects by address. Add `moved` blocks from the old to the new addresses.
-   Sections 7.7 and 11.6.
+   Sections 7.8 and 11.6.
 9. A precondition stops the plan or apply with an error; a check block prints
    a warning and lets it continue. Sections 8.3–8.4.
 10. After adding or changing a provider, a module, a version constraint, or

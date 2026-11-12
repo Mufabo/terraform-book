@@ -6,12 +6,15 @@ By the end of this lesson you will be able to:
 
 * Use operators, conditional expressions, and string templates. `[4e]`
 * Transform collections with `for` expressions and splat expressions. `[4e]`
+* Use common built-in functions and experiment in `terraform console`. `[4e]`
 * Create multiple resource instances with `count` and `for_each`, and choose
   between them. `[4e]`
 * Generate repeated nested blocks with `dynamic` blocks. `[4e]`
-* Use common built-in functions and experiment in `terraform console`. `[4e]`
 
-**Time:** about 50 minutes — 20 reading, 5 quick check, 25 exercise.
+**Time:** about 50 minutes — 20 reading, 5 quick check, 25 exercise. This
+chapter introduces more new ideas than any other. It has two halves with a
+checkpoint between them (after section 7.6), so you can spread it over two
+sittings.
 
 ---
 
@@ -87,7 +90,7 @@ The `~` strips whitespace and newlines next to the directive, so
 `hosts_file` becomes one `IP name` line per host. Write such templates with
 `<<EOT` and no indentation: with the indented `<<-EOT` form, the `~` markers
 also keep the indentation from being removed, and every line would start
-with spaces. For anything complex, the `templatefile()` function (7.9) is
+with spaces. For anything complex, the `templatefile()` function (7.6) is
 clearer.
 
 ## 7.4 `for` expressions
@@ -154,143 +157,7 @@ var.users[*].email
 You'll often use it with `count` resources:
 `google_compute_instance.web[*].name`.
 
-## 7.6 Multiple instances: `count`
-
-So far each resource block created exactly one object. The `count`
-meta-argument creates **several instances** of the same resource:
-
-```hcl
-resource "google_compute_instance" "web" {
-  count        = 3
-  name         = "web-${count.index}" # web-0, web-1, web-2
-  machine_type = "e2-micro"
-  zone         = "europe-west1-b"
-  # ...
-}
-```
-
-* `count.index` is the instance number, starting at 0.
-* Instances are addressed with an index: `google_compute_instance.web[0]`.
-* The whole resource is a list: `google_compute_instance.web[*].self_link`.
-
-### Conditional creation
-
-`count` is the idiomatic way to create a resource **only if** a condition is
-true:
-
-```hcl
-resource "google_compute_firewall" "ssh" {
-  count = var.enable_ssh ? 1 : 0
-  # ...
-}
-```
-
-Refer to it carefully, because it may have zero instances:
-`one(google_compute_firewall.ssh[*].name)` returns the name or `null`.
-
-### The problem with `count` and lists
-
-Suppose `count = length(var.zones)` with `zones = ["b", "c", "d"]`. If you
-remove `"b"` from the front of the list, every remaining element shifts
-index: `c` moves from `[1]` to `[0]`. Terraform sees *changes to every
-instance* and may destroy and re-create them. That's why `for_each` exists.
-
-## 7.7 Multiple instances: `for_each`
-
-`for_each` creates one instance per element of a **map** or a **set of
-strings**, identified by **key** instead of index:
-
-```hcl
-variable "buckets" {
-  type = map(object({
-    location      = string
-    storage_class = optional(string, "STANDARD")
-  }))
-  default = {
-    logs    = { location = "EU" }
-    backups = { location = "EU", storage_class = "NEARLINE" }
-  }
-}
-
-resource "google_storage_bucket" "this" {
-  for_each = var.buckets
-
-  name                        = "${var.project_id}-${each.key}"
-  location                    = each.value.location
-  storage_class               = each.value.storage_class
-  uniform_bucket_level_access = true
-}
-```
-
-* `each.key` — the map key (`"logs"`) or the set element.
-* `each.value` — the map value (the object) or, for sets, the same as
-  `each.key`.
-* Instances are addressed by key: `google_storage_bucket.this["logs"]`.
-* The whole resource is a **map**:
-  `{ for k, b in google_storage_bucket.this : k => b.url }`.
-
-Removing `logs` from the map destroys exactly that bucket; `backups` is
-untouched.
-
-With a list, convert to a set first: `for_each = toset(var.zone_names)`.
-
-### `count` or `for_each`?
-
-| Use | When |
-|---|---|
-| `count` | Instances are identical, or for on/off (`0` or `1`). |
-| `for_each` | Instances differ, or you might add/remove items in the middle. **Default choice.** |
-
-Restrictions: you can't use both on one resource, and the keys/length must be
-known at **plan time** — you can't use `for_each` over values that are only
-"known after apply", such as IDs of resources that don't exist yet.
-
-> **Exam tip:** `count.index` vs `each.key`/`each.value`; resources with
-> `count` are lists, resources with `for_each` are maps. `for_each` accepts a
-> map or a **set of strings**, not a list.
-
-## 7.8 `dynamic` blocks
-
-`count` and `for_each` repeat *resources*. What about repeating a **nested
-block** inside a resource, such as multiple `allow` blocks in a firewall
-rule? Use a `dynamic` block:
-
-```hcl
-variable "rules" {
-  type = list(object({
-    protocol = string
-    ports    = list(string)
-  }))
-  default = [
-    { protocol = "tcp", ports = ["80", "443"] },
-    { protocol = "icmp", ports = [] },
-  ]
-}
-
-resource "google_compute_firewall" "web" {
-  name    = "web"
-  network = google_compute_network.main.id
-
-  dynamic "allow" {
-    for_each = var.rules
-    content {
-      protocol = allow.value.protocol
-      ports    = allow.value.ports
-    }
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-}
-```
-
-* The label (`"allow"`) is the name of the nested block to generate.
-* Inside `content`, the iterator is named after the block: `allow.key`,
-  `allow.value`. Rename it with `iterator = rule` if you like.
-
-Use dynamic blocks sparingly: they make code harder to read. If the blocks are
-fixed, just write them out.
-
-## 7.9 Built-in functions
+## 7.6 Built-in functions
 
 Terraform has around 120 built-in functions. You **can't** write your own
 functions in HCL (although providers can ship functions, called like
@@ -393,6 +260,154 @@ metadata_startup_script = templatefile("${path.module}/scripts/startup.sh.tftpl"
   items = ["one", "two"]
 })
 ```
+
+### Checkpoint: the first half
+
+Everything up to here is about **computing values**: operators,
+conditionals, templates, `for` and splat expressions, and functions. The
+rest of the chapter is about **repeating things**: several instances of a
+resource, and several nested blocks inside one.
+
+Before you go on, do step 2 of the exercise at the end of this chapter (the
+console practice in `console-practice.md`). It uses only what you have read
+so far. If you want to split this chapter over two sittings, this is the
+place to stop.
+
+## 7.7 Multiple instances: `count`
+
+So far each resource block created exactly one object. The `count`
+meta-argument creates **several instances** of the same resource:
+
+```hcl
+resource "google_compute_instance" "web" {
+  count        = 3
+  name         = "web-${count.index}" # web-0, web-1, web-2
+  machine_type = "e2-micro"
+  zone         = "europe-west1-b"
+  # ...
+}
+```
+
+* `count.index` is the instance number, starting at 0.
+* Instances are addressed with an index: `google_compute_instance.web[0]`.
+* The whole resource is a list: `google_compute_instance.web[*].self_link`.
+
+### Conditional creation
+
+`count` is the idiomatic way to create a resource **only if** a condition is
+true:
+
+```hcl
+resource "google_compute_firewall" "ssh" {
+  count = var.enable_ssh ? 1 : 0
+  # ...
+}
+```
+
+Refer to it carefully, because it may have zero instances:
+`one(google_compute_firewall.ssh[*].name)` returns the name or `null`.
+
+### The problem with `count` and lists
+
+Suppose `count = length(var.zones)` with `zones = ["b", "c", "d"]`. If you
+remove `"b"` from the front of the list, every remaining element shifts
+index: `c` moves from `[1]` to `[0]`. Terraform sees *changes to every
+instance* and may destroy and re-create them. That's why `for_each` exists.
+
+## 7.8 Multiple instances: `for_each`
+
+`for_each` creates one instance per element of a **map** or a **set of
+strings**, identified by **key** instead of index:
+
+```hcl
+variable "buckets" {
+  type = map(object({
+    location      = string
+    storage_class = optional(string, "STANDARD")
+  }))
+  default = {
+    logs    = { location = "EU" }
+    backups = { location = "EU", storage_class = "NEARLINE" }
+  }
+}
+
+resource "google_storage_bucket" "this" {
+  for_each = var.buckets
+
+  name                        = "${var.project_id}-${each.key}"
+  location                    = each.value.location
+  storage_class               = each.value.storage_class
+  uniform_bucket_level_access = true
+}
+```
+
+* `each.key` — the map key (`"logs"`) or the set element.
+* `each.value` — the map value (the object) or, for sets, the same as
+  `each.key`.
+* Instances are addressed by key: `google_storage_bucket.this["logs"]`.
+* The whole resource is a **map**:
+  `{ for k, b in google_storage_bucket.this : k => b.url }`.
+
+Removing `logs` from the map destroys exactly that bucket; `backups` is
+untouched.
+
+With a list, convert to a set first: `for_each = toset(var.zone_names)`.
+
+### `count` or `for_each`?
+
+| Use | When |
+|---|---|
+| `count` | Instances are identical, or for on/off (`0` or `1`). |
+| `for_each` | Instances differ, or you might add/remove items in the middle. **Default choice.** |
+
+Restrictions: you can't use both on one resource, and the keys/length must be
+known at **plan time** — you can't use `for_each` over values that are only
+"known after apply", such as IDs of resources that don't exist yet.
+
+> **Exam tip:** `count.index` vs `each.key`/`each.value`; resources with
+> `count` are lists, resources with `for_each` are maps. `for_each` accepts a
+> map or a **set of strings**, not a list.
+
+## 7.9 `dynamic` blocks
+
+`count` and `for_each` repeat *resources*. What about repeating a **nested
+block** inside a resource, such as multiple `allow` blocks in a firewall
+rule? Use a `dynamic` block:
+
+```hcl
+variable "rules" {
+  type = list(object({
+    protocol = string
+    ports    = list(string)
+  }))
+  default = [
+    { protocol = "tcp", ports = ["80", "443"] },
+    { protocol = "icmp", ports = [] },
+  ]
+}
+
+resource "google_compute_firewall" "web" {
+  name    = "web"
+  network = google_compute_network.main.id
+
+  dynamic "allow" {
+    for_each = var.rules
+    content {
+      protocol = allow.value.protocol
+      ports    = allow.value.ports
+    }
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+```
+
+* The label (`"allow"`) is the name of the nested block to generate.
+* Inside `content`, the iterator is named after the block: `allow.key`,
+  `allow.value`. Rename it with `iterator = rule` if you like.
+
+Use dynamic blocks sparingly: they make code harder to read. If the blocks are
+fixed, just write them out.
 
 ## 7.10 Putting it together
 

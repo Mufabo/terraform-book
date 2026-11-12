@@ -1,6 +1,8 @@
 # Introduction to Terraform on Google Cloud
 
-A hands-on book for **absolute beginners**. You will go from "what is
+A hands-on book for **beginners**: Parts I–IV assume only that you can use a
+terminal and a text editor; the last Part also uses Git, GitHub, and YAML
+(the preface lists what each Part expects). You will go from "what is
 Infrastructure as Code?" to running Terraform in CI/CD pipelines that manage
 separate dev, staging, and production environments on Google Cloud.
 

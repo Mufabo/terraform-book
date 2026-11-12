@@ -13,6 +13,11 @@ By the end of this lesson you will be able to:
   Cloud, with separate state per environment.
 * Promote changes safely from dev to prod.
 
+> This chapter opens Part VI, which goes beyond the exam and asks for more
+> than the earlier Parts: from Chapter 21 on you need Git branches, pull
+> requests on GitHub, and some YAML. The preface lists what each Part
+> expects.
+
 **Time:** about 50 minutes — 15 reading, 5 quick check, 30 exercise.
 
 ---

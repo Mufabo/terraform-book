@@ -32,7 +32,9 @@ contents (mdBook/MkDocs style).
 Every chapter follows the same template: Learning objectives (tagged with exam
 IDs like `[4c]`, followed by a `**Time:**` line) → concepts with code and CLI
 output → common mistakes / exam tips → summary → quick check (5 recall
-questions, then 2 multiple-choice "Scenario questions" numbered 6 and 7) →
+questions, then 2 multiple-choice "Scenario questions" numbered 6 and 7;
+Chapters 16 and 17 have five, numbered 6 to 10, because their exercises need
+paid tiers and were never run live) →
 hands-on exercise (goal, estimated time, files, steps, expected result,
 stretch goal, challenge, cleanup) → quick-check answers. Google Cloud concepts are explained in GitHub-style alert boxes
 (`> [!NOTE]` followed by `> **Google Cloud: <topic>.**`) where the concept
@@ -47,6 +49,10 @@ capstone). The `z` makes the file sort directly after that chapter, which is
 what puts it in the right place in the EPUB. A review has ten mixed questions
 (the last two or three from earlier Parts), a "From memory" task, and answers
 that cite section numbers, so keep them in sync when sections move.
+
+Chapter 7 is deliberately in two halves (7.1–7.6 computing values, 7.7–7.9
+repeating things) with a "Checkpoint" between them; `console-practice.md`
+uses only the first half.
 
 Vary the position of the correct option in multiple-choice questions.
 Chapter 22 has two practice tests: Part C (recall, answers in Part D) and
