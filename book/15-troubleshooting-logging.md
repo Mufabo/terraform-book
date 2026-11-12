@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
   debugging tools.
 * Solve the most common Google Cloud errors.
 
+**Time:** about 50 minutes — 20 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 15.1 A troubleshooting mindset

@@ -11,6 +11,8 @@ By the end of this lesson you will be able to:
 * Generate repeated nested blocks with `dynamic` blocks. `[4e]`
 * Use common built-in functions and experiment in `terraform console`. `[4e]`
 
+**Time:** about 50 minutes — 20 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 7.1 Expressions

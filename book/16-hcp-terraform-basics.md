@@ -15,6 +15,8 @@ By the end of this lesson you will be able to:
   credentials** (no keys). `[8d]`
 * Create infrastructure with HCP Terraform. `[8a]`
 
+**Time:** about 1 hour — 20 reading, 5 quick check, 35 exercise.
+
 ---
 
 ## 16.1 What is HCP Terraform? `[8a]`

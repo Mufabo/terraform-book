@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
   `create_before_destroy`, `prevent_destroy`, `ignore_changes`, and
   `replace_triggered_by`.
 
+**Time:** about 50 minutes — 20 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 8.1 Why custom conditions?

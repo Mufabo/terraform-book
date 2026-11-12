@@ -17,6 +17,8 @@ By the end of this lesson you will be able to:
 > tests your *understanding* of them, not your billing plan. The exercise uses
 > features available on the free tier where possible.
 
+**Time:** about 1 hour — 20 reading, 5 quick check, 35 exercise.
+
 ---
 
 ## 17.1 Teams and permissions `[8b]`

@@ -12,6 +12,8 @@ By the end of this lesson you will be able to:
 * Find and evaluate modules on the public registry, including Google's
   `terraform-google-modules`. `[5a]`
 
+**Time:** about 45 minutes — 15 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 12.1 What is a module?

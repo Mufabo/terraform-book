@@ -12,6 +12,8 @@ By the end of this lesson you will be able to:
 * Destroy infrastructure with `terraform destroy`. `[3f]`
 * Format code with `terraform fmt`. `[3g]`
 
+**Time:** about 1 hour 5 minutes — 35 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 3.1 Anatomy of a Terraform configuration

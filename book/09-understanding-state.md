@@ -12,6 +12,8 @@ By the end of this lesson you will be able to:
 * Modify state safely with `terraform state mv` and `terraform state rm`. `[7b]`
 * Explain why state must be protected (it can contain secrets). `[2d]`
 
+**Time:** about 45 minutes — 15 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 9.1 What is state? `[2d]`

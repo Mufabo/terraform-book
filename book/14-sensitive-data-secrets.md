@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
 * Describe how **HashiCorp Vault** integrates with Terraform. `[4h]`
 * Apply best practices for credentials and secrets management. `[4h]`
 
+**Time:** about 50 minutes — 20 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 14.1 Where secrets leak

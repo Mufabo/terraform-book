@@ -28,15 +28,51 @@ By the end of the book you will be able to:
 
 ## How each chapter works
 
-Every chapter is designed to take **about one hour**:
+Most chapters take **about an hour**. Every chapter has the same parts:
 
 | Section | Time | Purpose |
 |---|---|---|
 | Learning objectives | 1 min | What you will be able to do afterwards. Exam objective IDs such as `[3d]` show which part of the exam it covers. |
-| Concepts | ~30 min | Explanations with small examples you can type along. |
-| Common mistakes & exam tips | ~3 min | Traps beginners and exam candidates fall into. |
-| Summary & quick check | ~5 min | Five questions to test yourself. Answers are at the end of the chapter. |
-| Hands-on exercise | ~20 min | Build something real in your own Google Cloud project. |
+| Concepts, common mistakes, and summary | 15–35 min | Explanations with small examples you can type along, the traps beginners and exam candidates fall into, and a recap. |
+| Quick check | ~5 min | Five questions to test yourself. Answers are at the end of the chapter. |
+| Hands-on exercise | 20–45 min | Build something real in your own Google Cloud project. |
+
+### How long each chapter takes
+
+Each chapter states its own estimate below the learning objectives. Plan for
+about **23 hours** for the whole book:
+
+| Chapter | Reading | Exercise | Total |
+|---|---|---|---|
+| 1. What Is Infrastructure as Code? | 20 min | 20 min | 45 minutes |
+| 2. Setting Up Your Environment | 35 min + 30 min setup | 20 min | 1 hour 30 minutes |
+| 3. Your First Configuration and the Core Workflow | 35 min | 25 min | 1 hour 5 minutes |
+| 4. Providers | 25 min | 25 min | 55 minutes |
+| 5. Resources, Data Sources, and Dependencies | 25 min | 25 min | 55 minutes |
+| 6. Variables, Outputs, and Locals | 15 min | 25 min | 45 minutes |
+| 7. Expressions and Functions | 20 min | 25 min | 50 minutes |
+| 8. Custom Conditions and Lifecycle Rules | 20 min | 25 min | 50 minutes |
+| 9. Understanding State | 15 min | 25 min | 45 minutes |
+| 10. Remote State on Google Cloud Storage | 20 min | 35 min | 1 hour |
+| 11. Drift, Import, and Refactoring | 20 min | 30 min | 55 minutes |
+| 12. Using Modules | 15 min | 25 min | 45 minutes |
+| 13. Writing Your Own Modules | 15 min | 30 min | 50 minutes |
+| 14. Sensitive Data and Secrets | 20 min | 25 min | 50 minutes |
+| 15. Troubleshooting and Logging | 20 min | 25 min | 50 minutes |
+| 16. HCP Terraform Basics | 20 min | 35 min | 1 hour |
+| 17. Collaboration and Governance in HCP Terraform | 20 min | 35 min | 1 hour |
+| 18. Managing Multiple Environments | 15 min | 30 min | 50 minutes |
+| 19. Testing Terraform Code | 20 min | 30 min | 55 minutes |
+| 20. Policy as Code with `gcloud terraform vet` | 25 min | 30 min | 1 hour |
+| 21. CI/CD with GitHub Actions | 25 min | 45 min | 1 hour 15 minutes |
+| 22. Capstone Project and Exam Preparation | 15 min | 2–3 h + 40 min test | 3–4 hours |
+
+The totals include five minutes for the quick check. Reading is counted at
+about 100 words a minute, a careful pace that leaves room for code and
+command output. The exercise times assume that nothing goes badly wrong. If
+this is your first time in a terminal or in a cloud, expect to need longer,
+above all in Chapters 2 and 3; an error you have to track down yourself is
+part of the learning, not time lost.
 
 Code for every exercise is in the `code/` folder. Each chapter has an
 `exercise/` folder with `TODO` markers for you to complete and a `solution/`

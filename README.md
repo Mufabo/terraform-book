@@ -4,7 +4,8 @@ A hands-on book for **absolute beginners**. You will go from "what is
 Infrastructure as Code?" to running Terraform in CI/CD pipelines that manage
 separate dev, staging, and production environments on Google Cloud.
 
-* **22 lessons, about one hour each.** Every chapter starts with learning
+* **22 lessons, most about one hour each** (around 23 hours in total; the
+  preface lists every chapter's time). Every chapter starts with learning
   objectives and ends with a hands-on exercise.
 * **Covers the full HashiCorp Certified: Terraform Associate (004) curriculum.**
   [Appendix A](book/appendix-a-exam-objective-map.md) maps every exam objective

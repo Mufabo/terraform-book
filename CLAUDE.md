@@ -4,8 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-A beginner book, *Introduction to Terraform on Google Cloud*: 22 one-hour
-lessons plus appendices in `book/` (Markdown), and runnable Terraform for every
+A beginner book, *Introduction to Terraform on Google Cloud*: 22 lessons
+of about an hour each plus appendices in `book/` (Markdown), and runnable Terraform for every
 chapter in `code/`. It must cover the full Terraform Associate (004) exam, plus
 multiple environments, testing, policy as code (`gcloud beta terraform vet`),
 and CI/CD (GitHub Actions). `SUMMARY.md` is the table of
@@ -30,8 +30,8 @@ contents (mdBook/MkDocs style).
 ## Book conventions
 
 Every chapter follows the same template: Learning objectives (tagged with exam
-IDs like `[4c]`) → concepts with code and CLI output → common mistakes / exam
-tips → summary → 5 quick-check questions → hands-on exercise (goal, estimated
+IDs like `[4c]`, followed by a `**Time:**` line) → concepts with code and CLI
+output → common mistakes / exam tips → summary → 5 quick-check questions → hands-on exercise (goal, estimated
 time, files, steps, expected result, stretch goal, cleanup) → quick-check
 answers. Google Cloud concepts are explained in GitHub-style alert boxes
 (`> [!NOTE]` followed by `> **Google Cloud: <topic>.**`) where the concept
@@ -39,6 +39,11 @@ first appears; the EPUB build renders them via pandoc's `alerts` extension
 and `epub/style.css`. Section numbers (`10.6`) are referenced from
 `book/appendix-a-exam-objective-map.md`; keep that map in sync when sections
 move or are renumbered.
+
+The `**Time:**` line is reading (words before the hands-on exercise at 100
+words a minute, rounded to 5 minutes) + 5 minutes quick check + the
+exercise's estimated time. The preface repeats every chapter's time in a
+table, so update both when a chapter grows or an exercise estimate changes.
 
 Code snippets in chapters must match the files in `code/chNN-*/solution/`.
 Exercise steps reference `TODO (step N)` markers in `exercise/` files, so

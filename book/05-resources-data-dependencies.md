@@ -12,6 +12,8 @@ By the end of this lesson you will be able to:
   needed. `[4f]`
 * Build a small network with a web server on Google Cloud.
 
+**Time:** about 55 minutes — 25 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 5.1 Resources: things Terraform manages `[4a]`

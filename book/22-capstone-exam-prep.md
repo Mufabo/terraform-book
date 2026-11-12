@@ -13,6 +13,10 @@ By the end of this lesson you will be able to:
 * Check your readiness against every exam objective.
 * Answer exam-style questions under time pressure.
 
+**Time:** 3 to 4 hours — about 15 minutes of reading (Parts A and B), 2 to 3
+hours for the capstone project, and 40 minutes for the practice test and its
+review.
+
 ---
 
 ## Part A — The capstone project

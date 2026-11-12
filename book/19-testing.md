@@ -15,6 +15,8 @@ By the end of this lesson you will be able to:
 * Write an integration test that creates and destroys real resources.
 * Automate checks before every commit with **pre-commit** hooks.
 
+**Time:** about 55 minutes — 20 reading, 5 quick check, 30 exercise.
+
 ---
 
 ## 19.1 Why test infrastructure code?

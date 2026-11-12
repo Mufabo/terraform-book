@@ -12,6 +12,8 @@ By the end of this lesson you will be able to:
 * Describe the main building blocks of Terraform: configuration, providers,
   state, and the core workflow. `[1c]` `[3a]`
 
+**Time:** about 45 minutes — 20 reading, 5 quick check, 20 exercise.
+
 ---
 
 ## 1.1 The problem: infrastructure by hand

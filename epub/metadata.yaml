@@ -5,7 +5,7 @@ author: Mufabo
 lang: en-US
 rights: All rights reserved.
 description: >
-  A hands-on book for absolute beginners: 22 one-hour lessons covering the
+  A hands-on book for absolute beginners: 22 lessons of about an hour each, covering the
   Terraform Associate (004) curriculum, multiple environments, testing,
   policy as code, and CI/CD on Google Cloud.
 subject: Terraform; Google Cloud; Infrastructure as Code

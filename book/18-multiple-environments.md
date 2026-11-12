@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
   Cloud, with separate state per environment.
 * Promote changes safely from dev to prod.
 
+**Time:** about 50 minutes — 15 reading, 5 quick check, 30 exercise.
+
 ---
 
 ## 18.1 Why multiple environments?

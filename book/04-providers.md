@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
 * Write a configuration that uses several providers (`google`,
   `google-beta`, `random`). `[2c]`
 
+**Time:** about 55 minutes — 25 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 4.1 What a provider is `[2b]`

@@ -16,6 +16,10 @@ By the end of this lesson you will be able to:
 > This chapter is mostly setup. It is not directly tested on the exam, but every
 > later chapter depends on it, so take your time.
 
+**Time:** about 1 hour 30 minutes — 35 reading, 5 quick check, 20 exercise,
+and roughly 30 for running the installation and setup commands as you read
+(downloads and enabling APIs take a while).
+
 ---
 
 ## 2.1 What we are going to install

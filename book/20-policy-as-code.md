@@ -17,6 +17,8 @@ By the end of this lesson you will be able to:
 * Compare `gcloud terraform vet` with Sentinel/OPA in HCP Terraform and
   scanners such as Checkov and Trivy.
 
+**Time:** about 1 hour — 25 reading, 5 quick check, 30 exercise.
+
 ---
 
 ## 20.1 Why policy as code?

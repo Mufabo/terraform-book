@@ -11,6 +11,8 @@ By the end of this lesson you will be able to:
   configuration automatically. `[7a]`
 * Refactor safely with `moved` and `removed` blocks. `[6d]`
 
+**Time:** about 55 minutes — 20 reading, 5 quick check, 30 exercise.
+
 ---
 
 ## 11.1 What is drift? `[6d]`

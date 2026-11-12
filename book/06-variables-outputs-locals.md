@@ -12,6 +12,8 @@ By the end of this lesson you will be able to:
 * Use the primitive and **complex types**: `list`, `set`, `map`, `object`,
   `tuple`, and `optional()` attributes. `[4d]`
 
+**Time:** about 45 minutes — 15 reading, 5 quick check, 25 exercise.
+
 ---
 
 ## 6.1 Why variables?

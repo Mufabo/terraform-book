@@ -14,6 +14,8 @@ By the end of this lesson you will be able to:
 * Build workflows that run `fmt`, TFLint, `terraform test`, `plan`,
   `gcloud terraform vet`, and `apply`, and post the plan to the pull request.
 
+**Time:** about 1 hour 15 minutes — 25 reading, 5 quick check, 45 exercise.
+
 ---
 
 ## 21.1 Why CI/CD for Terraform?

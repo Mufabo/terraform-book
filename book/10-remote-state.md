@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
 * Read another configuration's outputs with the `terraform_remote_state`
   data source. `[6c]`
 
+**Time:** about 1 hour — 20 reading, 5 quick check, 35 exercise.
+
 ---
 
 ## 10.1 Why remote state? `[6c]`

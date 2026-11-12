@@ -13,6 +13,8 @@ By the end of this lesson you will be able to:
 * Refactor existing resources into a module without re-creating them.
 * Describe how modules are versioned and published. `[5d]`
 
+**Time:** about 50 minutes — 15 reading, 5 quick check, 30 exercise.
+
 ---
 
 ## 13.1 When to write a module
