@@ -451,7 +451,13 @@ run without credentials, then optionally an integration test.
    $ terraform test -filter=tests/unit.tftest.hcl
    ```
 
-   (Optionally run `CLOUDSDK_CONFIG=/tmp/empty GOOGLE_APPLICATION_CREDENTIALS=/nonexistent terraform test -filter=tests/unit.tftest.hcl` to be sure no credentials are used.)
+   To be sure no credentials are used, you can also point the Google
+   libraries at locations that don't exist:
+
+   ```console
+   $ CLOUDSDK_CONFIG=/tmp/empty GOOGLE_APPLICATION_CREDENTIALS=/nonexistent \
+       terraform test -filter=tests/unit.tftest.hcl
+   ```
 5. **Make a test fail.** Change the bucket's `public_access_prevention` to
    `"inherited"` in `main.tf` and rerun the tests. Read the failure message.
    Revert.

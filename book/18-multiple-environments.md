@@ -181,12 +181,13 @@ module "web_app" {
 module "web_app" {
   source = "../../modules/web-app"
 
-  project_id    = var.project_id
-  region        = var.region
-  environment   = "prod"
-  min_instances = 1
-  max_instances = 10
-  public        = true
+  project_id          = var.project_id
+  region              = var.region
+  environment         = "prod"
+  min_instances       = 0 # use 1+ in real production to avoid cold starts
+  max_instances       = 5
+  public              = true
+  deletion_protection = true
 }
 ```
 
@@ -321,8 +322,8 @@ This layout is also used in Chapters 19 – 22.
    Two separate states.
 5. **Change the module**: add a label `team = "shop"` to the bucket in
    `modules/web-app/main.tf` (for example
-   `labels = merge(local.labels, { team = "shop" })`). Plan in `envs/dev` (one change) and apply.
-   Plan in `envs/prod` — the same change is pending there. In a real team,
+   `labels = merge(local.labels, { team = "shop" })`). Plan in `envs/dev`
+   (one change) and apply. Plan in `envs/prod` — the same change is pending there. In a real team,
    the pipeline would apply it to prod after approval. Apply it.
 6. **Compare with CLI workspaces.** In `workspaces-demo/`, run:
 
@@ -349,8 +350,9 @@ Add `envs/staging/` in under five minutes. What did you have to change?
 
 ### Cleanup
 
-Keep `envs/dev` and `envs/prod` if you plan to continue with Chapters 19 –
-21 (they're cheap: Cloud Run scales to zero). Otherwise:
+No later chapter needs these two environments to stay deployed. You can
+still keep them (they're cheap: Cloud Run scales to zero), and Chapter 21's
+pipeline takes over their state if it uses the same bucket. To remove them:
 
 ```console
 $ (cd envs/dev && terraform destroy)

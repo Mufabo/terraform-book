@@ -385,7 +385,7 @@ existing resource into it without re-creating it.
      default empty), `labels`, `force_destroy`.
    * `main.tf`: the bucket with uniform access, public access prevention,
      versioning, a dynamic lifecycle rule, and IAM members for readers.
-   * `outputs.tf`: `name` and `url`.
+   * `outputs.tf`: `name`, `url`, and `self_link`.
    * `versions.tf`: minimum provider version.
 4. **Refactor.** In the root `main.tf`, replace the `logs` resource with a
    `module "logs"` call (same bucket name, `retention_days = 30`) and add a

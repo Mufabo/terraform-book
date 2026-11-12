@@ -1,1 +1,1 @@
-# TODO: output "name" and output "url"
+# TODO: output "name", output "url", and output "self_link"

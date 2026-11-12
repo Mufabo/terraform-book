@@ -408,8 +408,8 @@ run locally) and `app/` (runs in HCP Terraform).
 3. **Google side.** In `wif/`, create `terraform.tfvars` with your project ID,
    organisation name, and workspace name `ch16-app`. Complete the `TODO`s
    (pool, provider with attribute condition, service account, bindings),
-   uncomment the outputs in `outputs.tf`, and apply locally. Note the outputs `workload_provider_name` and
-   `service_account_email`.
+   uncomment the outputs in `outputs.tf`, and apply locally. Note the
+   outputs `workload_provider_name` and `service_account_email`.
 4. **App configuration.** In `app/versions.tf`, complete the `cloud` block
    with your organisation, project `terraform-book`, and workspace `ch16-app`.
    Run `terraform init`. HCP Terraform creates the project and workspace

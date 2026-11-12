@@ -385,7 +385,7 @@ into it, and read its outputs from a second configuration.
 4. Find the state in the bucket:
    `gcloud storage ls -r gs://<state-bucket>/`. Run `terraform plan` again
    and, while it runs, list the bucket again to spot the `.tflock` file.
-5. Enable versioning proof: in `network/main.tf`, add
+5. **Prove that versioning works:** in `network/main.tf`, add
    `private_ip_google_access = true` to the subnet (an in-place update),
    apply, and list object versions with
    `gcloud storage ls -a gs://<state-bucket>/ch10/network/`. Every apply
@@ -417,7 +417,10 @@ into it, and read its outputs from a second configuration.
       new output under "Changes to Outputs".
    3. Run `terraform plan` in `app/` again. It now shows the VM's `tags`
       changing in place. Apply, then check the tag:
-      `gcloud compute instances describe ch10-app --zone=europe-west1-b --format="value(tags.items)"`.
+
+      ```console
+      $ gcloud compute instances describe ch10-app --zone=europe-west1-b --format="value(tags.items)"
+      ```
 8. Run `terraform state list` in `app/`. Is the subnet listed? Why not?
 
 ### Expected result

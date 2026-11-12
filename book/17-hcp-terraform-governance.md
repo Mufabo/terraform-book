@@ -117,7 +117,7 @@ resource "google_cloud_run_v2_service" "app" {
   `sensitive = true`, so you can use them without the plan hiding them.
 * Unlike `terraform_remote_state`, `tfe_outputs` reads only the outputs, not
   the full state, so the consumer never sees the producer's resource
-  attributes. It still sees only **root** outputs (see Chapter 10.6).
+  attributes. It still sees only **root** outputs (see section 10.6).
 * Inside HCP Terraform runs, the provider authenticates automatically. Locally
   it uses your `terraform login` token.
 * Combine it with a **run trigger** so `app-prod` re-plans whenever
@@ -410,10 +410,12 @@ it in the UI.
 
 ```console
 $ (cd consumer && terraform destroy)
+$ (cd ../../ch16-hcp-terraform/exercise/wif && terraform destroy)   # re-applied in step 5
 ```
 
 Delete the workspace, the policy set, and (optionally) the registry module in
-the UI.
+the UI. Archive or delete the two GitHub repositories
+(`terraform-google-secure-bucket` and `tf-policies`).
 
 ---
 

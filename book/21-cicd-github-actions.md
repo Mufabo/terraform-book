@@ -116,8 +116,8 @@ Google checks.
 > change, and delete most resources, but it **cannot change IAM policies**.
 > That's why the apply identities also get Project IAM Admin
 > (`roles/resourcemanager.projectIamAdmin`): the app's code grants roles,
-> for example its service account's access to the uploads bucket. Workload Identity Federation
-> itself is explained in a box in section 16.6.
+> for example its service account's access to the uploads bucket. Workload
+> Identity Federation itself is explained in a box in section 16.6.
 
 ### Bootstrap with Terraform
 
@@ -533,8 +533,9 @@ comments, policy checks, and a production approval.
 2. **Bootstrap Google Cloud.** In `bootstrap/`, create `terraform.tfvars`
    (project, `OWNER/web-shop-infra`, state bucket from Chapter 10). Complete
    the two `TODO`s in `main.tf` (the attribute condition, and the
-   `apply_wif` binding for `attribute.environment`, which you uncomment). `terraform init && terraform apply`. Keep the
-   `github_variables` output open.
+   `apply_wif` binding for `attribute.environment`, which you uncomment).
+   `terraform init && terraform apply`. Keep the `github_variables` output
+   open.
 3. **Configure GitHub.**
    * *Settings → Secrets and variables → Actions → Variables*: create one
      repository variable for each entry of `github_variables`.
@@ -549,9 +550,13 @@ comments, policy checks, and a production approval.
    your approval. Approve it. The services are **private** (`public =
    false`), because the policy library bans `allUsers` on Cloud Run. Call
    one with an identity token:
-   `curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" <url>`. (If you deployed `envs/dev`/`envs/prod` locally
-   in Chapter 18 with the same state bucket, the pipeline simply takes over
-   that state.)
+
+   ```console
+   $ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" <url>
+   ```
+
+   (If you deployed `envs/dev`/`envs/prod` locally in Chapter 18 with the
+   same state bucket, the pipeline simply takes over that state.)
 6. **Make a change through a pull request.** Create a branch, change
    `max_instances` in `infra/envs/dev/main.tf` to `3`, push, and open a PR.
    Watch the checks and the plan comments for dev and prod.
@@ -601,11 +606,10 @@ the pool first (`gcloud iam workload-identity-pools undelete github
 1. `id-token: write`.
 2. So that only jobs running in the protected `prod` GitHub environment
    (which require a reviewer's approval) can obtain production credentials.
-   (The book binds to the token's `environment` claim rather than its
-   subject, because new repositories get immutable subjects with numeric
-   IDs.)
    Any other workflow in the repository, including a modified one in a pull
-   request, can't.
+   request, can't. (The book binds to the token's `environment` claim rather
+   than its subject, because new repositories get immutable subjects with
+   numeric IDs.)
 3. The wrapper script changes how output and exit codes are handled; disabling
    it gives plain CLI behaviour (e.g. reliable `-detailed-exitcode`).
 4. It prevents two apply runs for the same branch from running at the same

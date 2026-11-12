@@ -101,8 +101,8 @@ provider "google" {
 The provider block sets defaults used by all Google resources: which project
 and which region. Pick a region near you (for example `us-central1`,
 `europe-west1`, `asia-southeast1`). The default region applies to regional
-resources such as VMs; it does not decide where the bucket below lives. That
-is set by the bucket's own `location` argument.
+resources such as subnets; it does not decide where the bucket below lives.
+That is set by the bucket's own `location` argument.
 
 > [!NOTE]
 > **Google Cloud: regions, zones, and locations.** A **region** is a

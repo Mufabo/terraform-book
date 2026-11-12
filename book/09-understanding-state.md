@@ -218,8 +218,8 @@ Lists the address of every resource in state:
 $ terraform state list
 data.google_project.current
 google_storage_bucket.notes
-google_storage_bucket.this["logs"]
 google_storage_bucket.this["backups"]
+google_storage_bucket.this["logs"]
 random_id.suffix
 ```
 
@@ -370,8 +370,9 @@ forget resources without touching real infrastructure.
    `terraform apply -var 'buckets=["logs", "archive", "extra"]'` and leave it
    waiting at the "Enter a value" prompt. (The extra bucket gives `apply`
    something to do; with no changes it would finish at once without asking.)
-   In a second terminal, run `terraform plan`. Read the lock error. Then try `terraform plan -lock-timeout=30s` and answer the
-   first prompt with `no` within 30 seconds — the second command proceeds.
+   In a second terminal, run `terraform plan`. Read the lock error. Then try
+   `terraform plan -lock-timeout=30s` and answer the first prompt with `no`
+   within 30 seconds — the second command proceeds.
 5. **Rename:** In `main.tf`, rename `google_storage_bucket.notes` to
    `google_storage_bucket.docs` (and its references in `outputs.tf`). Run
    `terraform plan` — it wants to destroy and create! Now run

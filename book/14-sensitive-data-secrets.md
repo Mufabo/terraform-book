@@ -90,8 +90,9 @@ What it does **not** do:
 
 * It does **not** encrypt or remove the value from **state** — the plain text
   is still there.
-* It does not hide the value from `terraform output -raw`/`-json` or
-  `terraform console`.
+* It does not hide the value from `terraform output -raw`/`-json`.
+  (`terraform console` does redact it, as `(sensitive value)`, unless you
+  wrap it in `nonsensitive()`.)
 
 > **Exam tip:** `sensitive = true` = redacted in CLI output only. State still
 > contains the value. This is one of the most frequently tested facts.
@@ -170,9 +171,10 @@ Because Terraform doesn't store the value, it can't detect when it changes.
 The `*_wo_version` number is how you tell Terraform to send a new value:
 **increase it** to rotate the secret.
 
-> **Newer than the exam:** Ephemeral resources (1.10) and write-only arguments
-> (1.11) postdate parts of the exam's syllabus, but they're the modern best
-> practice for keeping secrets out of state. Know that they exist.
+> **Exam tip:** Ephemeral values (1.10) and write-only arguments (1.11) are
+> recent, but both are older than the exam's Terraform version (1.12) and
+> belong to objective 4h, so they can appear on the exam. Know what each one
+> is, and that they keep secrets out of the plan file and the state.
 
 ## 14.4 Google Secret Manager
 

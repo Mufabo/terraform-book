@@ -133,8 +133,9 @@ $ gcloud init
 ```
 
 `gcloud init` runs `gcloud auth login` for you: it opens a browser so you can
-log in with your Google account. It then asks you to pick or create a project. You can skip project selection for now;
-we create one in the next step.
+log in with your Google account. It then asks you to pick or create a
+project. You can skip project selection for now; we create one in the next
+step.
 
 ## 2.4 Creating a Google Cloud project
 

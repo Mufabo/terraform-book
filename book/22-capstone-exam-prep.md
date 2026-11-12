@@ -68,8 +68,8 @@ short:
    repository, or a paid plan; see Chapter 21).
 5. A README.
 
-Plan for **two to three hours** — this is the one chapter that's longer than
-an hour. Work in small pull requests; let your pipeline check every step.
+Plan for **two to three hours** — far more than any other chapter. Work in
+small pull requests; let your pipeline check every step.
 
 ### A.3 Suggested order
 
@@ -97,7 +97,7 @@ whole book:
 | Where is state stored, how is it locked, how is it protected? | Ch. 9–10 |
 | Why are provider versions pinned exactly and module versions local? | Ch. 4, 12 |
 | How does the API key avoid ever being written to state? | Ch. 14 |
-| Why does the Cloud Run service `depends_on` the secret version and IAM binding? | Ch. 5 |
+| Why does the Cloud Run service `depends_on` the IAM binding, and the `web_app` module call on the secret version? | Ch. 5 |
 | What do the unit tests prove, and what can't they prove? | Ch. 19 |
 | Which policy would have caught a public bucket, and at what point in the pipeline? | Ch. 20 |
 | How does the pipeline authenticate, and why can't a pull request deploy to prod? | Ch. 21 |
