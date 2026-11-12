@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this repository is
 
 A beginner book, *Introduction to Terraform on Google Cloud*: 22 lessons
-of about an hour each plus appendices in `book/` (Markdown), and runnable Terraform for every
-chapter in `code/`. It must cover the full Terraform Associate (004) exam, plus
+of about an hour each plus appendices in `book/` (Markdown), and runnable
+Terraform for every chapter in `code/`. It must cover the full Terraform Associate (004) exam, plus
 multiple environments, testing, policy as code (`gcloud beta terraform vet`),
 and CI/CD (GitHub Actions). `SUMMARY.md` is the table of
 contents (mdBook/MkDocs style).
@@ -58,6 +58,10 @@ comments rather than invalid values). Placeholders: project
 `terraform.tfvars` (git-ignored); `terraform.tfvars.example` is committed.
 
 Default region throughout is `europe-west1` / bucket location `EU`.
+
+`ch02-setup/solution/project-bootstrap` (project, billing link, budget and
+APIs as Terraform) is described in `book/appendix-e-project-with-terraform.md`,
+not in Chapter 2.
 
 Code that is shared across chapters is **copied**, not referenced, so a change
 must be applied to every copy:

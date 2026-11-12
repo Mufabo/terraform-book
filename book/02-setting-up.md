@@ -16,7 +16,7 @@ By the end of this lesson you will be able to:
 > This chapter is mostly setup. It is not directly tested on the exam, but every
 > later chapter depends on it, so take your time.
 
-**Time:** about 1 hour 30 minutes — 35 reading, 5 quick check, 20 exercise,
+**Time:** about 1 hour 25 minutes — 30 reading, 5 quick check, 20 exercise,
 and roughly 30 for running the installation and setup commands as you read
 (downloads and enabling APIs take a while).
 
@@ -256,89 +256,10 @@ $ gcloud billing budgets create \
 > account's currency) gives you a comfortable warning margin. Appendix D
 > estimates the cost of every chapter.
 
-### Alternative: the same steps with Terraform
-
-> **Note:** Skip this on your first read. It uses the workflow from
-> Chapter 3 and needs the credentials you set up in section 2.6. Use the
-> `gcloud` commands above now, and come back here once Terraform is familiar.
-
-Everything above can also be done with Terraform, which is how teams create
-projects in practice: the project, its billing link, and its budget are then
-reviewed and versioned like any other code. Each `gcloud` command has a
-matching resource:
-
-| `gcloud` command | Terraform resource |
-|---|---|
-| `gcloud projects create` | `google_project` |
-| `gcloud billing projects link` | `billing_account` argument of `google_project` |
-| `gcloud services enable billingbudgets.googleapis.com` | `google_project_service` |
-| `gcloud billing budgets create` | `google_billing_budget` |
-| `gcloud config set project` | *(none — this is a local `gcloud` setting)* |
-
-The complete configuration is in `code/ch02-setup/solution/project-bootstrap/`.
-The core of it:
-
-```hcl
-resource "google_project" "book" {
-  project_id      = var.project_id
-  name            = "Terraform Book"
-  billing_account = var.billing_account
-
-  # The provider protects projects from `terraform destroy` by default.
-  # "DELETE" lets you remove the learning project with Terraform.
-  deletion_policy = "DELETE"
-}
-
-resource "google_billing_budget" "book" {
-  provider = google.quota
-
-  billing_account = var.billing_account
-  display_name    = "terraform-book-budget"
-
-  budget_filter {
-    # Budgets store projects by number. The API converts an ID to a number,
-    # so using the ID here would show a change on every plan.
-    projects = ["projects/${google_project.book.number}"]
-  }
-
-  amount {
-    specified_amount {
-      currency_code = var.budget_currency
-      units         = tostring(var.budget_amount)
-    }
-  }
-
-  threshold_rules {
-    threshold_percent = 0.5
-  }
-  # ... 0.9 and 1.0 as above
-
-  depends_on = [google_project_service.billingbudgets]
-}
-```
-
-To use it, copy `terraform.tfvars.example` to `terraform.tfvars`, fill in your
-project ID and billing account, and run `terraform init` and
-`terraform apply`. If you already created your project with `gcloud`, use a
-**new** project ID here; Terraform can't create a project that already
-exists. (Alternatively, bring the existing project under Terraform's control
-with an `import` block, section 11.5.)
-
-If the budget fails with an error saying the Billing Budget API is not
-enabled, wait a minute and run `terraform apply` again: a newly enabled API
-can take a moment to become active.
-
-Three things are different from the `gcloud` version:
-
-* **The quota project.** When Terraform uses your personal credentials, the
-  Budget and Service Usage APIs need a project to bill API calls to. The
-  configuration therefore has a second, aliased provider (`google.quota`,
-  Chapter 4) that uses the new project for this.
-* **The currency** in `budget_currency` must match your billing account's
-  currency, or the API rejects the budget.
-* **Keep the state file.** This configuration's state is now the record of
-  your project. If you lose it, Terraform no longer knows the project exists.
-  `terraform destroy` here deletes the whole project and everything in it.
+> **Note:** Teams usually create projects, billing links, and budgets with
+> Terraform itself, so that they're reviewed and versioned like any other
+> code. Appendix E shows how, once you know the workflow from Chapters 3
+> and 4.
 
 ## 2.5 Enabling APIs
 
@@ -358,7 +279,8 @@ $ gcloud services enable \
 ```
 
 This takes a minute or two. (In Chapter 5 you will learn to enable APIs with
-Terraform itself using the `google_project_service` resource.)
+Terraform itself using the `google_project_service` resource; Appendix E
+enables this whole list that way.)
 
 > [!NOTE]
 > **Google Cloud: services and APIs.** Each Google Cloud product (Compute
@@ -375,7 +297,8 @@ Terraform itself using the `google_project_service` resource.)
 > APIs that act on something other than a project's own resources, such as
 > Billing Budgets (a billing account) or Service Usage (which enables APIs),
 > can't tell which project to count the call against when you use your
-> personal credentials. That's the **quota project** from section 2.4.
+> personal credentials. That's the **quota project** from section 2.4, and
+> you set one for Terraform in section 2.6.
 
 > [!NOTE]
 > **Google Cloud: the `default` network.** Enabling `compute.googleapis.com` also
@@ -402,45 +325,6 @@ Terraform itself using the `google_project_service` resource.)
 > automatic `default` network altogether (with the organization policy
 > `compute.skipDefaultNetworkCreation`) and create their own networks, as
 > Chapter 5 does.
-
-### Alternative: enabling APIs with Terraform
-
-> **Note:** Like the alternative in section 2.4, skip this on your first read
-> and use the `gcloud` command above.
-
-The `project-bootstrap` configuration from section 2.4 also enables these
-APIs. One `google_project_service` resource per API would mean eight nearly
-identical blocks, so it uses `for_each` (Chapter 7) to create one for each
-entry in a set:
-
-```hcl
-variable "services" {
-  description = "APIs to enable in the project (section 2.5)."
-  type        = set(string)
-  default = [
-    "compute.googleapis.com",
-    "storage.googleapis.com",
-    # ... the same list as the gcloud command above
-  ]
-}
-
-resource "google_project_service" "book" {
-  provider = google.quota
-  for_each = var.services
-
-  project            = google_project.book.project_id
-  service            = each.value
-  disable_on_destroy = false
-}
-```
-
-* `disable_on_destroy = false` keeps the APIs enabled when you destroy the
-  resource. Disabling an API that other resources still use breaks them, so
-  this is the safe choice.
-* To enable another API later, add it to the list and run `terraform apply`.
-* Like the budget, this resource uses the `google.quota` provider, because
-  the Service Usage API needs a quota project when you use your own
-  credentials.
 
 ## 2.6 Authenticating Terraform to Google Cloud
 

@@ -45,7 +45,7 @@ about **23 hours** for the whole book:
 | Chapter | Reading | Exercise | Total |
 |---|---|---|---|
 | 1. What Is Infrastructure as Code? | 20 min | 20 min | 45 minutes |
-| 2. Setting Up Your Environment | 35 min + 30 min setup | 20 min | 1 hour 30 minutes |
+| 2. Setting Up Your Environment | 30 min + 30 min setup | 20 min | 1 hour 25 minutes |
 | 3. Your First Configuration and the Core Workflow | 35 min | 25 min | 1 hour 5 minutes |
 | 4. Providers | 25 min | 25 min | 55 minutes |
 | 5. Resources, Data Sources, and Dependencies | 25 min | 25 min | 55 minutes |

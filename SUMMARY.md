@@ -48,3 +48,4 @@
 * [B. CLI Cheat Sheet](book/appendix-b-cli-cheatsheet.md)
 * [C. Cleanup and Costs](book/appendix-c-cleanup-and-costs.md)
 * [D. Cost Estimate](book/appendix-d-cost-estimate.md)
+* [E. Creating the Project with Terraform](book/appendix-e-project-with-terraform.md)
