@@ -356,9 +356,10 @@ violates policies. (Rulesets on private repositories also need a paid plan,
 and GitHub doesn't let you approve your own pull request, so on a
 one-person repository leave out the approval requirement.)
 
-> **Security tip:** Pull requests from **forks** don't get OIDC tokens or
-> repository variables by default, so they can't plan. That's intentional:
-> never run Terraform with cloud credentials on untrusted code. Avoid
+> **Security tip:** Pull requests from **forks** don't get OIDC tokens by
+> default (GitHub reduces their `id-token: write` permission to read-only),
+> so they can't authenticate and can't plan. That's intentional: never run
+> Terraform with cloud credentials on untrusted code. Avoid
 > `pull_request_target` for Terraform workflows.
 
 ## 21.5 The apply workflow
@@ -615,5 +616,5 @@ the pool first (`gcloud iam workload-identity-pools undelete github
 4. It prevents two apply runs for the same branch from running at the same
    time; the second waits.
 5. Fork code is untrusted; running it with cloud credentials could leak or
-   abuse them. GitHub therefore doesn't give fork PRs OIDC tokens or
-   variables by default.
+   abuse them. GitHub therefore doesn't give fork PRs OIDC tokens by
+   default.
