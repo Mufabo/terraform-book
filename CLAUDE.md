@@ -41,6 +41,13 @@ and `epub/style.css`. Section numbers (`10.6`) are referenced from
 `book/appendix-a-exam-objective-map.md`; keep that map in sync when sections
 move or are renumbered.
 
+Each Part ends with a review page, `book/NNz-review-part-N.md` (NN = the
+Part's last chapter; for Part VI that is 21, so the review precedes the
+capstone). The `z` makes the file sort directly after that chapter, which is
+what puts it in the right place in the EPUB. A review has ten mixed questions
+(the last two or three from earlier Parts), a "From memory" task, and answers
+that cite section numbers, so keep them in sync when sections move.
+
 Vary the position of the correct option in multiple-choice questions.
 Chapter 22 has two practice tests: Part C (recall, answers in Part D) and
 Part E (scenarios, answers in Part F).

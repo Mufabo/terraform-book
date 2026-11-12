@@ -41,7 +41,7 @@ Most chapters take **about an hour**. Every chapter has the same parts:
 ### How long each chapter takes
 
 Each chapter states its own estimate below the learning objectives. Plan for
-about **24 hours** for the whole book:
+about **25 hours** for the whole book, including the six Part reviews:
 
 | Chapter | Reading | Exercise | Total |
 |---|---|---|---|
@@ -67,6 +67,12 @@ about **24 hours** for the whole book:
 | 20. Policy as Code with `gcloud terraform vet` | 25 min | 30 min | 1 hour |
 | 21. CI/CD with GitHub Actions | 25 min | 45 min | 1 hour 15 minutes |
 | 22. Capstone Project and Exam Preparation | 15 min | 2–3 h + two 40-min tests | 3½–4½ hours |
+
+Each of the book's six Parts ends with a **review** of about 15 minutes:
+ten questions that mix the Part's chapters and reach back to earlier Parts,
+plus a small task to do from memory. Don't skip them. Answering a question
+again after a gap of days is what moves it into long-term memory, and it
+shows you what to reread before the gap gets longer.
 
 The totals include five minutes for the quick check. Reading is counted at
 about 100 words a minute, a careful pace that leaves room for code and

@@ -4,7 +4,7 @@ A hands-on book for **absolute beginners**. You will go from "what is
 Infrastructure as Code?" to running Terraform in CI/CD pipelines that manage
 separate dev, staging, and production environments on Google Cloud.
 
-* **22 lessons, most about one hour each** (around 24 hours in total; the
+* **22 lessons, most about one hour each** (around 25 hours in total; the
   preface lists every chapter's time). Every chapter starts with learning
   objectives and ends with a hands-on exercise.
 * **Covers the full HashiCorp Certified: Terraform Associate (004) curriculum.**
@@ -20,7 +20,8 @@ separate dev, staging, and production environments on Google Cloud.
 1. Read the [Preface](book/00-preface.md) and work through
    [Chapter 2](book/02-setting-up.md) to install the tools and create your
    Google Cloud project.
-2. Read the chapters in order. Each one builds on the previous ones.
+2. Read the chapters in order. Each one builds on the previous ones. Each
+   Part ends with a short review that mixes questions from everything so far.
 3. At the end of each chapter, open `code/chNN-*/exercise/`, complete the
    `TODO`s, and compare your work with `code/chNN-*/solution/`.
 4. For more practice, try the chapter's **challenge**: a task without starter

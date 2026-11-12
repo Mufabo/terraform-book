@@ -153,8 +153,8 @@ Official resources:
 
 | Days | Activity |
 |---|---|
-| 1–2 | Re-read the summaries and "Common mistakes and exam tips" of Chapters 1–8. Redo the quick checks without looking. |
-| 3–4 | Chapters 9–15 the same way. Re-run the Chapter 9 and 11 exercises — state and import questions are common. |
+| 1–2 | Re-read the summaries and "Common mistakes and exam tips" of Chapters 1–8. Redo the quick checks and the reviews of Parts I and II without looking. |
+| 3–4 | Chapters 9–15 and the reviews of Parts III and IV the same way. Re-run the Chapter 9 and 11 exercises — state and import questions are common. |
 | 5 | Chapters 16–17 (HCP Terraform). If you skipped the exercises, at least create a free organisation and click through workspaces, variables, variable sets, the registry, and policy sets. |
 | 6 | Walk through Appendix A. Mark every objective you can't explain out loud in two sentences. |
 | 7 | Take the first practice test (Part C) under exam conditions: 30 questions, 30 minutes. |
