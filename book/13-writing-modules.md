@@ -415,6 +415,35 @@ through the refactoring.
 
 Install terraform-docs and generate the module's README.
 
+### Challenge
+
+*Optional, about 40 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch13-writing-modules/challenge/`.*
+
+Write a second module, `modules/simple-network`, and use it twice.
+
+The module's interface:
+
+* Inputs: `project_id`; `name` (validated: lowercase letters, digits, and
+  hyphens); `subnets`, a map of objects with `region` and `cidr` (validated:
+  every `cidr` is a valid CIDR block); `enable_iap_ssh` (default `false`).
+* It creates a custom-mode network called `name`, one subnet per map entry
+  called `<name>-<key>` with Private Google Access on, and, **only if**
+  `enable_iap_ssh` is true, a firewall rule that allows SSH from
+  Identity-Aware Proxy (`35.235.240.0/20`) to VMs carrying a network tag.
+* Outputs: the network ID, a map from subnet key to subnet ID, and the
+  network tag for SSH (`null` when the rule doesn't exist).
+* A `versions.tf` suitable for a reusable module, no `provider` block, and a
+  short `README.md`.
+
+In the root module, call it twice: a `dev` network with one subnet and IAP
+SSH, and a `test` network with two subnets and without it.
+
+**Done when** the plan shows two networks, three subnets, and one firewall
+rule; an invalid `cidr` is rejected with your own error message; and the
+root's outputs show `null` for the test network's SSH tag.
+
 ### Cleanup
 
 ```console

@@ -485,6 +485,35 @@ the bucket is blocked.
 Add a `terraform_data` resource holding a `var.app_version` string and use
 `replace_triggered_by` so that changing the version replaces the VM.
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch08-conditions/challenge/`.*
+
+Write a configuration for a "records" bucket that enforces these rules.
+Decide for each rule which mechanism fits: a `validation`, a `precondition`,
+a `postcondition`, a `check` block, or a `lifecycle` argument.
+
+1. `environment` is `dev`, `staging`, or `prod`.
+2. `location` is `EU`, `EUROPE-WEST1`, or `EUROPE-WEST4`, written in upper
+   or lower case.
+3. `retention_days` (objects are deleted after that many days) is a whole
+   number from 1 to 365.
+4. In `prod`, versioning must be switched on (`versioning` is a bool
+   variable, default `false`).
+5. The bucket Terraform creates must enforce public access prevention.
+6. Company guideline, not a hard rule: in `prod`, records should be kept for
+   at least 90 days. A shorter time must not stop a deployment.
+7. An audit tool updates the bucket's `last_audit` label. Terraform must not
+   undo that.
+
+**Done when** each of these gives the result in brackets:
+`-var location=US` (error), `-var location=europe-west4` (plan),
+`-var retention_days=7.5` (error), `-var environment=prod` (error),
+`-var environment=prod -var versioning=true` (plan with a warning), and the
+same with `-var retention_days=120` (clean plan).
+
 ### Cleanup
 
 Set `prevent_destroy = false` (or remove the line), then:

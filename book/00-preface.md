@@ -36,6 +36,7 @@ Most chapters take **about an hour**. Every chapter has the same parts:
 | Concepts, common mistakes, and summary | 15–35 min | Explanations with small examples you can type along, the traps beginners and exam candidates fall into, and a recap. |
 | Quick check | ~5 min | Five questions to test yourself. Answers are at the end of the chapter. |
 | Hands-on exercise | 20–45 min | Build something real in your own Google Cloud project. |
+| Stretch goal and challenge | optional | Go further without step-by-step guidance. |
 
 ### How long each chapter takes
 
@@ -77,6 +78,16 @@ part of the learning, not time lost.
 Code for every exercise is in the `code/` folder. Each chapter has an
 `exercise/` folder with `TODO` markers for you to complete and a `solution/`
 folder with a working answer. Try the exercise yourself before you peek!
+
+Each exercise ends with two optional extras. The **stretch goal** takes the
+exercise one step further. The **challenge** is a new, small task described
+only by its requirements: no starter files, no `TODO`s, and often an
+argument or a command you have to look up yourself. Filling in `TODO`s shows
+that you followed the chapter; the challenge shows whether you can use it on
+your own, which is what your job and the exam will ask of you. Reference
+solutions are in each chapter's `challenge/` folder. The challenges take 15
+to 40 minutes each and aren't counted in the times above. If you're short of
+time, do the challenge rather than the stretch goal.
 
 ## Conventions
 

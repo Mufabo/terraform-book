@@ -305,6 +305,32 @@ A VPC with two subnets and a firewall rule, two buckets, and a VM in the
 Look at the module's source in `.terraform/modules/vpc`. Find the resource
 that creates the network. How many input variables does the module have?
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch12-using-modules/challenge/`.*
+
+Build networks and buckets for several environments, writing **no
+`resource` block of your own**: only the two registry modules from the
+exercise, in the same pinned versions.
+
+* A variable describes the environments, by default `dev` and `test`.
+* **One** `module` block creates a VPC network per environment (use a
+  meta-argument). Each network is named `ch12c-<environment>` and has one
+  subnet `app` with its own `/24` out of `10.70.0.0/16`, calculated with a
+  function rather than typed in.
+* The storage module creates one bucket per environment.
+* An output maps each environment to its network name, its subnet's self
+  link, and its subnet's IP range. A second output lists the bucket names.
+
+The modules' Inputs and Outputs tabs in the Registry tell you what you can
+set and read.
+
+**Done when** the plan creates two networks, two subnets, and two buckets,
+and adding `staging` to the variable adds exactly one of each. Look at
+`terraform state list` to see how the module instances are addressed.
+
 ### Cleanup
 
 ```console

@@ -353,6 +353,32 @@ clash?
 
 Compare with `code/ch01-iac/solution/answers.md`.
 
+### Challenge
+
+*Optional, about 20 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. (Here, on paper or in an
+editor: you can't run anything yet.) A reference solution is in
+`code/ch01-iac/challenge/`.*
+
+A colleague built a small file-sharing setup with this script:
+
+```bash
+gcloud storage buckets create gs://tf-book-fatih-12345-share --location=EU
+gcloud compute networks create share-net --subnet-mode=custom
+gcloud compute firewall-rules create share-allow-https \
+    --network=share-net --allow=tcp:443 --source-ranges=10.0.0.0/8
+```
+
+1. Write the declarative version: one `resource` block per command. Use the
+   exercise's `main.tf` as a guide to the syntax, and make a sensible guess
+   where you don't know an argument's name.
+2. What happens when the script runs a second time? What happens when
+   Terraform applies your version a second time?
+3. Someone changes the firewall rule's port to 8443 in the console. What does
+   the script do about it on its next run, and what does Terraform do?
+4. What would you have to change, in each version, to build the same setup a
+   second time for another team?
+
 ### Cleanup
 
 Nothing to clean up — you did not create any cloud resources yet.

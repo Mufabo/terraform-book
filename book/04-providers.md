@@ -526,6 +526,30 @@ Three buckets sharing the same random suffix, two in Europe and one in the US.
 Add checksums for macOS and Windows to the lock file with
 `terraform providers lock -platform=...`. How did the file change?
 
+### Challenge
+
+*Optional, about 25 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch04-providers/challenge/`.*
+
+In the exercise, the `google.us` alias didn't decide where a bucket lives.
+Build something where the provider configuration does matter.
+
+* Providers: `hashicorp/google` 8.9.0 and `hashicorp/random` 3.9.1, pinned
+  exactly.
+* Two configurations of the Google provider: the default in `europe-west1`
+  and an alias in `us-central1`.
+* A `random_pet` resource (look it up in the `random` provider's
+  documentation) that provides a name prefix.
+* One custom-mode VPC network and two subnets, `10.50.0.0/24` and
+  `10.50.1.0/24`. **Neither subnet may set `region`.** One must end up in
+  Europe and the other in the US.
+* An output that shows the region of each subnet.
+
+**Done when** the output shows `europe-west1` for one subnet and
+`us-central1` for the other, and `terraform providers` lists both providers.
+Destroy everything afterwards.
+
 ### Cleanup
 
 ```console

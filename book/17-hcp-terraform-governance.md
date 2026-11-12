@@ -408,6 +408,36 @@ Write the second policy `require-labels.sentinel` that requires every bucket
 to have an `owner` label, set it to `soft-mandatory`, and practise overriding
 it in the UI.
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. Teams other than `owners`
+need a paid tier; writing and validating the code is the exercise here. A
+reference solution is in `code/ch17-hcp-governance/challenge/`.*
+
+A company gives you these requirements. Express them with the
+`hashicorp/tfe` provider.
+
+* Two projects, `networking` and `web-shop`. Workspaces: `network-prod` in
+  the first; `web-shop-dev` and `web-shop-prod` in the second.
+* The **platform** team runs everything in `networking`.
+* The **web-shop developers** may apply in dev, but in prod they may only
+  queue plans.
+* The **auditors** can see everything in both projects and change nothing.
+* `web-shop-prod` reads outputs of `network-prod`. No other workspace may.
+* Whenever `network-prod` applies, `web-shop-prod` plans again.
+
+For each requirement, decide at which level the permission belongs
+(organisation, project, or workspace) and which fixed role is the smallest
+one that works.
+
+Also answer in writing: the company has two rules, "data must stay in the
+EU" and "every bucket needs an `owner` label". Which enforcement level would
+you give each, and how would you scope the policy sets?
+
+**Done when** `terraform validate` succeeds and you can justify every role
+you chose.
+
 ### Cleanup
 
 ```console

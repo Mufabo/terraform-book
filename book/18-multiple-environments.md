@@ -351,6 +351,35 @@ state stored under `envs/dev/` and `envs/prod/` in your state bucket.
 
 Add `envs/staging/` in under five minutes. What did you have to change?
 
+### Challenge
+
+*Optional, about 35 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch18-environments/challenge/`.*
+
+Section 18.3 described a strategy the exercise didn't build: **one**
+configuration with a tfvars file per environment. Build it, and see for
+yourself where it is weaker.
+
+* One root module that calls the exercise's `web-app` module. Use another
+  `app_name` than the exercise so nothing clashes.
+* `dev.tfvars` and `prod.tfvars` hold everything that differs (environment
+  name, instance limits, deletion protection).
+* Each environment has its own state: the same state bucket, the prefixes
+  `ch18c/dev` and `ch18c/prod`. Neither the bucket nor a prefix is in a
+  `.tf` file.
+* A small wrapper script, used as `./tf.sh dev plan` or `./tf.sh prod apply`,
+  that makes it **impossible** to combine one environment's state with
+  another environment's values.
+
+Before you write the script, do it wrong once on purpose **with `plan`
+only**: initialise with the prod prefix and plan with `dev.tfvars`. Read
+what Terraform proposes.
+
+**Done when** both environments are deployed through the script, the state
+bucket holds two state objects under `ch18c/`, and you can name two things
+the directory-per-environment layout can do that this one can't.
+
 ### Cleanup
 
 No later chapter needs these two environments to stay deployed. You can

@@ -480,6 +480,33 @@ only as the service account. A new service account also takes a minute to
 become usable; until then, the provider reports `impersonate: status code
 404`.
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. (`SOLUTION.md` there has
+the commands.) A reference solution is in `code/ch14-secrets/challenge/`.*
+
+Store two secrets in Secret Manager without either value ever being written
+to the state **or to a saved plan file**.
+
+* **A partner's API token** that somebody gives you. It reaches Terraform
+  through an input variable, which the exercise didn't use for secrets. The
+  variable must be declared so that Terraform never stores its value.
+* **A signing key** that only has to be random. No human should ever see it.
+* A service account `ch14c-app` that may read these two secrets and nothing
+  else.
+* Outputs may say where the secrets are, never what they contain.
+* A way to rotate the partner token when the partner issues a new one.
+
+Supply the token without putting it into a file or onto the command line.
+
+**Done when** `terraform plan -out=tfplan` followed by
+`terraform show -json tfplan | grep -c <token>` prints `0`, the same search
+in `terraform state pull` prints `0`, and
+`gcloud secrets versions access latest` shows the token. Also find out: what
+does `terraform apply tfplan` need that a saved plan normally doesn't, and
+why?
+
 ### Cleanup
 
 ```console

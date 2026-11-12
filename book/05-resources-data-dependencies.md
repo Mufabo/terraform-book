@@ -528,6 +528,36 @@ Identity-Aware Proxy range `35.235.240.0/20`, then connect with
 > You can ignore it: the connection works without NumPy, only large file
 > transfers over the tunnel are slower.
 
+### Challenge
+
+*Optional, about 35 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch05-resources-data/challenge/`.*
+
+Build a two-tier setup: a web VM that the internet can reach, and a
+database VM that only the web VM can reach.
+
+* The Compute Engine API enabled with Terraform; a custom-mode network and
+  one subnet (`10.11.0.0/24`). Use names that don't clash with the exercise,
+  for example with the prefix `ch05c-`.
+* A VM `web` (tag `web`) with a public IP address and nginx, and a VM `db`
+  (tag `db`) **without** a public IP address. Both are `e2-micro`, use the
+  newest Debian 12 image from a data source, a zone from a data source, and
+  Secure Boot.
+* Firewall rules: TCP 80 from anywhere to `web`; TCP 5432 to `db`, but
+  **only from VMs tagged `web`** (the firewall resource's documentation
+  shows how to name a tag as the source).
+* The web page must show the database VM's internal IP address.
+* Outputs: the web URL and the database VM's internal IP address.
+
+Before you apply, draw the dependency graph and answer: which resources will
+Terraform create in parallel? Are the two VMs created in parallel? Which
+dependencies are explicit?
+
+**Done when** the web page shows the internal IP address from your output,
+and your graph matches what `terraform apply` did. Destroy both VMs when
+you're finished; two VMs cost twice as much as one.
+
 ### Cleanup
 
 ```console

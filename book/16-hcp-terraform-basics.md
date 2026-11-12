@@ -443,6 +443,31 @@ with state stored in the workspace.
 Use the `tfe` provider (in `wif/` or a new folder) to create the workspace
 and its environment variables as code instead of clicking.
 
+### Challenge
+
+*Optional, about 35 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. Like the exercise, it
+needs your HCP Terraform organisation. A reference solution is in
+`code/ch16-hcp-terraform/challenge/`.*
+
+Run one configuration in two workspaces, and create everything in HCP
+Terraform as code instead of by clicking.
+
+* With the `hashicorp/tfe` provider (0.82.0), create: a project; two
+  workspaces `ch16c-app-dev` and `ch16c-app-prod` in it, both carrying the
+  same tag; a Terraform variable `environment` with a different value in
+  each workspace; and **one** variable set, attached to the project, that
+  holds `project_id` and the three `TFC_GCP_*` environment variables.
+* Change the app configuration's `cloud` block so that it selects the
+  workspaces **by tag** instead of by name, and make the bucket's name
+  depend on `var.environment`.
+* On the Google side, the service account binding from the exercise trusts
+  one workspace name. Extend it to both.
+
+**Done when** `terraform workspace list` shows both workspaces, and
+`terraform apply` in each creates its own bucket with its own state, with
+no variable set by hand in the UI.
+
 ### Cleanup
 
 ```console

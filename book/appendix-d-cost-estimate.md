@@ -72,7 +72,9 @@ free trial. The "billable" column lists only resources that cost anything.
 | 22 | State bucket, Cloud Run, secrets, GitHub Actions | < $0.01 (free tier) |
 | **Total** | | **≈ $0.15–0.25** |
 
-Almost the whole total comes from the four chapters with a VM. If you work
+The optional challenges use the same kinds of resources and add a few cents
+at most; only Chapter 5's creates VMs (two of them). Almost the whole total
+comes from the four chapters with a VM. If you work
 through the book during the free trial, it's covered by the credits.
 
 > **Tip:** If you want to avoid even the VM cost, you can run Chapters 5, 8,

@@ -349,6 +349,29 @@ categories and fixes.
 Run `TF_LOG=TRACE terraform plan 2> trace.log` and count the lines
 (`wc -l trace.log`). Compare with `DEBUG`. Then delete the files.
 
+### Challenge
+
+*Optional, about 25 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. The one exception to "no
+starter files": you need the broken configuration in `challenge/broken/`. The
+fixed version is in `fixed/`, the explanations in `BUGS.md`. A reference
+solution is in `code/ch15-troubleshooting/challenge/`.*
+
+`code/ch15-troubleshooting/challenge/broken/` contains **four** bugs of
+kinds the exercise didn't have. This time there are no hints about which
+command reveals which bug.
+
+1. Copy `broken/` to a folder of your own and create `terraform.tfvars`.
+2. Find and fix the bugs, one at a time. For each, write down the command
+   that revealed it, its category (language, state, core, or provider), and
+   why the earlier commands couldn't see it.
+3. For the last bug, capture a debug log and find Google's exact answer in
+   it.
+
+**Done when** `terraform apply` succeeds and a second `terraform apply`
+reports no changes. One of the bugs hides another: which one, and why?
+Destroy everything afterwards and delete the log.
+
 ### Cleanup
 
 ```console

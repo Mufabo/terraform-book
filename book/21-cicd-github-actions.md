@@ -584,6 +584,32 @@ approval — with no service account keys anywhere.
 Add a nightly drift-detection workflow (section 21.6) that runs a
 refresh-only plan for both environments with the plan identity.
 
+### Challenge
+
+*Optional, about 40 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch21-github-actions/challenge/`.*
+
+The chapter's cleanup destroys the environments from a laptop. Write a
+workflow that does it through the pipeline instead, as safely as an apply.
+
+* It can only be started **by hand**, for one environment chosen from a
+  list, and the person must type the environment's name again to confirm.
+* It runs only for the code on `main`.
+* It uses the same identities and the same protection as an apply: for
+  `prod`, the required reviewer must approve before anything happens.
+* It never runs at the same time as an apply.
+* What the log shows as the plan is exactly what gets destroyed.
+* Text typed into the form must not be able to inject commands into the
+  workflow's shell steps.
+
+Decide for yourself whether the workflow should switch off
+`deletion_protection`, and whether it needs the `vet` step. Lint the result
+with actionlint.
+
+**Done when** the workflow destroys `dev` after a correct confirmation,
+refuses a wrong one, and waits for approval before destroying `prod`.
+
 ### Cleanup
 
 Destroy through the pipeline or locally:

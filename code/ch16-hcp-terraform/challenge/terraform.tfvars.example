@@ -1,0 +1,4 @@
+organization           = "tf-book-yourname"
+project_id             = "tf-book-fatih-12345"
+service_account_email  = "hcp-terraform-dev@tf-book-fatih-12345.iam.gserviceaccount.com"
+workload_provider_name = "projects/123456789012/locations/global/workloadIdentityPools/hcp-terraform/providers/hcp-terraform-oidc"

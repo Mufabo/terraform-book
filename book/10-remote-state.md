@@ -438,6 +438,29 @@ Replace `terraform_remote_state` in `app/` with a
 `data "google_compute_subnetwork"` lookup by name and region. Which approach
 do you prefer, and why?
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. Do this before the
+exercise's cleanup: it needs the applied `network/` configuration. A reference
+solution is in `code/ch10-remote-state/challenge/storage/`.*
+
+Add a third configuration, `storage/`, next to `network/` and `app/`.
+
+* Its state lives in your state bucket under the prefix `ch10/storage`. The
+  bucket name must not appear in any `.tf` file.
+* It creates one regional bucket in **the same region as the network
+  configuration's subnet**, and it finds that region by reading the network
+  configuration's state. No region may be hard-coded.
+* Outputs: the bucket's name and location.
+
+Then move this configuration's state to the prefix `ch10/files`, without
+re-creating the bucket.
+
+**Done when** `terraform plan` shows no changes after the move, and you can
+answer: what happened to the state object under the old prefix? What would
+`terraform init -reconfigure` have done instead?
+
 ### Cleanup
 
 Destroy in reverse order:

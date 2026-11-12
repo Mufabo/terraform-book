@@ -483,6 +483,36 @@ credentials.
 Add a run that sets `deletion_protection = true` and asserts that the bucket's
 `force_destroy` is `false`.
 
+### Challenge
+
+*Optional, about 35 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch19-testing/challenge/`.*
+
+The `secure-bucket` module from Chapter 13 has no tests. Write them from
+scratch, in a copy of the module, as mocked unit tests that need no
+credentials. Cover at least:
+
+* the security settings every bucket must have, and the default location;
+* the lifecycle rule: absent with `retention_days = 0`, present with the
+  right age and action otherwise;
+* the labels: the caller's labels are kept, and `managed_by` is always
+  `terraform`, **even if the caller tries to set it**;
+* the readers: one IAM member per reader, none without readers, and never a
+  broader role than object viewer;
+* the name validation;
+* one output.
+
+Some nested blocks of the bucket are *sets*, which can't be indexed with
+`[0]`. The error message tells you when you meet one; `one()` helps.
+
+Then make sure your tests can fail: loosen a security setting in `main.tf`,
+and swap the two arguments of `merge()`. Each change must turn at least one
+test red.
+
+**Done when** `terraform test` passes without credentials, and each of the
+two deliberate mistakes makes it fail.
+
 ### Cleanup
 
 Unit tests create nothing. The integration test destroys its resources

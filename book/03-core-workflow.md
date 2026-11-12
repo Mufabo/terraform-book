@@ -719,6 +719,35 @@ Run `terraform plan -detailed-exitcode` before and after making a change, and
 print `echo $?` each time. Which exit codes do you see, and how could a
 script use them?
 
+### Challenge
+
+*Optional, about 25 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch03-core-workflow/challenge/`.*
+
+Build an archive bucket and take it through the whole workflow.
+
+* Three files: `versions.tf`, `providers.tf`, `main.tf`, with the book's
+  pinned versions.
+* A bucket named `<your-project-id>-ch03-archive` in `EU` with uniform
+  bucket-level access, `force_destroy`, the storage class `NEARLINE`, and
+  the label `purpose = "archive"`.
+* Objects are deleted automatically 30 days after they were created. The
+  bucket's page in the Registry documentation tells you which nested block
+  does that.
+
+Then:
+
+1. `terraform fmt -check` must exit with `0` before you go on.
+2. Save a plan, look at it with `terraform show`, and apply exactly that plan.
+3. Change the 30 days to 60. **Before** you plan: update in place, or
+   replacement? Check your prediction. Do the same for a change of the
+   bucket's name, without applying it.
+4. Preview the destruction without destroying anything, then destroy.
+
+**Done when** the bucket has gone through create, update, and destroy, and
+both predictions in step 3 are checked against a plan.
+
 ### Cleanup
 
 ```console

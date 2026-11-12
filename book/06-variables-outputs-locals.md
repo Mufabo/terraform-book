@@ -490,6 +490,35 @@ Resources named after your environment, labelled with `environment`,
 Create `prod.tfvars` with different values and run
 `terraform plan -var-file=prod.tfvars`. What would change?
 
+### Challenge
+
+*Optional, about 25 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch06-variables/challenge/`.*
+
+Write a configuration that any team can use to get a bucket, without
+editing a `.tf` file.
+
+* Inputs: `project_id`, `region`, `team` (required), `environment`
+  (default `dev`), `labels` (extra labels, default none), and one object
+  variable `bucket` with a required `location` and three optional
+  attributes: `storage_class` (default `STANDARD`), `versioning` (default
+  `false`), and `soft_delete_days` (default `7`).
+* The bucket is named `<project>-<team>-<environment>`. Build the name and
+  the merged labels (`team`, `environment`, `managed_by`, plus the extra
+  ones) in locals.
+* `soft_delete_days` sets how long deleted objects can be restored. The
+  bucket resource wants that as a number of **seconds**.
+* Outputs: the bucket's name, its URL, and a one-line `summary` string that
+  mentions the storage class, the location, and the soft-delete days.
+* Two files, `dev.tfvars` and `prod.tfvars`. Dev sets as little as possible;
+  prod sets every attribute.
+
+**Done when** `terraform plan -var-file=dev.tfvars` and
+`terraform plan -var-file=prod.tfvars` show two different buckets from the
+same code, and the dev plan shows the defaults (`STANDARD`, 604800 seconds).
+Apply one of them if you like, and destroy it with the same `-var-file`.
+
 ### Cleanup
 
 ```console

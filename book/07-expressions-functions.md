@@ -514,6 +514,39 @@ the sorted *list* of names, the CIDRs of the others may shift — would that
 force replacement? How could you make the CIDR assignment stable? (Hint: put
 an explicit `index` or `cidr` in each subnet object.)
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch07-expressions/challenge/`.*
+
+Several teams each need a bucket in some environments. The input is:
+
+```hcl
+teams = {
+  shop    = { environments = ["dev", "prod"] }
+  reports = { environments = ["prod"], location = "EUROPE-WEST1" }
+}
+```
+
+* Declare the variable with a precise type; `location` is optional and
+  defaults to `EU`.
+* Create **one bucket per team and environment** (three for the input above),
+  named `<project>-<team>-<environment>`, with `team` and `environment`
+  labels. One resource block, `for_each`, keys such as `shop-dev`. You'll
+  need to turn the nested input into a flat map first; `flatten()` helps.
+* Buckets that are **not** `prod` get a lifecycle rule that deletes objects
+  after `var.temporary_days` (default 14). Prod buckets get no rule.
+* Outputs: the bucket names grouped by team
+  (`{ reports = [...], shop = [...] }`), and a list with the URLs of the prod
+  buckets only.
+
+Work out the expressions in `terraform console` first.
+
+**Done when** the plan shows three buckets, only `shop-dev` has a lifecycle
+rule, and adding a team to the variable adds buckets without touching the
+existing ones.
+
 ### Cleanup
 
 ```console

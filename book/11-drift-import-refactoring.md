@@ -468,6 +468,37 @@ Import the `default` VPC network of your project
 generated configuration. Then remove it again with a `removed` block
 (`destroy = false`) — you don't want Terraform to manage it.
 
+### Challenge
+
+*Optional, about 35 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. (`SOLUTION.md` there has
+the details.) A reference solution is in `code/ch11-drift-import/challenge/`.*
+
+Someone built a network by hand. Bring it under Terraform's control, change
+nothing about it, and later release it again.
+
+```console
+$ gcloud compute networks create ch11c-net --subnet-mode=custom
+$ gcloud compute networks subnets create ch11c-subnet --network=ch11c-net \
+    --range=10.60.0.0/24 --region=europe-west1
+$ gcloud compute firewall-rules create ch11c-allow-ssh-iap --network=ch11c-net \
+    --allow=tcp:22 --source-ranges=35.235.240.0/20
+```
+
+1. Import all three objects with `import` blocks. Write the resource blocks
+   **yourself** this time (no `-generate-config-out`). Each resource's
+   documentation page lists its import ID format; `gcloud ... describe`
+   shows the real settings.
+2. Add a second port to the firewall rule with `gcloud`, find the drift, and
+   let Terraform revert it.
+3. Rename the firewall resource in your code without re-creating the rule.
+4. Stop managing all three objects, leaving them in place. Then delete them
+   with `gcloud`.
+
+**Done when** step 1 ends with `Plan: 3 to import, 0 to add, 0 to change, 0
+to destroy`, step 3's plan shows no destroy, and after step 4
+`terraform state list` prints nothing while the network still exists.
+
 ### Cleanup
 
 ```console

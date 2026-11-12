@@ -1,0 +1,2 @@
+project_id   = "tf-book-fatih-12345"
+state_bucket = "tf-book-fatih-12345-tfstate"

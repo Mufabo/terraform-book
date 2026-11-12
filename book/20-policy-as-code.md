@@ -572,6 +572,30 @@ Write a new Terraform-based template
 `e2-micro` and `e2-small` for `google_compute_instance`, add a constraint, and
 test it with a sample VM.
 
+### Challenge
+
+*Optional, about 35 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch20-policy-as-code/challenge/`.*
+
+Your company wants a cost guardrail: **no Cloud Run service may scale beyond
+10 instances.** Write the policy.
+
+* A new Terraform-based constraint template with a parameter for the limit,
+  and a constraint that sets it to 10 for all addresses.
+* Look at `terraform show -json tfplan` for the sample's Cloud Run service
+  to find where the instance limit sits in a resource change.
+* A service that sets **no** limit must be reported too. Google's default is
+  far higher than 10.
+* Deleting a service must not be reported.
+
+Test it with three versions of the sample's service: a limit of 3, a limit
+of 50, and no `scaling` block at all.
+
+**Done when** `./vet.sh` reports nothing for the first version and one
+violation with a clear message for each of the other two. How would you
+give one module a stricter limit without writing a second template?
+
 ### Cleanup
 
 Nothing was applied — `vet.sh` only plans. Delete any leftover `tfplan` and

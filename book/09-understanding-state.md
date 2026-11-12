@@ -402,6 +402,32 @@ anything, and you've seen a state lock in action.
 
 Look inside `terraform.tfstate.backup`. Which serial does it have?
 
+### Challenge
+
+*Optional, about 30 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. (`SOLUTION.md` there has
+the commands.) A reference solution is in `code/ch09-state/challenge/`.*
+
+One configuration has grown too large, and a second team should take over
+part of it. Split it **without destroying or re-creating anything**.
+
+1. In a folder `platform/`, write and apply a configuration with a bucket
+   `google_storage_bucket.shared` and two more buckets from one resource
+   `google_storage_bucket.team` with `for_each` (for example `shop` and
+   `reports`).
+2. Create a second folder `teams/` with its own configuration. Afterwards,
+   `teams/` must manage the two team buckets, and `platform/` only the shared
+   bucket, each with its own local state file.
+
+`terraform state mv -help` lists an option that this chapter didn't mention
+and that does most of the work.
+
+**Done when** `terraform plan` shows "No changes" in **both** folders,
+`terraform state list` shows one bucket in `platform/` and two in `teams/`,
+and `gcloud storage buckets list` shows the same three buckets as before.
+What would have happened if you had simply moved the resource block from one
+folder to the other and applied both?
+
 ### Cleanup
 
 ```console

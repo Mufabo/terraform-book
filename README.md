@@ -23,7 +23,9 @@ separate dev, staging, and production environments on Google Cloud.
 2. Read the chapters in order. Each one builds on the previous ones.
 3. At the end of each chapter, open `code/chNN-*/exercise/`, complete the
    `TODO`s, and compare your work with `code/chNN-*/solution/`.
-4. **Always run the cleanup step** at the end of an exercise so you do not pay
+4. For more practice, try the chapter's **challenge**: a task without starter
+   files, with a reference solution in `code/chNN-*/challenge/`.
+5. **Always run the cleanup step** at the end of an exercise so you do not pay
    for resources you are no longer using.
 
 ## Table of contents
@@ -34,7 +36,7 @@ See [SUMMARY.md](SUMMARY.md).
 
 ```
 book/        Chapters and appendices (Markdown)
-code/        One folder per chapter, each with exercise/ and solution/
+code/        One folder per chapter, each with exercise/, solution/, and challenge/
 VERSIONS.md  Every pinned tool version in one place
 ```
 

@@ -1,0 +1,52 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: tfcloudrunmaxinstancesconstraintv1
+spec:
+  crd:
+    spec:
+      names:
+        kind: TFCloudRunMaxInstancesConstraintV1
+      validation:
+        openAPIV3Schema:
+          properties:
+            max_instances:
+              description: Highest max_instance_count a Cloud Run service may set.
+              type: integer
+  targets:
+    - target: validation.resourcechange.terraform.cloud.google.com
+      rego: |
+        package templates.gcp.TFCloudRunMaxInstancesConstraintV1
+
+        # Rule 1: a limit is set, but it is too high.
+        violation[{
+          "msg": message,
+          "details": metadata,
+        }] {
+          resource := input.review
+          resource.type == "google_cloud_run_v2_service"
+          is_object(resource.change.after)
+          configured := resource.change.after.template[_].scaling[_].max_instance_count
+          configured > input.parameters.max_instances
+
+          message := sprintf("%s: max_instance_count is %v, the limit is %v", [resource.address, configured, input.parameters.max_instances])
+          metadata := {"resource": resource.address, "max_instance_count": configured}
+        }
+
+        # Rule 2: no limit is set, so Google's much higher default applies.
+        violation[{
+          "msg": message,
+          "details": metadata,
+        }] {
+          resource := input.review
+          resource.type == "google_cloud_run_v2_service"
+          is_object(resource.change.after)
+          not has_limit(resource.change.after)
+
+          message := sprintf("%s: scaling.max_instance_count must be set (limit %v)", [resource.address, input.parameters.max_instances])
+          metadata := {"resource": resource.address}
+        }
+
+        has_limit(after) {
+          after.template[_].scaling[_].max_instance_count > 0
+        }

@@ -547,6 +547,28 @@ project_number = "123456789012"
 Run `terraform version` inside the folder after `terraform init`. It now also
 lists the provider version that was downloaded (`registry.terraform.io/hashicorp/google v8.9.0`).
 
+### Challenge
+
+*Optional, about 15 minutes. There are no starter files and no `TODO`s: work
+in a new, empty folder from the requirements alone. A reference solution is in
+`code/ch02-setup/challenge/`.*
+
+Write a configuration that **creates nothing** and prints three facts about
+your setup as outputs:
+
+* the email address of the identity Terraform is authenticated as,
+* the region the provider is configured with,
+* the names of the zones in that region.
+
+You need three data sources that this chapter didn't show. Find them in the
+Google provider's documentation in the Terraform Registry
+(<https://registry.terraform.io/providers/hashicorp/google/8.9.0/docs>):
+filter the left-hand menu for "client" and for "zones". The exercise's
+`main.tf` shows what a `data` block and an `output` block look like.
+
+**Done when** `terraform apply` reports `0 added, 0 changed, 0 destroyed` and
+shows your email address, your region, and a list of zones.
+
 ### Cleanup
 
 No cloud resources were created, so nothing needs to be destroyed. The apply

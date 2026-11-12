@@ -32,7 +32,7 @@ contents (mdBook/MkDocs style).
 Every chapter follows the same template: Learning objectives (tagged with exam
 IDs like `[4c]`, followed by a `**Time:**` line) → concepts with code and CLI
 output → common mistakes / exam tips → summary → 5 quick-check questions → hands-on exercise (goal, estimated
-time, files, steps, expected result, stretch goal, cleanup) → quick-check
+time, files, steps, expected result, stretch goal, challenge, cleanup) → quick-check
 answers. Google Cloud concepts are explained in GitHub-style alert boxes
 (`> [!NOTE]` followed by `> **Google Cloud: <topic>.**`) where the concept
 first appears; the EPUB build renders them via pandoc's `alerts` extension
@@ -57,6 +57,16 @@ comments rather than invalid values). Placeholders: project
 `tf-book-fatih-12345`, HCP Terraform org `tf-book-yourname`. Real values go in
 `terraform.tfvars` (git-ignored); `terraform.tfvars.example` is committed.
 
+Chapters 1–21 also have a `challenge/` folder: the reference solution of the
+chapter's unscaffolded "Challenge" task (requirements only, no `TODO`s; the
+task text is in the chapter, after the stretch goal). Challenge roots follow
+the same version and lock-file rules as solutions. Explanations live in an
+`answers.md`, `SOLUTION.md`, `NOTES.md`, or `BUGS.md` next to the code. Not
+every challenge is a single root: ch09 has `platform/` and `teams/`, ch10
+`storage/`, ch15 `broken/` and `fixed/`, ch19 `secure-bucket/` (a module with
+tests), ch20 only policy YAML, ch21 only a workflow. Resource names in
+challenges carry a `chNNc-` prefix so they never clash with the exercise.
+
 Default region throughout is `europe-west1` / bucket location `EU`.
 
 `ch02-setup/solution/project-bootstrap` (project, billing link, budget and
@@ -78,6 +88,12 @@ must be applied to every copy:
   capstone. It bans `allUsers` on Cloud Run, so the ch21/ch22 envs set
   `public = false`.
 
+* The `secure-bucket` module from
+  `ch13-writing-modules/solution/modules/secure-bucket` is copied to
+  `ch17-hcp-governance` (as `terraform-google-secure-bucket`) and to
+  `ch19-testing/challenge/secure-bucket` (with unit tests).
+* `ch18-environments/challenge` calls `../solution/modules/web-app` directly.
+
 Multi-root chapters have an apply order: ch10 `bootstrap` → `network` → `app`
 (app reads network outputs via `terraform_remote_state`); ch16/21 run a
 `bootstrap/` (WIF pool, service accounts) and the ch22 capstone a
@@ -89,6 +105,8 @@ Expected failures, not bugs:
 * `ch03-core-workflow/exercise` is intentionally unformatted (`fmt` exercise).
 * `ch15-troubleshooting/exercise` contains six deliberate bugs, listed in
   `solution/BUGS.md` (note `terraform init` already catches the syntax ones).
+* `ch15-troubleshooting/challenge/broken` contains four deliberate bugs,
+  listed in `challenge/BUGS.md` (`validate` fails with a cycle).
 * `ch17-hcp-governance/solution/consumer` fails `init` without
   `terraform login` (private registry module).
 
@@ -152,3 +170,9 @@ and the ch21 GitHub Actions pipeline end to end (with a private repo, so the
 prod approval and branch ruleset were not exercised: GitHub Free only offers
 them for public repos). Untested live: HCP Terraform (ch16/17, only validated
 and the ch16 `wif/` planned) and the Sentinel policies.
+
+The challenge solutions (added later) pass fmt/init/validate, and the ch19
+challenge's unit tests pass offline, but **none was applied**. Chapters 6–8
+and 12–14 were additionally checked with read-only plans. Not run at all:
+the ch20 challenge template (never passed through `vet`), the ch21 destroy
+workflow (actionlint only), and the ch16/17 `tfe` configurations.
