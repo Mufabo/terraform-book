@@ -6,8 +6,7 @@ EXPECTED_TF="1.17"          # any 1.17.x patch release matches "~> 1.17.0"
 EXPECTED_GCLOUD="591.0.0"
 REQUIRED_APIS="compute.googleapis.com storage.googleapis.com iam.googleapis.com
 cloudresourcemanager.googleapis.com secretmanager.googleapis.com run.googleapis.com
-artifactregistry.googleapis.com iamcredentials.googleapis.com
-sts.googleapis.com"
+iamcredentials.googleapis.com sts.googleapis.com"
 
 ok()   { printf '  [ OK ]      %s\n' "$1"; }
 bad()  { printf '  [ %s ] %s\n' "$2" "$1"; FAILED=1; }

@@ -109,10 +109,11 @@ resource "google_compute_instance" "web" {
 * Every environment must use the same code version at the same time — no
   gradual promotion.
 
-> **Exam tip:** `terraform workspace new|select|list|show|delete`,
-> `terraform.workspace`, and the fact that each CLI workspace has a separate
-> state in the same backend are all fair game. You can't delete the `default`
-> workspace.
+> **Exam tip:** The exam's objectives name only **HCP Terraform** workspaces
+> (8c), not CLI workspaces, but you should be able to tell the two apart
+> (section 16.2). The facts to remember about CLI workspaces: each one has a
+> separate state in the same backend, `terraform.workspace` holds the current
+> one's name, and you can't delete the `default` workspace.
 
 ## 18.3 Strategy 2: one configuration, a tfvars file per environment
 
