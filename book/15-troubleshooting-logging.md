@@ -258,6 +258,16 @@ output "terraform_identity" {
 `protoPayload.status.code!=0` to see API calls that failed, which identity
 made them, and why.
 
+> [!NOTE]
+> **Google Cloud: Cloud Audit Logs.** Google Cloud records API calls in
+> **audit logs**, which you search in **Cloud Logging**. *Admin Activity*
+> logs (anything that changes a configuration, such as creating a bucket or
+> granting a role) are always on and free. *Data Access* logs (reading
+> configurations or data) are off for most services, because they can be
+> large and cost money; you enable them per service. Since Terraform works
+> only through APIs, every change it makes appears in the Admin Activity log
+> with the identity that made it.
+
 ## Common mistakes and exam tips
 
 * Setting `TF_LOG_PATH` without a log level (`TF_LOG`, `TF_LOG_CORE`, or

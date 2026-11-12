@@ -1,0 +1,17 @@
+/* Appended to pandoc's default epub.css by build.sh. */
+
+/* GitHub-style alerts (> [!NOTE]), parsed by pandoc's `alerts` extension. */
+div.alert {
+  margin: 1em 0;
+  padding: 0.4em 0.9em;
+  border-left: 0.25em solid #0969da;
+  background-color: #f2f7fd;
+}
+div.alert > div.title p {
+  margin: 0 0 0.3em 0;
+  font-weight: bold;
+  color: #0969da;
+}
+div.alert > p:last-child {
+  margin-bottom: 0.2em;
+}

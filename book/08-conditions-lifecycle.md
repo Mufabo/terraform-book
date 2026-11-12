@@ -190,7 +190,7 @@ something about a value you return:
 
 ```hcl
 output "web_url" {
-  value = "https://${google_cloud_run_v2_service.web.uri}"
+  value = google_cloud_run_v2_service.web.uri # already starts with https://
 
   precondition {
     condition     = google_cloud_run_v2_service.web.ingress == "INGRESS_TRAFFIC_ALL"
@@ -198,6 +198,18 @@ output "web_url" {
   }
 }
 ```
+
+> [!NOTE]
+> **Google Cloud: Cloud Run.** **Cloud Run** runs containers without servers
+> for you to manage. You give it a container image, and it gives you an HTTPS
+> URL ending in `.run.app` (the `uri` attribute). It starts container
+> instances when requests arrive and scales down to zero when there are none,
+> so an idle service costs nothing. Every deployment creates an immutable
+> **revision**, and the **service** sends traffic to its revisions. Two
+> settings decide who can reach a service: **ingress** says where requests may
+> come from (`INGRESS_TRAFFIC_ALL` means the internet), and IAM says who may
+> call it (`roles/run.invoker`; granting it to `allUsers` makes the service
+> public). Services are regional. Chapter 14 deploys one.
 
 ### Which one should I use?
 
@@ -277,6 +289,15 @@ resource "google_compute_instance_template" "web" {
 
 Note `name_prefix`: since both objects exist briefly, they need different
 names. Google generates a unique suffix.
+
+> [!NOTE]
+> **Google Cloud: instance templates.** An **instance template** is a
+> blueprint for VMs: machine type, image, network, metadata. A **managed
+> instance group** uses it to create and replace identical VMs, for example to
+> scale out or to heal a broken one. Templates can't be changed after
+> creation, so every change to a template means a new one, and the group must
+> be pointed at it before the old one can be deleted. That's exactly the order
+> `create_before_destroy` gives you.
 
 ### `prevent_destroy`
 

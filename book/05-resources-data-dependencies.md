@@ -346,6 +346,26 @@ A few new things:
   The image data source has no dependencies, so Terraform reads it during plan.
 * `output` prints a value after `apply` (Chapter 6 covers outputs).
 
+> [!NOTE]
+> **Google Cloud: Compute Engine VMs.** **Compute Engine** is Google Cloud's
+> virtual machine service. A VM, also called an *instance*, lives in one zone
+> and is made of:
+>
+> * A **machine type**, which sets CPUs and memory. `e2-micro` is the
+>   smallest general-purpose type: 2 shared vCPUs and 1 GB of memory.
+> * A **boot disk** created from an **image**. Google publishes images in
+>   public projects such as `debian-cloud`, grouped into **image families**
+>   like `debian-12`; a family always points to its newest image.
+> * One or more **network interfaces**, each in a subnet. An `access_config`
+>   block adds an external IP address; without it, the VM has only an
+>   internal one.
+> * **Metadata**: key/value pairs the VM can read from inside, such as its
+>   startup script and SSH keys.
+>
+> A running VM is billed per second; its disk is billed even while the VM is
+> stopped. One `e2-micro` per month is free, but only in a few US regions, not
+> in `europe-west1` (Appendix D).
+
 The dependency graph:
 
 ```
@@ -364,6 +384,31 @@ in parallel.
 > **Note:** The firewall rule doesn't reference the VM (it uses the `web` tag),
 > and the VM doesn't reference the firewall. That's fine: firewall rules apply
 > to any instance with a matching tag, whenever it is created.
+
+> [!NOTE]
+> **Google Cloud: VPC networks and subnets.** A **VPC network** (Virtual
+> Private Cloud) is a private network for your resources. On Google Cloud a
+> network is **global**: one network spans all regions. IP address ranges
+> belong to **subnets**, which are **regional**. `ch05-subnet` provides the
+> range `10.10.0.0/24` (256 addresses, four of which Google reserves) in
+> `europe-west1`, and the VM gets its internal IP address from it. Resources
+> in the same network reach each other over internal addresses, even across
+> regions; separate networks are isolated unless you connect them. An
+> *auto mode* network gets a subnet in every region automatically, like the
+> `default` network from section 2.5. `auto_create_subnetworks = false` makes
+> a *custom mode* network, where you decide which subnets exist. Production
+> networks use custom mode.
+
+> [!NOTE]
+> **Google Cloud: firewall rules and network tags.** Firewall rules belong to
+> a network and filter the traffic to and from its VMs. Every network starts
+> with two hidden *implied* rules: all incoming (**ingress**) traffic is
+> denied, and all outgoing (**egress**) traffic is allowed. You then add rules
+> that open exactly what you need. `ch05-allow-http` allows TCP port 80 from
+> anywhere (`0.0.0.0/0`), but only to VMs that carry the **network tag**
+> `web`. Network tags are plain strings on a VM (`tags = ["web"]`) that
+> firewall rules can target; they have nothing to do with labels. When several
+> rules match, the one with the lowest `priority` number (default 1000) wins.
 
 ## 5.7 Resource behaviour you should know
 
@@ -454,7 +499,18 @@ Add a second firewall rule that allows SSH (TCP 22) only from Google's
 Identity-Aware Proxy range `35.235.240.0/20`, then connect with
 `gcloud compute ssh ch05-web --tunnel-through-iap --zone <zone>`.
 
-> **Info: where your SSH key goes.** The first time you run
+> [!NOTE]
+> **Google Cloud: Identity-Aware Proxy (IAP).** IAP **TCP forwarding** lets
+> you reach a VM's SSH port without opening it to the internet, and even
+> without an external IP address. With `--tunnel-through-iap`, `gcloud`
+> connects to Google, IAM checks that you may use the tunnel (as project Owner
+> you may; others need `roles/iap.tunnelResourceAccessor`), and Google then
+> opens the connection to the VM from the range `35.235.240.0/20`. That's why
+> the firewall rule only has to allow that range. Chapter 10's `iap-ssh`
+> module uses the same pattern.
+
+> [!NOTE]
+> **Google Cloud: where your SSH key goes.** The first time you run
 > `gcloud compute ssh`, it creates a key pair in `~/.ssh/google_compute_engine`
 > (it may ask for a passphrase) and adds the public key to your **project's**
 > metadata under `ssh-keys`. Every VM in the project then accepts it.
@@ -464,7 +520,8 @@ Identity-Aware Proxy range `35.235.240.0/20`, then connect with
 > and remove it with
 > `gcloud compute project-info remove-metadata --keys=ssh-keys`.
 
-> **Info: the NumPy warning.** When connecting through IAP, `gcloud` may print
+> [!NOTE]
+> **Google Cloud: the NumPy warning.** When connecting through IAP, `gcloud` may print
 > `To increase the performance of the tunnel, consider installing NumPy`.
 > You can ignore it: the connection works without NumPy, only large file
 > transfers over the tunnel are slower.

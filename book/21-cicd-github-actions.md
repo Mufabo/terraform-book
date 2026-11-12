@@ -108,6 +108,17 @@ Google checks.
 > (Chapter 18) and each apply identity only has roles in its own project.
 > Here everything is in your single learning project.
 
+> [!NOTE]
+> **Google Cloud: the roles in this table.** *Viewer* (`roles/viewer`) can
+> read most resources but not data or secrets. *Security Reviewer*
+> (`roles/iam.securityReviewer`) adds read access to IAM policies, which a
+> plan needs to refresh IAM resources. *Editor* (`roles/editor`) can create,
+> change, and delete most resources, but it **cannot change IAM policies**.
+> That's why the apply identities also get Project IAM Admin
+> (`roles/resourcemanager.projectIamAdmin`): the app's code grants roles,
+> for example its service account's access to the uploads bucket. Workload Identity Federation
+> itself is explained in a box in section 16.6.
+
 ### Bootstrap with Terraform
 
 The `bootstrap/` configuration (run once, locally, by an administrator)

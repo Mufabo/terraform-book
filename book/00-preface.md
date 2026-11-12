@@ -74,6 +74,15 @@ Boxes like these appear throughout the book:
 
 > **Cost note:** Something that could cost money if you forget to clean up.
 
+This book teaches Terraform, not Google Cloud, but you can't build on a
+cloud you don't understand. Wherever a Google Cloud concept first appears,
+a box like this one explains it:
+
+> [!NOTE]
+> **Google Cloud: projects.** A short explanation of a Google Cloud concept,
+> such as what a project, a region, or a service account is. Skip the boxes
+> for concepts you already know; they aren't part of the exam.
+
 ## Versions
 
 The book uses **Terraform 1.17.0** and the **Google provider 8.9.0**, the

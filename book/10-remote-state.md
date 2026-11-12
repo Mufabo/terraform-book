@@ -99,6 +99,18 @@ Security checklist for a state bucket:
 * A separate project (or at least a separate bucket) per environment
   (Chapter 18).
 
+> [!NOTE]
+> **Google Cloud: object versioning, lifecycle rules, and public access
+> prevention.** With **object versioning**, overwriting or deleting an object
+> doesn't destroy the old data: the previous content is kept as a
+> *noncurrent* version (`ARCHIVED` in Terraform's `with_state`), which you
+> can list with `gcloud storage ls --all-versions gs://BUCKET/PATH` and
+> restore. Noncurrent versions are billed like normal data, so a **lifecycle
+> rule** deletes them automatically; lifecycle rules can also delete objects
+> or move them to a cheaper storage class after a number of days. **Public
+> access prevention** set to `enforced` blocks every grant to `allUsers` or
+> `allAuthenticatedUsers`, so the bucket can't be made public even by mistake.
+
 ## 10.3 Configuring the `gcs` backend `[6c]`
 
 Add a `backend` block inside the `terraform` block:

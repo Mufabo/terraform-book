@@ -68,6 +68,15 @@ $ terraform output -raw connection_string     # explicit request still shows it
 postgres://app:s3cr3t@10.1.2.3/app
 ```
 
+> [!NOTE]
+> **Google Cloud: Cloud SQL.** **Cloud SQL** is Google Cloud's managed
+> database service for PostgreSQL, MySQL, and SQL Server. Google runs the
+> server, backups, and patches; you create the instance
+> (`google_sql_database_instance`), databases, and users (`google_sql_user`).
+> An instance can have a public IP address, a private IP address in your VPC
+> network, or both. Unlike buckets, an instance costs money for every hour it
+> exists, even when idle, which is why this book's exercises don't create one.
+
 What sensitivity does:
 
 * Hides the value in `plan` and `apply` output.
@@ -207,6 +216,16 @@ The best pattern: Terraform grants an application's **service account**
 permission to read the secret, and the application fetches it itself.
 Terraform never handles the value.
 
+> [!NOTE]
+> **Google Cloud: workloads that run as a service account.** You can attach a
+> service account to a Cloud Run service, a VM, and most other compute
+> resources (`service_account` below). Code running there then asks the
+> built-in **metadata server** for a short-lived token, and Google's client
+> libraries do this automatically: no key file, no secret to store. If you
+> don't attach one, many services use a default service account, which in
+> many projects holds the broad Editor role. A dedicated service account
+> with only the roles the application needs is the better choice.
+
 ```hcl
 resource "google_service_account" "app" {
   account_id   = "ch14-app"
@@ -327,6 +346,16 @@ provider "google" {
 ```
 
 You need `roles/iam.serviceAccountTokenCreator` on that service account.
+
+> [!NOTE]
+> **Google Cloud: impersonation.** **Impersonating** a service account means
+> asking Google for a short-lived token *for* that service account, using
+> your own credentials. Google allows it only if you hold
+> `roles/iam.serviceAccountTokenCreator` on the service account, and the audit
+> logs record both identities. Teams use it so that people have few
+> permissions themselves, and Terraform runs with exactly the permissions of
+> one well-reviewed service account. You can try it with `gcloud` too:
+> `gcloud storage ls --impersonate-service-account=SA_EMAIL`.
 
 ## 14.7 Checklist
 

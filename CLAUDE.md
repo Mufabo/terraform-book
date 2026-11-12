@@ -33,7 +33,10 @@ Every chapter follows the same template: Learning objectives (tagged with exam
 IDs like `[4c]`) → concepts with code and CLI output → common mistakes / exam
 tips → summary → 5 quick-check questions → hands-on exercise (goal, estimated
 time, files, steps, expected result, stretch goal, cleanup) → quick-check
-answers. Section numbers (`10.6`) are referenced from
+answers. Google Cloud concepts are explained in GitHub-style alert boxes
+(`> [!NOTE]` followed by `> **Google Cloud: <topic>.**`) where the concept
+first appears; the EPUB build renders them via pandoc's `alerts` extension
+and `epub/style.css`. Section numbers (`10.6`) are referenced from
 `book/appendix-a-exam-objective-map.md`; keep that map in sync when sections
 move or are renumbered.
 

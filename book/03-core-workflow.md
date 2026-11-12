@@ -104,6 +104,25 @@ and which region. Pick a region near you (for example `us-central1`,
 resources such as VMs; it does not decide where the bucket below lives. That
 is set by the bucket's own `location` argument.
 
+> [!NOTE]
+> **Google Cloud: regions, zones, and locations.** A **region** is a
+> geographic area, such as `europe-west1` (Belgium) or `us-central1` (Iowa).
+> Each region has several **zones**, separate data centres with their own
+> power and networking, named by adding a letter: `europe-west1-b`,
+> `europe-west1-c`, `europe-west1-d`. Every resource has a scope:
+>
+> | Scope | Lives in | Examples |
+> |---|---|---|
+> | Zonal | One zone | VMs, disks |
+> | Regional | One region | Subnets, Cloud Run services |
+> | Global | No particular place | VPC networks, firewall rules, service accounts |
+>
+> Cloud Storage has **locations** instead: a single region (`europe-west1`),
+> a dual-region, or a **multi-region** such as `EU` or `US`, which keeps
+> copies of your data in several regions of that area. Pick a region close to
+> your users; prices and available services differ between regions.
+> `gcloud compute regions list` and `gcloud compute zones list` show them all.
+
 **`main.tf`**
 
 ```hcl
@@ -138,6 +157,21 @@ stranger from creating a bucket with your project ID in its name. In practice
 nobody does, which is why the convention is so widely used. (The one name
 format Google *does* protect is a domain name, such as `assets.example.com`:
 you must prove you own the domain before you can use it as a bucket name.)
+
+> [!NOTE]
+> **Google Cloud: Cloud Storage.** **Cloud Storage** stores files, called
+> **objects**, in containers called **buckets**. There are no real folders:
+> `reports/2026/may.pdf` is one object whose name contains slashes, and the
+> console merely displays it as folders. Buckets are addressed as
+> `gs://BUCKET_NAME`, for example
+> `gcloud storage ls gs://tf-book-fatih-12345-notes`. A bucket's **storage
+> class** sets the price model: `STANDARD` for data you use often, and
+> `NEARLINE`, `COLDLINE`, and `ARCHIVE`, which are cheaper to store but
+> cost more to read, for backups and archives. Access is controlled with IAM.
+> **Uniform bucket-level access** switches off the older per-object access
+> lists (ACLs), so IAM is the only thing that decides who can read what.
+> Buckets are private by default, quick to create, and nearly free when
+> empty, which is why this book uses them for its first examples.
 
 **Alternative: a random suffix.** Instead of the project ID, you can let
 Terraform generate a random suffix with the `random` provider. Add it to
@@ -504,6 +538,17 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 ```
 
 The `~` means Terraform will update the existing bucket in place.
+
+> [!NOTE]
+> **Google Cloud: labels.** **Labels** are key/value pairs you attach to
+> resources, such as `env = "dev"` or `team = "payments"`. They don't change
+> how a resource behaves. Their main use is cost tracking: billing reports can
+> group and filter costs by label, so you can see what each team or
+> environment costs. Many `gcloud ... list` commands can filter by them too.
+> Keys start with a lowercase letter and, like values, may contain lowercase
+> letters, digits, underscores, and hyphens; a resource can have up to 64
+> labels. Don't confuse labels with the *network tags* of VMs (Chapter 5),
+> which firewall rules use.
 
 Why three label maps when you only wrote one? The Google provider tracks
 labels in three attributes:

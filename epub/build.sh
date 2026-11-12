@@ -9,8 +9,15 @@ OUTPUT="${1:-terraform-on-google-cloud.epub}"
 VERSION="${2:-dev}"
 REPO_URL="${REPO_URL:-https://github.com/Mufabo/terraform-book/blob/main}"
 
+# pandoc's default stylesheet plus our additions (alert boxes).
+CSS="$(mktemp --suffix=.css)"
+trap 'rm -f "$CSS"' EXIT
+pandoc --print-default-data-file epub.css > "$CSS"
+cat epub/style.css >> "$CSS"
+
 pandoc epub/metadata.yaml book/[0-9]*.md book/appendix-*.md \
-  --from=markdown+smart \
+  --from=markdown+smart+alerts \
+  --css="$CSS" \
   --to=epub3 \
   --output="$OUTPUT" \
   --toc --toc-depth=2 \

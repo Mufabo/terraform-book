@@ -145,6 +145,24 @@ resource "google_storage_bucket" "legacy" {
   it's the name; for a network it's
   `projects/{project}/global/networks/{name}`.
 
+> [!NOTE]
+> **Google Cloud: resource names.** Most Google Cloud resources have a full
+> name that shows where they live:
+>
+> ```
+> projects/tf-book-fatih-12345/global/networks/default                  # global
+> projects/tf-book-fatih-12345/regions/europe-west1/subnetworks/app     # regional
+> projects/tf-book-fatih-12345/zones/europe-west1-b/instances/web       # zonal
+> ```
+>
+> The Google provider usually stores this path as the resource's `id`, which
+> is why it's also the import ID. A **self link** is the same path as a full
+> API URL (`https://www.googleapis.com/compute/v1/projects/...`). Some
+> resources are known by a short name only (buckets, which are global and
+> unique) or by the project *number* rather than the ID. When in doubt, check
+> the import section of the resource's documentation page, or read the name
+> with `gcloud ... describe`.
+
 Run a plan:
 
 ```console

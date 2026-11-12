@@ -386,6 +386,16 @@ Resource types start with `google_` in both variants, so you must choose
 `google-beta` explicitly with `provider = google-beta`. Keep `google` and
 `google-beta` on the **same version** to avoid surprises.
 
+> [!NOTE]
+> **Google Cloud: launch stages.** Google releases features in stages.
+> **Preview** features (once called *beta*) work, but may still change and
+> usually come without an SLA; **General Availability (GA)** features are
+> stable and fully supported. The `google` provider contains only GA
+> features; `google-beta` contains those plus the Preview ones. `gcloud` has
+> the same split: `gcloud beta ...` commands, such as `gcloud beta terraform
+> vet` in Chapter 20. Once a feature reaches GA, it appears in `google` too,
+> and you can drop `provider = google-beta`.
+
 ### The `random` provider
 
 Some providers don't talk to any cloud at all. `hashicorp/random` generates

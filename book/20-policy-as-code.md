@@ -87,6 +87,18 @@ It's built on Google's open-source *Config Validator* and the Constraint
 Framework from the Kubernetes Gatekeeper project. The policies are written in
 **Rego**, the language of Open Policy Agent.
 
+> [!NOTE]
+> **Google Cloud: Cloud Asset Inventory.** **Cloud Asset Inventory** keeps a
+> searchable record of every resource and IAM policy in a project, folder, or
+> organization. Each record is an *asset* with a type such as
+> `storage.googleapis.com/Bucket`, its full configuration, and its
+> **ancestry**, the path up the resource hierarchy
+> (`organizations/123/folders/456/projects/789`). Security teams use it to
+> answer questions such as "which buckets in the company are public?"; try
+> `gcloud asset search-all-resources --scope=projects/$PROJECT_ID`.
+> `gcloud beta terraform vet` produces the same asset format from your plan,
+> so one policy can check both planned and existing resources.
+
 ### Installing
 
 `terraform vet` is part of the `terraform-tools` component of the Google

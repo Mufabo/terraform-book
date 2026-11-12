@@ -96,6 +96,17 @@ exists. To make it safe you must add your own checks ("if the network does not
 exist, create it; if its settings differ, update them..."). That gets
 complicated quickly.
 
+> [!NOTE]
+> **Google Cloud: the console, `gcloud`, and the APIs.** There are three
+> common ways to work with Google Cloud: the web **console**
+> (<https://console.cloud.google.com>), where you click; the **`gcloud`**
+> command-line tool, used in the script above; and the **APIs**, web
+> endpoints such as `compute.googleapis.com` that programs call. The console
+> and `gcloud` are both front ends to the same APIs, and so is Terraform: the
+> Google provider turns your configuration into API calls. Whatever you create
+> with one tool is visible in the others, which is handy for checking what
+> Terraform did.
+
 **Declarative** ("what"): you describe the *desired end state*, and the tool
 figures out the steps:
 

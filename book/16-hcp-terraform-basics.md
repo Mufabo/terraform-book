@@ -293,6 +293,25 @@ resource "google_project_iam_member" "terraform_editor" {
 > specific workspaces, and grant the narrowest roles possible (`roles/editor`
 > keeps the exercise simple).
 
+> [!NOTE]
+> **Google Cloud: Workload Identity Federation.** WIF lets identities from
+> outside Google, such as HCP Terraform runs or GitHub Actions jobs, use
+> Google Cloud without keys. Its parts:
+>
+> * A **workload identity pool** is a container for external identities.
+>   Deleted pool IDs stay reserved for 30 days, so you can't recreate a
+>   pool with the same ID straight away.
+> * A **provider** in the pool trusts one issuer of OIDC tokens
+>   (`issuer_uri`). Its **attribute mapping** copies claims from the token
+>   into Google attributes, and its **attribute condition** rejects tokens
+>   that don't match.
+> * Google's **Security Token Service** (STS) exchanges a valid external token
+>   for a short-lived Google token.
+> * The external identity is then named `principal://...` (one subject) or
+>   `principalSet://.../attribute.NAME/VALUE` (everyone with that attribute
+>   value). Granting it `roles/iam.workloadIdentityUser` on a service account
+>   lets it impersonate that service account.
+
 ### HCP Terraform side (workspace or variable set environment variables)
 
 | Environment variable | Value |

@@ -43,6 +43,15 @@ Each environment (own state under gs://<bucket>/envs/<env>/):
 └────────────────────────────────────────────────────────────────────┘
 ```
 
+> [!NOTE]
+> **Google Cloud: Direct VPC egress and Private Google Access.** A Cloud Run
+> service doesn't live in your VPC network. **Direct VPC egress** gives it a
+> network interface in a subnet, so its outgoing traffic can reach private
+> addresses in the network, such as a database with a private IP. **Private
+> Google Access** is a subnet setting that lets resources without external IP
+> addresses still reach Google APIs (Cloud Storage, Secret Manager, ...).
+> Together they let the service use private resources without a public path.
+
 ### A.2 Requirements
 
 The full requirement list is in `code/ch22-capstone/exercise/README.md`. In

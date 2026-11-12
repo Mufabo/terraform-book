@@ -165,6 +165,25 @@ $ tail -n1 ~/.bashrc
 export PROJECT_ID=tf-book-fatih-12345
 ```
 
+> [!NOTE]
+> **Google Cloud: projects and the resource hierarchy.** A project has three
+> identifiers:
+>
+> * The **project ID** (`tf-book-fatih-12345`): chosen by you, globally
+>   unique, and permanent. Terraform and `gcloud` use it almost everywhere.
+> * The **project name** ("Terraform Book"): a display label. You can change
+>   it at any time, and it doesn't have to be unique.
+> * The **project number** (for example `123456789012`): assigned by Google.
+>   A few APIs, such as budgets, use it instead of the ID.
+>
+> Every resource, such as a bucket or a VM, belongs to exactly one project.
+> Companies arrange their projects in a tree: an **organization** (tied to the
+> company's domain) at the top, **folders** (for example one per department
+> or environment) in the middle, and projects at the bottom. Permissions and
+> policies set on the organization or a folder are inherited by every project
+> below it. A personal Gmail account has no organization, so your project
+> stands on its own. That's fine for this book.
+
 ### Link a billing account
 
 Most resources require billing to be enabled, even if they fall within the
@@ -177,6 +196,16 @@ ACCOUNT_ID            NAME                OPEN  MASTER_ACCOUNT_ID
 $ export BILLING_ACCOUNT=0X0X0X-0X0X0X-0X0X0X
 $ gcloud billing projects link "$PROJECT_ID" --billing-account="$BILLING_ACCOUNT"
 ```
+
+> [!NOTE]
+> **Google Cloud: billing accounts.** A **billing account** holds a payment
+> method and pays for the projects linked to it. Billing accounts and projects
+> are separate things: one billing account can pay for many projects, and each
+> project is linked to at most one billing account. Budgets belong to the
+> billing account, not to a project, which is why the budget command below
+> names the billing account and then filters on your project. Unlinking
+> billing stops a project's paid services, but the real cleanup is deleting
+> the project (Appendix C).
 
 ### Set a budget alert
 
@@ -327,7 +356,25 @@ $ gcloud services enable \
 This takes a minute or two. (In Chapter 5 you will learn to enable APIs with
 Terraform itself using the `google_project_service` resource.)
 
-> **Info: the `default` network.** Enabling `compute.googleapis.com` also
+> [!NOTE]
+> **Google Cloud: services and APIs.** Each Google Cloud product (Compute
+> Engine for VMs, Cloud Storage, Secret Manager, ...) is a **service** with an
+> API named like `compute.googleapis.com`. A new project has only a small set
+> of APIs enabled, so nothing is used by accident. Enabling an API is free and
+> applies to one project; you pay only for what you then create with it. If
+> you forget one, the call fails with `403 ... has not been used in project
+> ... or it is disabled` (section 15.6). `gcloud services list --enabled`
+> shows what's on.
+>
+> Google also counts API calls against a project's **quotas**, limits on
+> requests and resources. Usually that's the project the resource lives in.
+> APIs that act on something other than a project's own resources, such as
+> Billing Budgets (a billing account) or Service Usage (which enables APIs),
+> can't tell which project to count the call against when you use your
+> personal credentials. That's the **quota project** from section 2.4.
+
+> [!NOTE]
+> **Google Cloud: the `default` network.** Enabling `compute.googleapis.com` also
 > creates a network called `default`, with a subnet in every region and four
 > firewall rules. Three of them accept traffic from the whole internet
 > (`0.0.0.0/0`): `default-allow-ssh` (port 22), `default-allow-rdp` (port
@@ -425,12 +472,49 @@ $ gcloud auth application-default set-quota-project "$PROJECT_ID"
 You need both. `gcloud init` in section 2.3 already ran `gcloud auth login`
 for you, so the only extra login is the `application-default` one above.
 
+> [!NOTE]
+> **Google Cloud: IAM in one minute.** **Identity and Access Management
+> (IAM)** decides who may do what:
+>
+> * A **principal** is *who*: a Google account (`user:alice@example.com`), a
+>   Google group, or a service account (see the next box).
+> * A **role** is *what*: a named set of permissions such as
+>   `storage.buckets.create`. The **basic roles** (`roles/owner`,
+>   `roles/editor`, `roles/viewer`) are very broad; **predefined roles** such
+>   as `roles/storage.objectViewer` cover one task in one service and are
+>   the better choice in production.
+> * An **allow policy** on a resource binds principals to roles. You can set
+>   it on an organization, a folder, a project, or a single resource such as a
+>   bucket, and grants are inherited downwards: a role on a project applies to
+>   everything in it.
+>
+> You created the project, so you are its Owner, and Terraform, using your ADC
+> credentials, can do everything you can. Terraform never has more
+> permissions than the identity it runs as. Chapter 13 shows how to manage
+> IAM with Terraform.
+
 ### What about service account keys?
 
 Older tutorials tell you to download a JSON **service account key** and set
 `GOOGLE_APPLICATION_CREDENTIALS`. Avoid this. Keys are long-lived secrets
 that are easily leaked. On your laptop, use ADC; in CI/CD pipelines, use
 **Workload Identity Federation** (Chapter 21), which needs no keys at all.
+
+> [!NOTE]
+> **Google Cloud: service accounts.** A **service account** is an identity
+> for software rather than a person: a VM, a Cloud Run service, or a CI/CD
+> pipeline. Its email address looks like
+> `NAME@PROJECT_ID.iam.gserviceaccount.com`, and you grant it roles like any
+> other principal. It has no password. Software gets short-lived tokens for it
+> in one of these ways: by running *as* the service account on Google Cloud
+> (Chapter 14), by **impersonating** it (section 14.6), through Workload
+> Identity Federation (Chapters 16 and 21), or, the option to avoid, with a
+> downloaded key file. A service account is also a resource: roles on the
+> service account itself, such as `roles/iam.serviceAccountTokenCreator`,
+> decide who may act as it.
+>
+> Your project's IAM page also lists **service agents**: service accounts
+> that Google creates to run services on your behalf. Leave them alone.
 
 > **Security tip:** Never commit credentials of any kind to Git. You will add a
 > `.gitignore` file in the next chapter.

@@ -156,6 +156,25 @@ resource "google_storage_bucket_iam_member" "readers" {
 Notice `this` as the resource name: a common convention when a module has one
 main resource of a type.
 
+> [!NOTE]
+> **Google Cloud: managing IAM with Terraform.** For most resources the
+> Google provider offers three kinds of IAM resource, here shown for buckets:
+>
+> | Resource | Manages | Other grants on the bucket |
+> |---|---|---|
+> | `google_storage_bucket_iam_member` | One principal in one role | Left alone |
+> | `google_storage_bucket_iam_binding` | *All* principals of one role | Removed for that role |
+> | `google_storage_bucket_iam_policy` | The whole policy | Removed |
+>
+> `_member` is *non-authoritative* and the safe default. `_binding` and
+> `_policy` are *authoritative*: they make the real policy match your code,
+> which silently removes grants that someone else, or Google, made. Never mix
+> `_policy` with the other two for the same resource, and be very careful with
+> the project-level `google_project_iam_policy`, which can lock you out of
+> your own project. Principals are written with a prefix: `user:`, `group:`,
+> `serviceAccount:`, `domain:`, or the special `allUsers` (anyone on the
+> internet) and `allAuthenticatedUsers` (anyone with a Google account).
+
 **`modules/secure-bucket/outputs.tf`**
 
 ```hcl
